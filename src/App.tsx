@@ -1,30 +1,9 @@
 import React, { useState } from 'react'
-import DatePicker from 'react-datepicker'
 import { useLocalStorage, useEarnings } from './hooks'
 import { formatCurrency } from './utils/calculations'
 import Header from './components/Header'
 import CurrencySelect from './components/CurrencySelect/CurrencySelect'
-
-const TimePicker: React.FC<{
-  label: string
-  selected: Date | null
-  onChange: (date: Date | null) => void
-}> = ({ label, selected, onChange }) => (
-  <div className="mb-4 flex-1">
-    <label className="mb-2 block text-gray-300">{label}</label>
-    <DatePicker
-      selected={selected}
-      onChange={onChange}
-      showTimeSelect
-      showTimeSelectOnly
-      timeIntervals={30}
-      timeCaption={label}
-      dateFormat="HH:mm"
-      timeFormat="HH:mm"
-      className="w-full rounded p-2 outline outline-gray-200/20"
-    />
-  </div>
-)
+import TimePicker from './components/TimePicker'
 
 const App: React.FC = () => {
   const [monthlySalary, setMonthlySalary] = useLocalStorage('monthlySalary', 0)
@@ -91,7 +70,7 @@ const App: React.FC = () => {
               type="number"
               value={monthlySalary}
               onChange={handleSetMonthlySalary}
-              className="w-full rounded p-2 outline outline-gray-200/20"
+              className="w-full rounded border border-gray-200/20 bg-gray-400/10 p-2 outline-gray-200/20"
             />
           </div>
           <div>
@@ -102,7 +81,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mb-4">
           <TimePicker
             label="Start Working Hour"
             selected={startHour}
@@ -122,24 +101,27 @@ const App: React.FC = () => {
           onCurrencyChange={handleSetEarningsCurrency}
         />
 
-        <div className="h-full w-full rounded-md border border-gray-200/20 bg-gray-950 bg-opacity-50 p-4 pb-8 shadow-lg">
-          <div className="mb-2 flex items-end justify-between gap-2">
-            <div className="text-xl font-bold text-gray-200">
-              Current earnings:{' '}
-              {formatCurrency(currentEarnings, earningsCurrency)}
+        <div className="h-full w-full overflow-hidden rounded-md border border-gray-200/20 bg-gray-400/10 p-4 shadow-lg">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <div className="mb-2 text-2xl font-bold text-gray-200">
+                <div className="text-xl text-gray-300">Current earnings:</div>
+                {formatCurrency(currentEarnings, earningsCurrency)}
+              </div>
+              <div className="mb-10 text-lg text-gray-200">
+                Today: {formatCurrency(dayEarnings, earningsCurrency)}
+              </div>
+              <div className="text-lg text-gray-300">
+                Month salary: {formatCurrency(monthEarnings, earningsCurrency)}
+              </div>
+              <div className="text-xs text-gray-500">
+                Exchange Rate: {exchangeRate} {earningsCurrency}/
+                {monthlySalaryCurrency}
+              </div>
             </div>
-            <img width={40} src="/images/party-popper.gif" alt="" />
-          </div>
-
-          <div className="mb-8 text-lg text-gray-200">
-            Today: {formatCurrency(dayEarnings, earningsCurrency)}
-          </div>
-          <div className="text-lg text-gray-300">
-            Month salary: {formatCurrency(monthEarnings, earningsCurrency)}
-          </div>
-          <div className="text-xs text-gray-500">
-            Exchange Rate: {exchangeRate} {earningsCurrency}/
-            {monthlySalaryCurrency}
+            {currentEarnings > 0 && (
+              <img width={90} src="/images/money-flying.gif" alt="" />
+            )}
           </div>
         </div>
       </div>
@@ -148,3 +130,4 @@ const App: React.FC = () => {
 }
 
 export default App
+//TODO: add onboarding tooltips
