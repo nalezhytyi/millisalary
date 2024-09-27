@@ -7,7 +7,7 @@ const Header = () => {
       <img
         className="self-end"
         width={40}
-        src="/images/money-face.gif"
+        src="images/money-face.gif"
         alt=""
       />
       <div className="group relative ml-auto">
