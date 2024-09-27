@@ -120,7 +120,7 @@ const App: React.FC = () => {
               </div>
             </div>
             {currentEarnings > 0 && (
-              <img width={90} src="/images/money-flying.gif" alt="" />
+              <img width={90} src="images/money-flying.gif" alt="" />
             )}
           </div>
         </div>

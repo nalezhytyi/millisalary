@@ -7,4 +7,15 @@ export default defineConfig({
     open: true,
     port: 3000,
   },
+  base: '/millisalary/',
+  build: {
+    outDir: 'build',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react'],
+        },
+      },
+    },
+  },
 })
