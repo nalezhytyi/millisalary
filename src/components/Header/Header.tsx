@@ -25,7 +25,7 @@ const Header = () => {
             d="M13 16h-1v-4h-1m0-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
           />
         </svg>
-        <div className="absolute right-full top-full mb-2 hidden w-32 min-w-96 flex-col gap-2 rounded bg-[#161834] p-2 text-xs text-white opacity-0 transition-opacity duration-300 ease-in-out group-hover:flex group-hover:opacity-100">
+        <div className="absolute right-full top-full mb-2 hidden w-60 md:w-32 md:min-w-96 flex-col gap-2 rounded bg-[#161834] p-2 text-xs text-white opacity-0 transition-opacity duration-300 ease-in-out group-hover:flex group-hover:opacity-100">
           <p>
             Application designed to help users track their earnings based on
             their monthly salary and working hours.
