@@ -94,5 +94,7 @@ export const formatCurrency = (amount: number, currency: string): string => {
     currency: currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount)
+  })
+    .format(amount)
+    .replace(/\u00A0/g, ' ')
 }

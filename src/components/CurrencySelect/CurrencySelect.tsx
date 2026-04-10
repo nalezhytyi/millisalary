@@ -5,6 +5,7 @@ interface CurrencySelectProps {
   onCurrencyChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
   label?: string
   infoText?: string
+  infoAlign?: 'start' | 'end'
   className?: string
 }
 
@@ -15,13 +16,19 @@ const CurrencySelect: React.FC<CurrencySelectProps> = ({
   onCurrencyChange,
   label,
   infoText,
+  infoAlign,
   className,
 }) => {
   return (
     <div className={className}>
       {label &&
         (infoText ? (
-          <InfoLabel className="mb-2" label={label} info={infoText} />
+          <InfoLabel
+            className="mb-2"
+            label={label}
+            info={infoText}
+            align={infoAlign}
+          />
         ) : (
           <label className="mb-2 block text-gray-300">{label}</label>
         ))}

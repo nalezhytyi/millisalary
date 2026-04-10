@@ -2,9 +2,17 @@ import { WORKING_HOURS_PER_DAY } from '../constants'
 
 export const parseSalaryInputValue = (value: string) => Number(value)
 
+export const normalizeWorkingDays = (value: number) => {
+  if (!Number.isFinite(value) || value <= 0) {
+    return 1
+  }
+
+  return Math.min(value, 31)
+}
+
 export const normalizeWorkingHoursPerDay = (value: number) => {
   if (value > 0) {
-    return value
+    return Math.min(value, 24)
   }
 
   return WORKING_HOURS_PER_DAY
