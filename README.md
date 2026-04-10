@@ -43,6 +43,12 @@ Start the development server:
 npm run dev
 ```
 
+Expose the dev server on your network:
+
+```bash
+npm run dev:host
+```
+
 The Vite dev server runs on:
 
 ```bash
@@ -55,6 +61,12 @@ Run the local development server:
 
 ```bash
 npm run dev
+```
+
+Run the local development server and bind to `0.0.0.0`:
+
+```bash
+npm run dev:host
 ```
 
 Create a production build:
