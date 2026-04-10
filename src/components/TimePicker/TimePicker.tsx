@@ -5,9 +5,10 @@ import InfoLabel from '../InfoLabel'
 const TimePicker: FC<{
   label: string
   infoText?: string
+  infoAlign?: 'start' | 'end'
   selected: Date | null
   onChange: (date: Date | null) => void
-}> = ({ label, infoText, selected, onChange }) => {
+}> = ({ label, infoText, infoAlign, selected, onChange }) => {
   const onDatepickerRef = (el: DatePicker | null) => {
     if (
       el &&
@@ -20,7 +21,12 @@ const TimePicker: FC<{
   return (
     <div className="flex-1">
       {infoText ? (
-        <InfoLabel className="mb-2" label={label} info={infoText} />
+        <InfoLabel
+          className="mb-2"
+          label={label}
+          info={infoText}
+          align={infoAlign}
+        />
       ) : (
         <label className="mb-2 block text-gray-300">{label}</label>
       )}

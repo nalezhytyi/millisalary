@@ -7,6 +7,8 @@ import {
   getEndHourFromStart,
   getNextEndAndStartHours,
   getNextStartAndEndHours,
+  normalizeWorkingDays,
+  normalizeWorkingHoursPerDay,
   parseSalaryInputValue,
 } from '../utils/salaryForm'
 import { useEarnings } from './useEarnings'
@@ -86,7 +88,9 @@ export const useAppState = () => {
   const handleSetWorkingHoursPerDay = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const nextWorkingHoursPerDay = parseSalaryInputValue(event.target.value)
+    const nextWorkingHoursPerDay = normalizeWorkingHoursPerDay(
+      parseSalaryInputValue(event.target.value)
+    )
 
     setWorkingHoursPerDay(nextWorkingHoursPerDay)
     if (startHour) {
@@ -97,7 +101,7 @@ export const useAppState = () => {
   const handleSetWorkingDays = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setWorkingDays(parseSalaryInputValue(event.target.value))
+    setWorkingDays(normalizeWorkingDays(parseSalaryInputValue(event.target.value)))
   }
 
   const handleStartHourChange = (date: Date | null) => {

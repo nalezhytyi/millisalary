@@ -78,10 +78,12 @@ const SalaryInputs: React.FC<SalaryInputsProps> = ({
             className="mb-2"
             label="Working Days / Month"
             info="How many working days you expect in this month."
+            align="start"
           />
           <input
             type="number"
             min="1"
+            max="31"
             step="1"
             value={workingDays}
             onChange={onWorkingDaysChange}
@@ -93,10 +95,12 @@ const SalaryInputs: React.FC<SalaryInputsProps> = ({
             className="mb-2"
             label="Working Hours / Day"
             info="How many hours you usually work in one full workday."
+            align="end"
           />
           <input
             type="number"
             min="0.5"
+            max="24"
             step="0.5"
             value={workingHoursPerDay}
             onChange={onWorkingHoursPerDayChange}
@@ -109,12 +113,14 @@ const SalaryInputs: React.FC<SalaryInputsProps> = ({
         <TimePicker
           label="Start Time"
           infoText="Time when you start working."
+          infoAlign="start"
           selected={startHour}
           onChange={onStartHourChange}
         />
         <TimePicker
           label="End Time"
           infoText="Time when you finish working."
+          infoAlign="end"
           selected={endHour}
           onChange={onEndHourChange}
         />
@@ -124,6 +130,7 @@ const SalaryInputs: React.FC<SalaryInputsProps> = ({
         className="mb-4"
         label="Earnings Currency"
         infoText="Currency used to display your calculated earnings."
+        infoAlign="start"
         selectedCurrency={earningsCurrency}
         onCurrencyChange={onEarningsCurrencyChange}
       />

@@ -2,14 +2,25 @@ interface InfoLabelProps {
   label: string
   info: string
   className?: string
+  align?: 'start' | 'end'
 }
 
-const InfoLabel: React.FC<InfoLabelProps> = ({ label, info, className }) => {
+const InfoLabel: React.FC<InfoLabelProps> = ({
+  label,
+  info,
+  className,
+  align = 'start',
+}) => {
+  const popoverPositionClasses =
+    align === 'end' ? 'right-0' : 'left-0'
+
   return (
     <div className={className}>
-      <div className="group relative inline-flex items-center">
+      <div className="group relative inline-flex max-w-full items-center">
         <label className="block cursor-help text-gray-300">{label}</label>
-        <div className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 w-56 rounded-md border border-gray-200/15 bg-slate-950/95 px-3 py-2 text-xs leading-relaxed text-gray-200 opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
+        <div
+          className={`pointer-events-none absolute bottom-full z-10 mb-2 w-56 max-w-[calc(100vw-2rem)] rounded-md border border-gray-200/15 bg-slate-950/95 px-3 py-2 text-xs leading-relaxed text-gray-200 opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 ${popoverPositionClasses}`}
+        >
           {info}
         </div>
       </div>

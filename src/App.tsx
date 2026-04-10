@@ -44,7 +44,7 @@ const App: React.FC = () => {
         onBackgroundChange={handleBackgroundChange}
       />
       <Header onSettingsClick={handleSettingsClick} />
-      <div className="container mx-auto max-w-md p-4">
+      <div className="w-full px-4 py-4 sm:mx-auto sm:max-w-md">
         <SalaryInputs
           monthlySalary={monthlySalary}
           monthlySalaryCurrency={monthlySalaryCurrency}
