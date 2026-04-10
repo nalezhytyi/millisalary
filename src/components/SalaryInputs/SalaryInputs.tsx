@@ -58,9 +58,11 @@ const SalaryInputs: React.FC<SalaryInputsProps> = ({
         <div className="flex-1">
           <input
             type="number"
+            inputMode="numeric"
             value={monthlySalary}
             onChange={onMonthlySalaryChange}
             onBlur={onMonthlySalaryBlur}
+            onFocus={(e) => e.target.select()}
             className={fieldClasses}
           />
         </div>
@@ -82,11 +84,13 @@ const SalaryInputs: React.FC<SalaryInputsProps> = ({
           />
           <input
             type="number"
+            inputMode="numeric"
             min="1"
             max="31"
             step="1"
             value={workingDays}
             onChange={onWorkingDaysChange}
+            onFocus={(e) => e.target.select()}
             className={fieldClasses}
           />
         </div>
@@ -99,11 +103,13 @@ const SalaryInputs: React.FC<SalaryInputsProps> = ({
           />
           <input
             type="number"
+            inputMode="numeric"
             min="0.5"
             max="24"
             step="0.5"
             value={workingHoursPerDay}
             onChange={onWorkingHoursPerDayChange}
+            onFocus={(e) => e.target.select()}
             className={fieldClasses}
           />
         </div>
