@@ -1,0 +1,160 @@
+import React, { useCallback, useState } from 'react'
+import { trackAmplitudeEvent } from '../amplitude'
+import { WORKING_DAYS, WORKING_HOURS_PER_DAY } from '../constants'
+import {
+  calculateWorkingHoursPerDayValue,
+  formatEventTime,
+  getEndHourFromStart,
+  getNextEndAndStartHours,
+  getNextStartAndEndHours,
+  parseSalaryInputValue,
+} from '../utils/salaryForm'
+import { useEarnings } from './useEarnings'
+import { useLocalStorage } from './useLocalStorage'
+
+export const useAppState = () => {
+  const [monthlySalary, setMonthlySalary] = useLocalStorage('monthlySalary', 0)
+  const [monthlySalaryCurrency, setMonthlySalaryCurrency] = useLocalStorage(
+    'monthlySalaryCurrency',
+    'USD'
+  )
+  const [earningsCurrency, setEarningsCurrency] = useLocalStorage(
+    'earningsCurrency',
+    'UAH'
+  )
+  const [workingHoursPerDay, setWorkingHoursPerDay] = useLocalStorage(
+    'workingHoursPerDay',
+    WORKING_HOURS_PER_DAY
+  )
+  const [workingDays, setWorkingDays] = useLocalStorage(
+    'workingDays',
+    WORKING_DAYS
+  )
+  const [startHour, setStartHour] = useState<Date | null>(new Date())
+  const [endHour, setEndHour] = useState<Date | null>(new Date())
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const {
+    currentEarnings,
+    monthEarnings,
+    dayEarnings,
+    totalDayEarnings,
+    exchangeRate,
+  } = useEarnings(
+    monthlySalary,
+    monthlySalaryCurrency,
+    earningsCurrency,
+    startHour,
+    endHour,
+    workingDays,
+    workingHoursPerDay
+  )
+
+  const handleSetMonthlySalary = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setMonthlySalary(parseSalaryInputValue(event.target.value))
+  }
+
+  const handleMonthlySalaryBlur = useCallback(() => {
+    trackAmplitudeEvent('salary_input_blurred', {
+      salary_value: monthlySalary,
+      has_salary_value: monthlySalary > 0,
+    })
+  }, [monthlySalary])
+
+  const handleSetMonthlySalaryCurrency = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const nextCurrency = event.target.value
+    setMonthlySalaryCurrency(nextCurrency)
+    trackAmplitudeEvent('salary_currency_changed', {
+      currency: nextCurrency,
+    })
+  }
+
+  const handleSetEarningsCurrency = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const nextCurrency = event.target.value
+    setEarningsCurrency(nextCurrency)
+    trackAmplitudeEvent('earnings_currency_changed', {
+      currency: nextCurrency,
+    })
+  }
+
+  const handleSetWorkingHoursPerDay = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const nextWorkingHoursPerDay = parseSalaryInputValue(event.target.value)
+
+    setWorkingHoursPerDay(nextWorkingHoursPerDay)
+    if (startHour) {
+      setEndHour(getEndHourFromStart(startHour, nextWorkingHoursPerDay))
+    }
+  }
+
+  const handleSetWorkingDays = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setWorkingDays(parseSalaryInputValue(event.target.value))
+  }
+
+  const handleStartHourChange = (date: Date | null) => {
+    const nextHours = getNextStartAndEndHours(date, endHour, workingHoursPerDay)
+
+    setStartHour(nextHours.startHour)
+    setEndHour(nextHours.endHour)
+    trackAmplitudeEvent('workday_start_time_changed', {
+      start_time: formatEventTime(date),
+    })
+  }
+
+  const handleEndHourChange = (date: Date | null) => {
+    const nextHours = getNextEndAndStartHours(date, startHour)
+
+    setStartHour(nextHours.startHour)
+    setEndHour(nextHours.endHour)
+    setWorkingHoursPerDay(
+      calculateWorkingHoursPerDayValue(nextHours.startHour, nextHours.endHour)
+    )
+    trackAmplitudeEvent('workday_end_time_changed', {
+      end_time: formatEventTime(date),
+    })
+  }
+
+  const handleSettingsClick = useCallback(() => {
+    setIsSidebarOpen(true)
+    trackAmplitudeEvent('settings_clicked')
+  }, [])
+
+  const handleCloseSidebar = useCallback(() => {
+    setIsSidebarOpen(false)
+  }, [])
+
+  return {
+    monthlySalary,
+    monthlySalaryCurrency,
+    earningsCurrency,
+    workingHoursPerDay,
+    workingDays,
+    startHour,
+    endHour,
+    isSidebarOpen,
+    currentEarnings,
+    monthEarnings,
+    dayEarnings,
+    totalDayEarnings,
+    exchangeRate,
+    handleSetMonthlySalary,
+    handleMonthlySalaryBlur,
+    handleSetMonthlySalaryCurrency,
+    handleSetEarningsCurrency,
+    handleSetWorkingHoursPerDay,
+    handleSetWorkingDays,
+    handleStartHourChange,
+    handleEndHourChange,
+    handleSettingsClick,
+    handleCloseSidebar,
+  }
+}
