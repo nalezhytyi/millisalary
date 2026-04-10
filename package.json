@@ -12,18 +12,22 @@
     "deploy": "gh-pages -d build"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "2.39.0",
+    "@amplitude/plugin-session-replay-browser": "1.27.7",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "dayjs": "^1.11.13",
-    "react": "^18.3.1",
-    "react-datepicker": "^7.4.0",
-    "react-dom": "^18.3.1"
+    "ogl": "^1.0.11",
+    "react": "^19.2.5",
+    "react-datepicker": "^9.1.0",
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@types/node": "^22.7.2",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.9.0",
@@ -37,7 +41,8 @@
     "tailwindcss": "^3.4.13",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
+    "vite": "^5.4.1",
+    "vite-plugin-pwa": "^1.2.0"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

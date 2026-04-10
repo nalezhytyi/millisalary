@@ -1,11 +1,13 @@
 import { FC } from 'react'
 import DatePicker from 'react-datepicker'
+import InfoLabel from '../InfoLabel'
 
 const TimePicker: FC<{
   label: string
+  infoText?: string
   selected: Date | null
   onChange: (date: Date | null) => void
-}> = ({ label, selected, onChange }) => {
+}> = ({ label, infoText, selected, onChange }) => {
   const onDatepickerRef = (el: DatePicker | null) => {
     if (
       el &&
@@ -17,7 +19,11 @@ const TimePicker: FC<{
   }
   return (
     <div className="flex-1">
-      <label className="mb-2 block text-gray-300">{label}</label>
+      {infoText ? (
+        <InfoLabel className="mb-2" label={label} info={infoText} />
+      ) : (
+        <label className="mb-2 block text-gray-300">{label}</label>
+      )}
       <DatePicker
         selected={selected}
         onChange={onChange}
@@ -28,7 +34,8 @@ const TimePicker: FC<{
         dateFormat="HH:mm"
         timeFormat="HH:mm"
         ref={(el) => onDatepickerRef(el)}
-        className="w-full rounded border border-gray-200/20 bg-gray-400/10 p-2 outline-gray-200/20"
+        wrapperClassName="w-full"
+        className="w-full rounded border border-gray-200/20 bg-gray-400/10 p-2 text-gray-200 outline-gray-200/20 backdrop-blur-md"
       />
     </div>
   )
