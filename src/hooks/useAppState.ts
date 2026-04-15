@@ -32,6 +32,10 @@ export const useAppState = () => {
     'workingDays',
     WORKING_DAYS
   )
+  const [isInputsCollapsed, setIsInputsCollapsed] = useLocalStorage(
+    'isInputsCollapsed',
+    false
+  )
   const [startHour, setStartHour] = useState<Date | null>(new Date())
   const [endHour, setEndHour] = useState<Date | null>(new Date())
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -136,12 +140,25 @@ export const useAppState = () => {
     setIsSidebarOpen(false)
   }, [])
 
+  const handleToggleInputsCollapsed = useCallback(() => {
+    setIsInputsCollapsed((previousValue) => {
+      const nextValue = !previousValue
+
+      trackAmplitudeEvent('inputs_collapsed_toggled', {
+        is_inputs_collapsed: nextValue,
+      })
+
+      return nextValue
+    })
+  }, [setIsInputsCollapsed])
+
   return {
     monthlySalary,
     monthlySalaryCurrency,
     earningsCurrency,
     workingHoursPerDay,
     workingDays,
+    isInputsCollapsed,
     startHour,
     endHour,
     isSidebarOpen,
@@ -160,5 +177,6 @@ export const useAppState = () => {
     handleEndHourChange,
     handleSettingsClick,
     handleCloseSidebar,
+    handleToggleInputsCollapsed,
   }
 }
