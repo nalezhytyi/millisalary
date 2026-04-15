@@ -12,6 +12,7 @@ const App: React.FC = () => {
     earningsCurrency,
     workingHoursPerDay,
     workingDays,
+    isInputsCollapsed,
     startHour,
     endHour,
     isSidebarOpen,
@@ -30,6 +31,7 @@ const App: React.FC = () => {
     handleEndHourChange,
     handleSettingsClick,
     handleCloseSidebar,
+    handleToggleInputsCollapsed,
   } = useAppState()
   const { background, backgroundComponent, handleBackgroundChange } =
     useBackground()
@@ -42,26 +44,32 @@ const App: React.FC = () => {
         onClose={handleCloseSidebar}
         selectedBackground={background}
         onBackgroundChange={handleBackgroundChange}
+        isInputsCollapsed={isInputsCollapsed}
+        onToggleInputsCollapsed={handleToggleInputsCollapsed}
       />
       <Header onSettingsClick={handleSettingsClick} />
       <div className="w-full px-4 py-4 sm:mx-auto sm:max-w-md">
-        <SalaryInputs
-          monthlySalary={monthlySalary}
-          monthlySalaryCurrency={monthlySalaryCurrency}
-          earningsCurrency={earningsCurrency}
-          workingHoursPerDay={workingHoursPerDay}
-          workingDays={workingDays}
-          startHour={startHour}
-          endHour={endHour}
-          onMonthlySalaryChange={handleSetMonthlySalary}
-          onMonthlySalaryBlur={handleMonthlySalaryBlur}
-          onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
-          onEarningsCurrencyChange={handleSetEarningsCurrency}
-          onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
-          onWorkingDaysChange={handleSetWorkingDays}
-          onStartHourChange={handleStartHourChange}
-          onEndHourChange={handleEndHourChange}
-        />
+        {!isInputsCollapsed && (
+          <div id="salary-inputs-panel">
+            <SalaryInputs
+              monthlySalary={monthlySalary}
+              monthlySalaryCurrency={monthlySalaryCurrency}
+              earningsCurrency={earningsCurrency}
+              workingHoursPerDay={workingHoursPerDay}
+              workingDays={workingDays}
+              startHour={startHour}
+              endHour={endHour}
+              onMonthlySalaryChange={handleSetMonthlySalary}
+              onMonthlySalaryBlur={handleMonthlySalaryBlur}
+              onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
+              onEarningsCurrencyChange={handleSetEarningsCurrency}
+              onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
+              onWorkingDaysChange={handleSetWorkingDays}
+              onStartHourChange={handleStartHourChange}
+              onEndHourChange={handleEndHourChange}
+            />
+          </div>
+        )}
         <EarningsSummary
           currentEarnings={currentEarnings}
           dayEarnings={dayEarnings}
