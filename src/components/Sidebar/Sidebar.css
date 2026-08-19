@@ -20,7 +20,9 @@
   position: fixed;
   top: 0;
   right: 0;
-  height: 100vh;
+  /* Anchor to both edges instead of height: 100vh — iOS standalone PWAs
+     compute vh without the status-bar area, leaving a gap at the bottom. */
+  bottom: 0;
   width: 380px;
   background: linear-gradient(135deg, rgba(22, 24, 52, 0.3) 0%, rgba(55, 59, 127, 0.3) 100%);
   backdrop-filter: blur(20px);
