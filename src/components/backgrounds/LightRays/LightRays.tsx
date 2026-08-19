@@ -300,7 +300,11 @@ void main() {
         }
       };
 
-      window.addEventListener('resize', updatePlacement);
+      // ResizeObserver, not window resize: iOS standalone PWAs settle the
+      // viewport after first paint without firing a resize event, which would
+      // leave the canvas pinned to its stale mount-time height.
+      const resizeObserver = new ResizeObserver(updatePlacement);
+      resizeObserver.observe(containerRef.current);
       updatePlacement();
       animationIdRef.current = requestAnimationFrame(loop);
 
@@ -310,7 +314,7 @@ void main() {
           animationIdRef.current = null;
         }
 
-        window.removeEventListener('resize', updatePlacement);
+        resizeObserver.disconnect();
 
         if (renderer) {
           try {

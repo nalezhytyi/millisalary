@@ -145,7 +145,11 @@ const Aurora = () => {
         program.uniforms.uResolution.value = [width, height];
       }
     }
-    window.addEventListener('resize', resize);
+    // ResizeObserver, not window resize: iOS standalone PWAs settle the
+    // viewport after first paint without firing a resize event, which would
+    // leave the canvas pinned to its stale mount-time height.
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(ctn);
 
     const geometry = new Triangle(gl);
     if (geometry.attributes.uv) {
@@ -185,7 +189,7 @@ const Aurora = () => {
 
     return () => {
       cancelAnimationFrame(animateId);
-      window.removeEventListener('resize', resize);
+      resizeObserver.disconnect();
       if (ctn && gl.canvas.parentNode === ctn) {
         ctn.removeChild(gl.canvas);
       }
