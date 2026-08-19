@@ -9,10 +9,18 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <script>
+      // iOS home-screen web apps size the layout viewport short of the real
+      // screen (see .ios-standalone rules in index.css). navigator.standalone
+      // is iOS-WebKit-only and true exactly in that mode.
+      if (navigator.standalone) {
+        document.documentElement.classList.add('ios-standalone')
+      }
+    </script>
     <title>Millisalary</title>
-    <script type="module" crossorigin src="/millisalary/assets/index-BAEXANBd.js"></script>
+    <script type="module" crossorigin src="/millisalary/assets/index-CEVrDcyH.js"></script>
     <link rel="modulepreload" crossorigin href="/millisalary/assets/vendor-C7k4LvGd.js">
-    <link rel="stylesheet" crossorigin href="/millisalary/assets/index-DJdWQaj-.css">
+    <link rel="stylesheet" crossorigin href="/millisalary/assets/index-CN-yV5ws.css">
   <link rel="manifest" href="/millisalary/manifest.webmanifest"></head>
   <body>
     <div id="root"></div>
