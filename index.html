@@ -9,6 +9,14 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <script>
+      // iOS home-screen web apps size the layout viewport short of the real
+      // screen (see .ios-standalone rules in index.css). navigator.standalone
+      // is iOS-WebKit-only and true exactly in that mode.
+      if (navigator.standalone) {
+        document.documentElement.classList.add('ios-standalone')
+      }
+    </script>
     <title>Millisalary</title>
   </head>
   <body>
