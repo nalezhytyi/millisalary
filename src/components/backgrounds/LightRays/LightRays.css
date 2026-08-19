@@ -6,3 +6,12 @@
   z-index: 3;
   overflow: hidden;
 }
+
+/* OGL's setSize writes inline pixel width/height on the canvas, measured once
+   at mount. !important keeps the box filling the container even if that
+   measurement is stale — otherwise iOS PWAs show a gap in the bottom safe area. */
+.light-rays-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}

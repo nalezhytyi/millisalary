@@ -245,7 +245,11 @@ export default function Galaxy({
         );
       }
     }
-    window.addEventListener('resize', resize, false);
+    // ResizeObserver, not window resize: iOS standalone PWAs settle the
+    // viewport after first paint without firing a resize event, which would
+    // leave the canvas pinned to its stale mount-time height.
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(ctn);
     resize();
 
     const geometry = new Triangle(gl);
@@ -325,7 +329,7 @@ export default function Galaxy({
 
     return () => {
       cancelAnimationFrame(animateId);
-      window.removeEventListener('resize', resize);
+      resizeObserver.disconnect();
       if (mouseInteraction) {
         ctn.removeEventListener('mousemove', handleMouseMove);
         ctn.removeEventListener('mouseleave', handleMouseLeave);

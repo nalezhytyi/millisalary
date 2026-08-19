@@ -116,7 +116,11 @@ const DarkVeil = () => {
       program.uniforms.uResolution.value.set(w, h);
     };
 
-    window.addEventListener('resize', resize);
+    // ResizeObserver, not window resize: iOS standalone PWAs settle the
+    // viewport after first paint without firing a resize event, which would
+    // leave the canvas pinned to its stale mount-time height.
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(parent);
     resize();
 
     const start = performance.now();
@@ -132,7 +136,7 @@ const DarkVeil = () => {
 
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener('resize', resize);
+      resizeObserver.disconnect();
     };
   }, [])
   return <canvas ref={ref} className="darkveil-canvas" />;
