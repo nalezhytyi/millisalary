@@ -24,6 +24,32 @@ body {
   padding: 0;
 }
 
+/* iOS standalone (home-screen) web apps anchor the layout viewport at the top
+   of the screen (viewport-fit=cover) but size it to screen minus the status
+   bar and never resize it, and WebKit clips the painting of position: fixed
+   layers to that short viewport — leaving a status-bar-sized band of bare
+   html background at the physical bottom. Absolutely-positioned layers DO
+   paint into that band, so in standalone mode the full-screen layers switch
+   to absolute and grow by the status-bar height; html becomes a non-scrolling
+   shell (the oversized layers must not make the page scrollable) and body the
+   content scroller. The .ios-standalone class is set in index.html from
+   navigator.standalone, which is true exactly in that mode. */
+html.ios-standalone {
+  height: 100%;
+  overflow: hidden;
+}
+.ios-standalone body {
+  height: 100%;
+  overflow-y: auto;
+}
+.ios-standalone .app-background,
+.ios-standalone .sidebar,
+.ios-standalone .sidebar-overlay {
+  position: absolute;
+  bottom: auto;
+  height: calc(100% + env(safe-area-inset-top));
+}
+
 input:focus,
 input:focus-visible,
 select:focus,

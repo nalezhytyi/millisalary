@@ -38,7 +38,9 @@ const App: React.FC = () => {
 
   return (
     <>
-      <div className="fixed inset-0 -z-10">{backgroundComponent}</div>
+      <div className="app-background fixed inset-0 -z-10">
+        {backgroundComponent}
+      </div>
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleCloseSidebar}
