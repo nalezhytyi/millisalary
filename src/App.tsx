@@ -48,7 +48,7 @@ const App: React.FC = () => {
         onToggleInputsCollapsed={handleToggleInputsCollapsed}
       />
       <Header onSettingsClick={handleSettingsClick} />
-      <div className="w-full px-4 py-4 sm:mx-auto sm:max-w-md">
+      <div className="w-full px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:mx-auto sm:max-w-md">
         {!isInputsCollapsed && (
           <div id="salary-inputs-panel">
             <SalaryInputs
