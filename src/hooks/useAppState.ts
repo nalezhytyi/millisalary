@@ -1,18 +1,28 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { trackAmplitudeEvent } from '../amplitude'
 import { WORKING_DAYS, WORKING_HOURS_PER_DAY } from '../constants'
 import {
   calculateWorkingHoursPerDayValue,
   formatEventTime,
+  formatTimeInputValue,
   getEndHourFromStart,
   getNextEndAndStartHours,
   getNextStartAndEndHours,
   normalizeWorkingDays,
   normalizeWorkingHoursPerDay,
   parseSalaryInputValue,
+  parseTimeInputValue,
 } from '../utils/salaryForm'
 import { useEarnings } from './useEarnings'
 import { useLocalStorage } from './useLocalStorage'
+
+const DEFAULT_START_HOUR = '09:00'
+const DEFAULT_END_HOUR = formatTimeInputValue(
+  getEndHourFromStart(
+    parseTimeInputValue(DEFAULT_START_HOUR, null)!,
+    WORKING_HOURS_PER_DAY
+  )
+)
 
 export const useAppState = () => {
   const [monthlySalary, setMonthlySalary] = useLocalStorage('monthlySalary', 0)
@@ -36,8 +46,30 @@ export const useAppState = () => {
     'isInputsCollapsed',
     false
   )
-  const [startHour, setStartHour] = useState<Date | null>(new Date())
-  const [endHour, setEndHour] = useState<Date | null>(new Date())
+  const [startHourValue, setStartHourValue] = useLocalStorage(
+    'startHour',
+    DEFAULT_START_HOUR
+  )
+  const [endHourValue, setEndHourValue] = useLocalStorage(
+    'endHour',
+    DEFAULT_END_HOUR
+  )
+  const startHour = useMemo(
+    () => parseTimeInputValue(startHourValue, null),
+    [startHourValue]
+  )
+  const endHour = useMemo(
+    () => parseTimeInputValue(endHourValue, null),
+    [endHourValue]
+  )
+  const setStartHour = useCallback(
+    (date: Date | null) => setStartHourValue(formatTimeInputValue(date)),
+    [setStartHourValue]
+  )
+  const setEndHour = useCallback(
+    (date: Date | null) => setEndHourValue(formatTimeInputValue(date)),
+    [setEndHourValue]
+  )
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const {

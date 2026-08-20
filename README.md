@@ -18,7 +18,7 @@ It also includes installable PWA support and animated backgrounds.
 - Installable PWA setup with service worker and manifest
 - Multiple animated background themes
 - Amplitude Analytics + Session Replay instrumentation
-- Mobile-friendly time input behavior
+- Native time input for workday start/end
 
 ## Tech Stack
 
@@ -26,7 +26,6 @@ It also includes installable PWA support and animated backgrounds.
 - TypeScript
 - Vite
 - Tailwind CSS
-- `react-datepicker`
 - `vite-plugin-pwa`
 
 ## Getting Started

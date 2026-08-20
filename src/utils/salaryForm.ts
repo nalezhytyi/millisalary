@@ -56,6 +56,34 @@ export const formatEventTime = (date: Date | null) => {
   })
 }
 
+export const formatTimeInputValue = (date: Date | null) => {
+  if (!date) {
+    return ''
+  }
+
+  return [date.getHours(), date.getMinutes()]
+    .map((part) => String(part).padStart(2, '0'))
+    .join(':')
+}
+
+export const parseTimeInputValue = (
+  value: string,
+  reference: Date | null
+) => {
+  const match = /^(\d{2}):(\d{2})$/.exec(value)
+
+  if (!match) {
+    return null
+  }
+
+  const [, hours, minutes] = match
+  const result = reference ? new Date(reference) : new Date()
+
+  result.setHours(Number(hours), Number(minutes), 0, 0)
+
+  return result
+}
+
 export const getNextStartAndEndHours = (
   nextStartHour: Date | null,
   currentEndHour: Date | null,
