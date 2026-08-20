@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App.tsx'
 import { initAmplitude } from './amplitude'
-import 'react-datepicker/dist/react-datepicker.css'
 import './index.css'
 
 void initAmplitude()

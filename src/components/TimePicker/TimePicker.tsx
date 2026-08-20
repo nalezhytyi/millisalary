@@ -1,6 +1,7 @@
 import { FC } from 'react'
-import DatePicker from 'react-datepicker'
 import InfoLabel from '../InfoLabel'
+import { formatTimeInputValue, parseTimeInputValue } from '../../utils/salaryForm'
+import './TimePicker.css'
 
 const TimePicker: FC<{
   label: string
@@ -9,17 +10,8 @@ const TimePicker: FC<{
   selected: Date | null
   onChange: (date: Date | null) => void
 }> = ({ label, infoText, infoAlign, selected, onChange }) => {
-  const onDatepickerRef = (el: DatePicker | null) => {
-    if (
-      el &&
-      el.input &&
-      /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-    ) {
-      el.input.setAttribute('readOnly', 'true')
-    }
-  }
   return (
-    <div className="flex-1">
+    <div className="min-w-0 flex-1">
       {infoText ? (
         <InfoLabel
           className="mb-2"
@@ -30,18 +22,15 @@ const TimePicker: FC<{
       ) : (
         <label className="mb-2 block text-gray-300">{label}</label>
       )}
-      <DatePicker
-        selected={selected}
-        onChange={onChange}
-        showTimeSelect
-        showTimeSelectOnly
-        timeIntervals={30}
-        timeCaption={label}
-        dateFormat="HH:mm"
-        timeFormat="HH:mm"
-        ref={(el) => onDatepickerRef(el)}
-        wrapperClassName="w-full"
-        className="w-full rounded border border-gray-200/20 bg-gray-400/10 p-2 text-gray-200 outline-gray-200/20 backdrop-blur-md"
+      <input
+        type="time"
+        step={60}
+        aria-label={label}
+        value={formatTimeInputValue(selected)}
+        onChange={(event) =>
+          onChange(parseTimeInputValue(event.target.value, selected))
+        }
+        className="time-picker-input w-full rounded border border-gray-200/20 bg-gray-400/10 p-2 text-gray-200 outline-gray-200/20 backdrop-blur-md"
       />
     </div>
   )

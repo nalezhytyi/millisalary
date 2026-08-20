@@ -50,6 +50,25 @@ html.ios-standalone {
   height: calc(100% + env(safe-area-inset-top));
 }
 
+/* The closed sidebar is parked a full panel-width to the right via transform.
+   While it is position: fixed (in-browser) that costs nothing, but the rule
+   above makes it absolute — and an absolute box sitting outside the viewport
+   extends the document ~380px to the right. iOS pans the visual viewport to
+   reveal a focused input, and that pan is what slid the whole app sideways
+   when a number input was tapped. Root-level clipping cannot undo it: overflow
+   on html propagates to the viewport (where clip degrades to hidden), and
+   hidden still scrolls programmatically. So in standalone the closed panel
+   stays put and is hidden in place, fading rather than sliding. */
+.ios-standalone .sidebar {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.ios-standalone .sidebar:not(.sidebar-open) {
+  transform: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
 input:focus,
 input:focus-visible,
 select:focus,
@@ -58,39 +77,4 @@ textarea:focus,
 textarea:focus-visible {
   outline: none;
   outline-color: transparent;
-}
-
-.react-datepicker {
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  padding: 2px;
-  background: #2e2e2e;
-}
-
-.react-datepicker__header,
-.react-datepicker__triangle {
-  display: none;
-}
-
-.react-datepicker__time-container .react-datepicker__time {
-  background: #2e2e2e;
-  color: #fff;
-  border-radius: 6px;
-}
-.react-datepicker__time-container
-  .react-datepicker__time
-  .react-datepicker__time-box
-  ul.react-datepicker__time-list
-  li.react-datepicker__time-list-item {
-  margin: 4px;
-  border-radius: 6px;
-}
-
-.react-datepicker__time-container
-  .react-datepicker__time
-  .react-datepicker__time-box
-  ul.react-datepicker__time-list
-  li.react-datepicker__time-list-item:hover {
-  background: #216ba5;
 }
