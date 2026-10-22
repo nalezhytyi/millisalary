@@ -1,29 +1,24 @@
-/* Native <input type="time"> renders its own light-scheme chrome by default.
-   color-scheme flips the built-in picker UI (icon, dropdown) to dark; the
-   pseudo-elements below then align the printed value and recolor the
-   trailing clock icon to match the field's text.
+/* Native <input type="time"> keeps its own picker UI (iOS shows the system
+   wheel). color-scheme is inherited from <html>, which useTheme keeps in sync
+   with the active theme, so the dropdown and icon follow light/dark.
 
-   A time input's intrinsic width (value box + picker chrome) is wider than a
-   plain text input's, and on iOS Safari it exceeds half a phone viewport. As
-   flex items, the two side-by-side fields would refuse to shrink below that
-   intrinsic width — overflowing the row and eating the gap between them — so
-   appearance/min-width here (plus min-w-0 on the flex parent in TimePicker)
-   let them shrink to the space the row actually has. */
+   A time input's intrinsic width (value box + picker chrome) can exceed the
+   space in a flex row on iOS Safari; appearance/min-width let it shrink to
+   what the row actually has. */
 .time-picker-input {
-  color-scheme: dark;
-  min-height: 2.75rem;
+  min-height: 2.25rem;
   -webkit-appearance: none;
   appearance: none;
   min-width: 0;
 }
 
 .time-picker-input::-webkit-date-and-time-value {
-  text-align: left;
+  text-align: right;
 }
 
-/* Chromium versions disagree on whether color-scheme lightens this icon, so
-   brightness(0) flattens it to black first and invert(1) then turns it white;
-   its hairline strokes antialias down to about the gray-200 of the text. */
-.time-picker-input::-webkit-calendar-picker-indicator {
+/* Chromium versions disagree on whether color-scheme recolors this icon, so
+   in dark mode brightness(0) flattens it to black first and invert(1) then
+   turns it white. In light mode its default dark glyph is already right. */
+.dark .time-picker-input::-webkit-calendar-picker-indicator {
   filter: brightness(0) invert(1);
 }

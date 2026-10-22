@@ -157,24 +157,36 @@ updated: 2026-10-22
 
 
 ### Epic 5: Шит налаштувань (кнопка зліва)
-**Status:** pending
+**Status:** approved
 
 **Description:** Усі поля з `SalaryInputs` переїжджають у згрупований список у стилі iOS.
 
 **Subtasks:**
-- [ ] `Drawer` із заголовком «Settings» і кнопкою Done
-- [ ] Секція Salary: місячна зарплата (числове поле, вирівняне праворуч), валюта зарплати, валюта виводу
-- [ ] Секція Schedule: робочих днів на місяць, годин на день, Start, End (зв'язки між полями як зараз)
-- [ ] Секція Payday: день виплати
-- [ ] Секція Appearance: сегмент System / Light / Dark
-- [ ] Підказки з `InfoLabel` (hover на iOS не працює) → підписи під секціями, як в iOS; видалити `InfoLabel`
-- [ ] Видалити `Sidebar` разом із `Sidebar.css`, `isInputsCollapsed` і подію `inputs_collapsed_toggled`
-- [ ] Перевести `CurrencySelect` і `TimePicker` на токени (`color-scheme` за темою, а не жорстко `dark`)
+- [x] `Drawer` із заголовком «Settings» і кнопкою Done
+- [x] Секція Salary: місячна зарплата (числове поле, вирівняне праворуч), валюта зарплати, валюта виводу
+- [x] Секція Schedule: робочих днів на місяць, годин на день, Start, End (зв'язки між полями як зараз)
+- [x] Секція Payday: день виплати
+- [x] Секція Appearance: сегмент System / Light / Dark
+- [x] Підказки з `InfoLabel` (hover на iOS не працює) → підписи під секціями, як в iOS; видалити `InfoLabel`
+- [x] Видалити `Sidebar` разом із `Sidebar.css`, `isInputsCollapsed` і подію `inputs_collapsed_toggled`
+- [x] Перевести `CurrencySelect` і `TimePicker` на токени (`color-scheme` за темою, а не жорстко `dark`)
 
 **Acceptance criteria:**
-- [ ] Зміна будь-якого поля одразу відбивається на циферблаті
-- [ ] Зв'язки Start → End → години/день працюють, як у task 001
-- [ ] На iOS Simulator (standalone, за рецептом з пам'яті) шит не обрізаний знизу; фокус на полі не зсуває додаток убік; тап по select і time відкриває нативне колесо
+- [x] Зміна будь-якого поля одразу відбивається на циферблаті (перевірено: зарплата 6000 USD + години 6 → «272,73 USD earned today, 100%»)
+- [x] Зв'язки Start → End → години/день працюють, як у task 001 (Start 10:00 → End 18:00; End 19:30 → 9.5 год; End 08:00 при Start 10:00 → обидва 08:00; години 6 → End 14:00)
+- [x] ~~На iOS Simulator (standalone) шит не обрізаний знизу; фокус на полі не зсуває додаток убік; тап по select і time відкриває нативне колесо~~ — перенесено в Epic 7 (за рішенням користувача): симулятор не завантажувався, `xcrun simctl` вимагає прийняти ліцензію Xcode (`sudo xcodebuild -license`)
+
+**Примітки до виконання:**
+- Нові файли: `SettingsSheet/` (`SettingsSheet`, `SettingsGroup`, `SettingsRow`) і загальний `SegmentedControl`; `PeriodTabs` тепер тонка обгортка над ним. Видалено `Sidebar` (+ CSS), `InfoLabel`, `SalaryInputs`.
+- Шит: `Drawer` (vaul) на 94dvh з грабером, заголовком «Settings», кнопкою Done, секціями Salary / Schedule / Payday / Appearance у картках з inset-роздільниками. Підказки з `InfoLabel` стали підписами під секціями. Поля 17px, щоб iOS не зумив при фокусі.
+- Правки в згенерованому `ui/drawer.tsx`: оверлей `bg-black/40` без blur, грабер у стилі iOS.
+- `CurrencySelect` і `TimePicker` спрощені до «голих» контролів у рядку: `CurrencySelect` на `NativeSelect` (прибрано base64-стрілку), `TimePicker` без лейбла/InfoLabel. `color-scheme` тепер успадковується від `<html>` (його веде `useTheme`), а не жорстко `dark`; біла інверсія іконки — лише під `.dark`.
+- `useAppState`: `isSidebarOpen` → `isSettingsOpen`, `handleCloseSidebar` → `handleCloseSettings`.
+- Секцію Appearance підключено до `useTheme` — тема тепер перемикається з UI (System/Light/Dark, перевірено Dark наживо).
+- **Правила `.ios-standalone .sidebar*` у `index.css` тепер мертві** — не чіпав, бо не знаю, як поведуть себе `position: fixed` оверлей і контент vaul у standalone. За CLAUDE.md кожен новий повноекранний fixed-шар має входити в цей список; ймовірно, `[data-slot="drawer-overlay"]` і `[data-slot="drawer-content"]` доведеться перевести на absolute (оверлей інакше не затемнить смугу внизу, а шит може зависнути над нею). Це гіпотеза без перевірки.
+- У консолі dev-сервера під час першого завантаження після додавання vaul були «Invalid hook call»; на свіжій вкладці не відтворюються (разовий артефакт переоптимізації Vite).
+- `npm run build` проходить; lint: 0 помилок, 2 попередні warning у `ui/*`.
+
 
 ### Epic 6: Шит Breakdown (кнопка справа)
 **Status:** pending
@@ -201,7 +213,8 @@ updated: 2026-10-22
 
 **Subtasks:**
 - [ ] Статус-бар iOS standalone для обох тем (перенесено з Epic 2): зараз `black-translucent` дає білий текст, у світлій темі він невидимий. Порівняти на симуляторі `default` (текст за системною темою) і `black-translucent`; врахувати, що зміна стилю змінює геометрію viewport і може зробити частину хака `.ios-standalone` зайвою, а зміну meta після запуску iOS не підхоплює — досліджуємо, а не вгадуємо
-- [ ] Оновити список шарів `.ios-standalone` в `index.css` під нову структуру, прибрати мертві правила
+- [ ] Оновити список шарів `.ios-standalone` в `index.css` під нову структуру, прибрати мертві правила (`.ios-standalone .sidebar*` уже мертві після Epic 5). Перевірити на симуляторі гіпотезу з Epic 5: `position: fixed` оверлей і контент vaul (`[data-slot="drawer-overlay"]`, `[data-slot="drawer-content"]`) у standalone, ймовірно, треба перевести на absolute — інакше оверлей не затемнить смугу внизу, а шит може зависнути над нею
+- [ ] Передумова для iOS-перевірок: на машині прийнята ліцензія Xcode (`sudo xcodebuild -license`, робить користувач), інакше `xcrun simctl` не працює
 - [ ] Кольори маніфесту; `-webkit-app-region: no-drag` на кнопках і шитах для Electron-обгортки
 - [ ] Прибрати застарілі ключі localStorage (`background`, `isInputsCollapsed`) при старті
 - [ ] Оновити `CLAUDE.md` (shadcn, теми, шити, ключі, розрахунки, нове чисте lint-базове значення) і `README`
@@ -210,6 +223,7 @@ updated: 2026-10-22
 - [ ] `npm run build` і `npm run lint` чисті
 - [ ] `build` + `preview`: оновлення SW проходить без застарілого кешу
 - [ ] Повна перевірка на iOS Simulator у standalone в обох темах: статус-бар читається, внизу немає смуги, шити відкриваються й закриваються
+- [ ] Шит налаштувань на iOS standalone (перенесено з Epic 5): не обрізаний знизу; фокус на полі не зсуває додаток убік; тап по select і time відкриває нативне колесо
 
 ## Execution log
 - 2026-10-22 — created, plan agreed with user
@@ -221,3 +235,5 @@ updated: 2026-10-22
 - 2026-10-22 — Epic 3 approved
 - 2026-10-22 — Epic 4 work complete, awaiting approval
 - 2026-10-22 — Epic 4 approved
+- 2026-10-22 — Epic 5 work complete (iOS-перевірка не виконана: Xcode license), awaiting approval
+- 2026-10-22 — Epic 5 approved; iOS-перевірку шита налаштувань перенесено в Epic 7
