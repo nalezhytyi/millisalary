@@ -1,0 +1,34 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "millisalary-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "exec",
+        "vite",
+        "--port",
+        "5174",
+        "--no-open"
+      ],
+      "port": 5174,
+      "url": "http://localhost:5174"
+    },
+    {
+      "name": "millisalary-preview",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "exec",
+        "vite",
+        "preview",
+        "--port",
+        "4173",
+        "--host",
+        "0.0.0.0",
+        "--strictPort"
+      ],
+      "port": 4173,
+      "url": "http://localhost:4173"
+    }
+  ]
+}

@@ -1,12 +1,50 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { fetchExchangeRate } from '../api'
-import { WORKING_DAYS, WORKING_HOURS_PER_DAY } from '../constants'
 import {
-  calculateMillisecondsPastToday,
-  countBusinessDaysBeforeDate,
-  getWorkingDayMilliseconds,
+  calculateEarnings,
+  PERIODS,
+  type EarningsSettings,
+  type EarningsSnapshot,
 } from '../utils/calculations'
+
+const EXCHANGE_RATES_KEY = 'exchangeRates'
+
+// Last known rate per "FROM>TO" pair, so a reload or an offline launch keeps
+// converting instead of falling back to 1
+const readCachedRate = (pair: string): number | null => {
+  try {
+    const rates = JSON.parse(localStorage.getItem(EXCHANGE_RATES_KEY) ?? '{}')
+    const rate = rates[pair]
+
+    return typeof rate === 'number' && Number.isFinite(rate) ? rate : null
+  } catch {
+    return null
+  }
+}
+
+const writeCachedRate = (pair: string, rate: number) => {
+  try {
+    const rates = JSON.parse(localStorage.getItem(EXCHANGE_RATES_KEY) ?? '{}')
+
+    localStorage.setItem(
+      EXCHANGE_RATES_KEY,
+      JSON.stringify({ ...rates, [pair]: rate })
+    )
+  } catch {
+    // Storage unavailable: the rate still applies for this session
+  }
+}
+
+// The tick runs every 100 ms; skip the re-render when nothing moved
+// (outside working hours, weekends, no salary)
+const isSameSnapshot = (a: EarningsSnapshot, b: EarningsSnapshot) =>
+  PERIODS.every(
+    (key) => a[key].earned === b[key].earned && a[key].total === b[key].total
+  ) &&
+  a.rates.perSecond === b.rates.perSecond &&
+  a.nextPayday.daysLeft === b.nextPayday.daysLeft &&
+  a.nextPayday.amount === b.nextPayday.amount
 
 export const useEarnings = (
   monthlySalary: number,
@@ -15,77 +53,84 @@ export const useEarnings = (
   startHour: Date | null,
   endHour: Date | null,
   workingDays: number,
-  workingHoursPerDay: number
+  workingHoursPerDay: number,
+  payday: number
 ) => {
-  const [currentEarnings, setCurrentEarnings] = useState<number>(0)
-  const [monthEarnings, setMonthEarnings] = useState<number>(0)
-  const [dayEarnings, setDayEarnings] = useState<number>(0)
-  const [totalDayEarnings, setTotalDayEarnings] = useState<number>(0)
-  const [exchangeRate, setExchangeRate] = useState<number>(1)
+  const pair = `${monthlySalaryCurrency}>${earningsCurrency}`
+  const isSameCurrency = monthlySalaryCurrency === earningsCurrency
+  const [fetchedRate, setFetchedRate] = useState<{
+    pair: string
+    rate: number
+  } | null>(null)
+
+  // A rate only ever applies to the pair it was fetched for
+  const exchangeRate = useMemo(() => {
+    if (isSameCurrency) {
+      return 1
+    }
+    if (fetchedRate?.pair === pair) {
+      return fetchedRate.rate
+    }
+
+    return readCachedRate(pair) ?? 1
+  }, [isSameCurrency, fetchedRate, pair])
+
+  const [earnings, setEarnings] = useState(() =>
+    calculateEarnings(dayjs(), {
+      monthlySalary,
+      workingDays,
+      workingHoursPerDay,
+      startHour,
+      endHour,
+      payday,
+      exchangeRate,
+    })
+  )
 
   useEffect(() => {
-    const updateExchangeRate = async () => {
-      try {
-        const rate = await fetchExchangeRate(
-          monthlySalaryCurrency,
-          earningsCurrency
-        )
-        setExchangeRate(rate)
-      } catch (error) {
+    if (isSameCurrency) {
+      return
+    }
+
+    // Ignore responses for a pair the user has already switched away from
+    let isCurrent = true
+
+    fetchExchangeRate(monthlySalaryCurrency, earningsCurrency)
+      .then((rate) => {
+        if (!isCurrent || !Number.isFinite(rate)) {
+          return
+        }
+        writeCachedRate(pair, rate)
+        setFetchedRate({ pair, rate })
+      })
+      .catch((error) => {
         console.error('Failed to fetch exchange rate:', error)
-      }
-    }
+      })
 
-    updateExchangeRate()
-  }, [monthlySalaryCurrency, earningsCurrency])
+    return () => {
+      isCurrent = false
+    }
+  }, [isSameCurrency, monthlySalaryCurrency, earningsCurrency, pair])
 
   useEffect(() => {
+    const settings: EarningsSettings = {
+      monthlySalary,
+      workingDays,
+      workingHoursPerDay,
+      startHour,
+      endHour,
+      payday,
+      exchangeRate,
+    }
     const updateEarnings = () => {
-      const now = dayjs()
-      const startOfDay = dayjs(startHour)
-      const endOfDay = dayjs(endHour)
-      const startOfMonth = now.startOf('month')
-      const startOfToday = now.startOf('day')
-      const safeWorkingDays = workingDays > 0 ? workingDays : WORKING_DAYS
-      const safeWorkingHoursPerDay =
-        workingHoursPerDay > 0 ? workingHoursPerDay : WORKING_HOURS_PER_DAY
-      const workingDayMilliseconds = getWorkingDayMilliseconds(
-        startHour,
-        endHour,
-        safeWorkingHoursPerDay
-      )
-      const dailySalary =
-        safeWorkingDays > 0 ? monthlySalary / safeWorkingDays : 0
-      const millisecondSalary =
-        workingDayMilliseconds > 0 ? dailySalary / workingDayMilliseconds : 0
-      const completedBusinessDays = countBusinessDaysBeforeDate(
-        startOfMonth,
-        startOfToday
-      )
-      const completedScheduledDays = Math.min(
-        completedBusinessDays,
-        safeWorkingDays
-      )
-      const isBusinessDayToday = now.day() !== 0 && now.day() !== 6
-      const isScheduledWorkingDayToday =
-        isBusinessDayToday && completedBusinessDays < safeWorkingDays
+      const next = calculateEarnings(dayjs(), settings)
 
-      const millisecondsPastToday = isScheduledWorkingDayToday
-        ? calculateMillisecondsPastToday(now, startOfDay, endOfDay)
-        : 0
-      const estimatedEarnings = Math.min(
-        monthlySalary,
-        completedScheduledDays * dailySalary +
-          millisecondSalary * millisecondsPastToday
+      setEarnings((previous) =>
+        isSameSnapshot(previous, next) ? previous : next
       )
-      const estimatedDayEarnings = millisecondSalary * millisecondsPastToday
-
-      setCurrentEarnings(estimatedEarnings * exchangeRate)
-      setMonthEarnings(monthlySalary * exchangeRate)
-      setDayEarnings(estimatedDayEarnings * exchangeRate)
-      setTotalDayEarnings(dailySalary * exchangeRate)
     }
 
+    updateEarnings()
     const timer = setInterval(updateEarnings, 100)
 
     return () => clearInterval(timer)
@@ -96,13 +141,8 @@ export const useEarnings = (
     exchangeRate,
     workingDays,
     workingHoursPerDay,
+    payday,
   ])
 
-  return {
-    currentEarnings,
-    monthEarnings,
-    dayEarnings,
-    totalDayEarnings,
-    exchangeRate,
-  }
+  return { earnings, exchangeRate }
 }
