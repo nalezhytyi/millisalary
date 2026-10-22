@@ -1,10 +1,50 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { fetchExchangeRate } from '../api'
 import {
   calculateEarnings,
+  PERIODS,
   type EarningsSettings,
+  type EarningsSnapshot,
 } from '../utils/calculations'
+
+const EXCHANGE_RATES_KEY = 'exchangeRates'
+
+// Last known rate per "FROM>TO" pair, so a reload or an offline launch keeps
+// converting instead of falling back to 1
+const readCachedRate = (pair: string): number | null => {
+  try {
+    const rates = JSON.parse(localStorage.getItem(EXCHANGE_RATES_KEY) ?? '{}')
+    const rate = rates[pair]
+
+    return typeof rate === 'number' && Number.isFinite(rate) ? rate : null
+  } catch {
+    return null
+  }
+}
+
+const writeCachedRate = (pair: string, rate: number) => {
+  try {
+    const rates = JSON.parse(localStorage.getItem(EXCHANGE_RATES_KEY) ?? '{}')
+
+    localStorage.setItem(
+      EXCHANGE_RATES_KEY,
+      JSON.stringify({ ...rates, [pair]: rate })
+    )
+  } catch {
+    // Storage unavailable: the rate still applies for this session
+  }
+}
+
+// The tick runs every 100 ms; skip the re-render when nothing moved
+// (outside working hours, weekends, no salary)
+const isSameSnapshot = (a: EarningsSnapshot, b: EarningsSnapshot) =>
+  PERIODS.every(
+    (key) => a[key].earned === b[key].earned && a[key].total === b[key].total
+  ) &&
+  a.rates.perSecond === b.rates.perSecond &&
+  a.nextPayday.daysLeft === b.nextPayday.daysLeft &&
+  a.nextPayday.amount === b.nextPayday.amount
 
 export const useEarnings = (
   monthlySalary: number,
@@ -16,7 +56,25 @@ export const useEarnings = (
   workingHoursPerDay: number,
   payday: number
 ) => {
-  const [exchangeRate, setExchangeRate] = useState<number>(1)
+  const pair = `${monthlySalaryCurrency}>${earningsCurrency}`
+  const isSameCurrency = monthlySalaryCurrency === earningsCurrency
+  const [fetchedRate, setFetchedRate] = useState<{
+    pair: string
+    rate: number
+  } | null>(null)
+
+  // A rate only ever applies to the pair it was fetched for
+  const exchangeRate = useMemo(() => {
+    if (isSameCurrency) {
+      return 1
+    }
+    if (fetchedRate?.pair === pair) {
+      return fetchedRate.rate
+    }
+
+    return readCachedRate(pair) ?? 1
+  }, [isSameCurrency, fetchedRate, pair])
+
   const [earnings, setEarnings] = useState(() =>
     calculateEarnings(dayjs(), {
       monthlySalary,
@@ -25,25 +83,34 @@ export const useEarnings = (
       startHour,
       endHour,
       payday,
-      exchangeRate: 1,
+      exchangeRate,
     })
   )
 
   useEffect(() => {
-    const updateExchangeRate = async () => {
-      try {
-        const rate = await fetchExchangeRate(
-          monthlySalaryCurrency,
-          earningsCurrency
-        )
-        setExchangeRate(rate)
-      } catch (error) {
-        console.error('Failed to fetch exchange rate:', error)
-      }
+    if (isSameCurrency) {
+      return
     }
 
-    updateExchangeRate()
-  }, [monthlySalaryCurrency, earningsCurrency])
+    // Ignore responses for a pair the user has already switched away from
+    let isCurrent = true
+
+    fetchExchangeRate(monthlySalaryCurrency, earningsCurrency)
+      .then((rate) => {
+        if (!isCurrent || !Number.isFinite(rate)) {
+          return
+        }
+        writeCachedRate(pair, rate)
+        setFetchedRate({ pair, rate })
+      })
+      .catch((error) => {
+        console.error('Failed to fetch exchange rate:', error)
+      })
+
+    return () => {
+      isCurrent = false
+    }
+  }, [isSameCurrency, monthlySalaryCurrency, earningsCurrency, pair])
 
   useEffect(() => {
     const settings: EarningsSettings = {
@@ -55,7 +122,13 @@ export const useEarnings = (
       payday,
       exchangeRate,
     }
-    const updateEarnings = () => setEarnings(calculateEarnings(dayjs(), settings))
+    const updateEarnings = () => {
+      const next = calculateEarnings(dayjs(), settings)
+
+      setEarnings((previous) =>
+        isSameSnapshot(previous, next) ? previous : next
+      )
+    }
 
     updateEarnings()
     const timer = setInterval(updateEarnings, 100)

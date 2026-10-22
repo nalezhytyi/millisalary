@@ -1,26 +1,6 @@
 import dayjs from 'dayjs'
-import { WORKING_DAYS, WORKING_HOURS_PER_DAY } from '../constants'
+import { WORKING_DAYS } from '../constants'
 import { normalizeWorkingHoursPerDay } from './salaryForm'
-
-export const getWorkingDayMilliseconds = (
-  startHour: Date | null,
-  endHour: Date | null,
-  workingHoursPerDay = WORKING_HOURS_PER_DAY
-): number => {
-  if (!startHour || !endHour) {
-    return normalizeWorkingHoursPerDay(workingHoursPerDay) * 3600 * 1000
-  }
-
-  const start = dayjs(startHour)
-  const end = dayjs(endHour)
-  const diffMilliseconds = end.diff(start)
-
-  if (diffMilliseconds <= 0) {
-    return normalizeWorkingHoursPerDay(workingHoursPerDay) * 3600 * 1000
-  }
-
-  return diffMilliseconds
-}
 
 export const calculateMillisecondsPastToday = (
   now: dayjs.Dayjs,
@@ -33,22 +13,6 @@ export const calculateMillisecondsPastToday = (
     return endOfDay.diff(startOfDay)
   }
   return 0
-}
-
-export const calculateTotalMillisecondsPassed = (
-  now: dayjs.Dayjs,
-  startOfMonth: dayjs.Dayjs,
-  workingDayMilliseconds = WORKING_HOURS_PER_DAY * 3600 * 1000
-): number => {
-  let totalMillisecondsPassed = 0
-  for (let date = startOfMonth; date.isBefore(now); date = date.add(1, 'day')) {
-    const day = date.day()
-    if (day !== 0 && day !== 6) {
-      // Exclude Sundays (0) and Saturdays (6)
-      totalMillisecondsPassed += workingDayMilliseconds
-    }
-  }
-  return totalMillisecondsPassed
 }
 
 export const countBusinessDaysBeforeDate = (
@@ -71,23 +35,6 @@ export const countBusinessDaysBeforeDate = (
   return businessDays
 }
 
-export const calculateWorkingHours = (
-  startHour: Date | null,
-  endHour: Date | null
-): string => {
-  if (!startHour || !endHour) {
-    return '0h 0m'
-  }
-
-  const start = dayjs(startHour)
-  const end = dayjs(endHour)
-  const diffMinutes = end.diff(start, 'minute')
-  const hours = Math.floor(diffMinutes / 60)
-  const minutes = diffMinutes % 60
-
-  return `${hours}h ${minutes}m`
-}
-
 export interface EarningsSettings {
   monthlySalary: number
   workingDays: number
@@ -105,7 +52,12 @@ export interface PeriodEarnings {
   total: number
 }
 
-export type Period = 'hour' | 'day' | 'week' | 'month' | 'year'
+export const PERIODS = ['hour', 'day', 'week', 'month', 'year'] as const
+
+export type Period = (typeof PERIODS)[number]
+
+export const isPeriod = (value: unknown): value is Period =>
+  PERIODS.includes(value as Period)
 
 export interface EarningsSnapshot {
   hour: PeriodEarnings
@@ -262,26 +214,40 @@ export const calculateEarnings = (
   }
 }
 
+// Building an Intl.NumberFormat is costly and amounts re-render every 100 ms
+const formatters = new Map<string, Intl.NumberFormat>()
+
+const getCurrencyFormatter = (currency: string, fractionDigits: number) => {
+  const key = `${currency}:${fractionDigits}`
+  let formatter = formatters.get(key)
+
+  if (!formatter) {
+    formatter = new Intl.NumberFormat('uk-UA', {
+      style: 'currency',
+      currency: currency,
+      // ₴ / $ / € / zł … on every platform; plain 'symbol' gives "грн" in
+      // Chromium, "₴" in WebKit and the ISO code for USD under uk-UA
+      currencyDisplay: 'narrowSymbol',
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+    })
+    formatters.set(key, formatter)
+  }
+
+  return formatter
+}
+
 export const formatCurrency = (
   amount: number,
   currency: string,
   fractionDigits = 2
-): string => {
-  return new Intl.NumberFormat('uk-UA', {
-    style: 'currency',
-    currency: currency,
-    // ₴ / $ / € / zł … on every platform; plain 'symbol' gives "грн" in
-    // Chromium, "₴" in WebKit and the ISO code for USD under uk-UA
-    currencyDisplay: 'narrowSymbol',
-    minimumFractionDigits: fractionDigits,
-    maximumFractionDigits: fractionDigits,
-  })
+): string =>
+  getCurrencyFormatter(currency, fractionDigits)
     .format(amount)
     .replace(/\u00A0/g, ' ')
-}
 
 export interface CurrencyParts {
-  /** Currency symbol or code, e.g. "$" or "грн" */
+  /** Narrow currency symbol, e.g. "$", "₴" or "zł" */
   symbol: string
   symbolPosition: 'prefix' | 'suffix'
   sign: string
@@ -296,13 +262,9 @@ export const formatCurrencyParts = (
   currency: string,
   fractionDigits = 2
 ): CurrencyParts => {
-  const parts = new Intl.NumberFormat('uk-UA', {
-    style: 'currency',
-    currency: currency,
-    currencyDisplay: 'narrowSymbol',
-    minimumFractionDigits: fractionDigits,
-    maximumFractionDigits: fractionDigits,
-  }).formatToParts(amount)
+  const parts = getCurrencyFormatter(currency, fractionDigits).formatToParts(
+    amount
+  )
   const join = (...types: string[]) =>
     parts
       .filter((part) => types.includes(part.type))

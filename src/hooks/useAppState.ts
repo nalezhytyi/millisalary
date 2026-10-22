@@ -14,7 +14,7 @@ import {
   parseSalaryInputValue,
   parseTimeInputValue,
 } from '../utils/salaryForm'
-import type { Period } from '../utils/calculations'
+import { isPeriod, type Period } from '../utils/calculations'
 import { useEarnings } from './useEarnings'
 import { useLocalStorage } from './useLocalStorage'
 
@@ -45,10 +45,12 @@ export const useAppState = () => {
     WORKING_DAYS
   )
   const [payday, setPayday] = useLocalStorage('payday', 1)
-  const [selectedPeriod, setSelectedPeriod] = useLocalStorage<Period>(
+  const [storedPeriod, setSelectedPeriod] = useLocalStorage<Period>(
     'selectedPeriod',
     'day'
   )
+  // localStorage is untrusted: an unknown period would crash the dial
+  const selectedPeriod = isPeriod(storedPeriod) ? storedPeriod : 'day'
   const [startHourValue, setStartHourValue] = useLocalStorage(
     'startHour',
     DEFAULT_START_HOUR
@@ -90,11 +92,14 @@ export const useAppState = () => {
     payday
   )
 
-  const handleSetMonthlySalary = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setMonthlySalary(parseSalaryInputValue(event.target.value))
-  }
+  // Handlers are stable (useCallback) so the memoized sheets skip the 100 ms
+  // earnings re-render
+  const handleSetMonthlySalary = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setMonthlySalary(parseSalaryInputValue(event.target.value))
+    },
+    [setMonthlySalary]
+  )
 
   const handleMonthlySalaryBlur = useCallback(() => {
     trackAmplitudeEvent('salary_input_blurred', {
@@ -103,46 +108,52 @@ export const useAppState = () => {
     })
   }, [monthlySalary])
 
-  const handleSetMonthlySalaryCurrency = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const nextCurrency = event.target.value
-    setMonthlySalaryCurrency(nextCurrency)
-    trackAmplitudeEvent('salary_currency_changed', {
-      currency: nextCurrency,
-    })
-  }
+  const handleSetMonthlySalaryCurrency = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      const nextCurrency = event.target.value
+      setMonthlySalaryCurrency(nextCurrency)
+      trackAmplitudeEvent('salary_currency_changed', {
+        currency: nextCurrency,
+      })
+    },
+    [setMonthlySalaryCurrency]
+  )
 
-  const handleSetEarningsCurrency = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const nextCurrency = event.target.value
-    setEarningsCurrency(nextCurrency)
-    trackAmplitudeEvent('earnings_currency_changed', {
-      currency: nextCurrency,
-    })
-  }
+  const handleSetEarningsCurrency = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      const nextCurrency = event.target.value
+      setEarningsCurrency(nextCurrency)
+      trackAmplitudeEvent('earnings_currency_changed', {
+        currency: nextCurrency,
+      })
+    },
+    [setEarningsCurrency]
+  )
 
-  const handleSetWorkingHoursPerDay = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const nextWorkingHoursPerDay = normalizeWorkingHoursPerDay(
-      parseSalaryInputValue(event.target.value)
-    )
+  const handleSetWorkingHoursPerDay = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextWorkingHoursPerDay = normalizeWorkingHoursPerDay(
+        parseSalaryInputValue(event.target.value)
+      )
 
-    setWorkingHoursPerDay(nextWorkingHoursPerDay)
-    editedFields.current.add('working_hours_per_day')
-    if (startHour) {
-      setEndHour(getEndHourFromStart(startHour, nextWorkingHoursPerDay))
-    }
-  }
+      setWorkingHoursPerDay(nextWorkingHoursPerDay)
+      editedFields.current.add('working_hours_per_day')
+      if (startHour) {
+        setEndHour(getEndHourFromStart(startHour, nextWorkingHoursPerDay))
+      }
+    },
+    [setWorkingHoursPerDay, setEndHour, startHour]
+  )
 
-  const handleSetWorkingDays = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setWorkingDays(normalizeWorkingDays(parseSalaryInputValue(event.target.value)))
-    editedFields.current.add('working_days')
-  }
+  const handleSetWorkingDays = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setWorkingDays(
+        normalizeWorkingDays(parseSalaryInputValue(event.target.value))
+      )
+      editedFields.current.add('working_days')
+    },
+    [setWorkingDays]
+  )
 
   const handleWorkingDaysBlur = useCallback(() => {
     if (editedFields.current.delete('working_days')) {
@@ -158,12 +169,13 @@ export const useAppState = () => {
     }
   }, [workingHoursPerDay])
 
-  const handleSetPayday = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const nextPayday = normalizePayday(parseSalaryInputValue(event.target.value))
-
-    setPayday(nextPayday)
-    editedFields.current.add('payday')
-  }
+  const handleSetPayday = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setPayday(normalizePayday(parseSalaryInputValue(event.target.value)))
+      editedFields.current.add('payday')
+    },
+    [setPayday]
+  )
 
   const handlePaydayBlur = useCallback(() => {
     if (editedFields.current.delete('payday')) {
@@ -171,28 +183,38 @@ export const useAppState = () => {
     }
   }, [payday])
 
-  const handleStartHourChange = (date: Date | null) => {
-    const nextHours = getNextStartAndEndHours(date, endHour, workingHoursPerDay)
+  const handleStartHourChange = useCallback(
+    (date: Date | null) => {
+      const nextHours = getNextStartAndEndHours(
+        date,
+        endHour,
+        workingHoursPerDay
+      )
 
-    setStartHour(nextHours.startHour)
-    setEndHour(nextHours.endHour)
-    trackAmplitudeEvent('workday_start_time_changed', {
-      start_time: formatEventTime(date),
-    })
-  }
+      setStartHour(nextHours.startHour)
+      setEndHour(nextHours.endHour)
+      trackAmplitudeEvent('workday_start_time_changed', {
+        start_time: formatEventTime(date),
+      })
+    },
+    [endHour, workingHoursPerDay, setStartHour, setEndHour]
+  )
 
-  const handleEndHourChange = (date: Date | null) => {
-    const nextHours = getNextEndAndStartHours(date, startHour)
+  const handleEndHourChange = useCallback(
+    (date: Date | null) => {
+      const nextHours = getNextEndAndStartHours(date, startHour)
 
-    setStartHour(nextHours.startHour)
-    setEndHour(nextHours.endHour)
-    setWorkingHoursPerDay(
-      calculateWorkingHoursPerDayValue(nextHours.startHour, nextHours.endHour)
-    )
-    trackAmplitudeEvent('workday_end_time_changed', {
-      end_time: formatEventTime(date),
-    })
-  }
+      setStartHour(nextHours.startHour)
+      setEndHour(nextHours.endHour)
+      setWorkingHoursPerDay(
+        calculateWorkingHoursPerDayValue(nextHours.startHour, nextHours.endHour)
+      )
+      trackAmplitudeEvent('workday_end_time_changed', {
+        end_time: formatEventTime(date),
+      })
+    },
+    [startHour, setStartHour, setEndHour, setWorkingHoursPerDay]
+  )
 
   const openSettings = useCallback((source: 'header' | 'setup_hint') => {
     sheetOpenedAt.current.settings = Date.now()
@@ -211,11 +233,16 @@ export const useAppState = () => {
   )
 
   const handleCloseSettings = useCallback(() => {
+    // A field still focused when the sheet closes may never get its blur
+    // (iOS keeps focus on the input while Done is tapped), so flush it here
+    handleWorkingDaysBlur()
+    handleWorkingHoursPerDayBlur()
+    handlePaydayBlur()
     setIsSettingsOpen(false)
     trackAmplitudeEvent('settings_closed', {
       duration_ms: Date.now() - sheetOpenedAt.current.settings,
     })
-  }, [])
+  }, [handleWorkingDaysBlur, handleWorkingHoursPerDayBlur, handlePaydayBlur])
 
   const handleBreakdownClick = useCallback(() => {
     sheetOpenedAt.current.breakdown = Date.now()
