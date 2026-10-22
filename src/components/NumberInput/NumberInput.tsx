@@ -10,7 +10,8 @@ type NumberInputProps = Omit<
 }
 
 // While focused the field shows exactly what was typed, so it can be cleared
-// mid-edit; an empty field isn't committed and the normalized value comes
+// mid-edit. Only complete values are committed: an empty field, or one below
+// `min` (the "0" on the way to "0.5"), stays a draft and the saved value comes
 // back on blur. Selects the value on focus.
 const NumberInput = ({
   value,
@@ -32,8 +33,15 @@ const NumberInput = ({
         onFocus?.(event)
       }}
       onChange={(event) => {
-        setDraft(event.target.value)
-        if (event.target.value !== '') {
+        const { value: raw } = event.target
+        const parsed = Number(raw)
+
+        setDraft(raw)
+        if (
+          raw !== '' &&
+          Number.isFinite(parsed) &&
+          (props.min === undefined || parsed >= Number(props.min))
+        ) {
           onChange(event)
         }
       }}

@@ -138,7 +138,8 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
         <ListRow label="Working hours / day" htmlFor="working-hours">
           <NumberInput
             id="working-hours"
-            inputMode="numeric"
+            // halves are allowed; iOS's numeric keypad has no decimal key
+            inputMode="decimal"
             min="0.5"
             max="24"
             step="0.5"
