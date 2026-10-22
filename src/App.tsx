@@ -1,9 +1,12 @@
 import React from 'react'
-import EarningsSummary from './components/EarningsSummary'
+import BreakdownSheet from './components/BreakdownSheet'
+import EarningsDial from './components/EarningsDial'
 import Header from './components/Header'
-import SalaryInputs from './components/SalaryInputs'
-import Sidebar from './components/Sidebar'
-import { useAppState, useBackground } from './hooks'
+import PeriodTabs from './components/PeriodTabs'
+import SettingsSheet from './components/SettingsSheet'
+import SetupHint from './components/SetupHint'
+import StatsRow from './components/StatsRow'
+import { useAppState, useTheme } from './hooks'
 
 const App: React.FC = () => {
   const {
@@ -12,76 +15,93 @@ const App: React.FC = () => {
     earningsCurrency,
     workingHoursPerDay,
     workingDays,
-    isInputsCollapsed,
+    payday,
+    selectedPeriod,
     startHour,
     endHour,
-    isSidebarOpen,
-    currentEarnings,
-    monthEarnings,
-    dayEarnings,
-    totalDayEarnings,
+    isSettingsOpen,
+    isBreakdownOpen,
     exchangeRate,
+    earnings,
     handleSetMonthlySalary,
     handleMonthlySalaryBlur,
     handleSetMonthlySalaryCurrency,
     handleSetEarningsCurrency,
     handleSetWorkingHoursPerDay,
+    handleWorkingHoursPerDayBlur,
     handleSetWorkingDays,
+    handleWorkingDaysBlur,
+    handleSetPayday,
+    handlePaydayBlur,
     handleStartHourChange,
     handleEndHourChange,
     handleSettingsClick,
-    handleCloseSidebar,
-    handleToggleInputsCollapsed,
+    handleSetupHintSettingsClick,
+    handleCloseSettings,
+    handleBreakdownClick,
+    handleCloseBreakdown,
+    handlePeriodChange,
   } = useAppState()
-  const { background, backgroundComponent, handleBackgroundChange } =
-    useBackground()
+  const { theme, setTheme } = useTheme()
 
   return (
     <>
-      <div className="app-background fixed inset-0 -z-10">
-        {backgroundComponent}
-      </div>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        selectedBackground={background}
-        onBackgroundChange={handleBackgroundChange}
-        isInputsCollapsed={isInputsCollapsed}
-        onToggleInputsCollapsed={handleToggleInputsCollapsed}
+      <SettingsSheet
+        open={isSettingsOpen}
+        onClose={handleCloseSettings}
+        monthlySalary={monthlySalary}
+        monthlySalaryCurrency={monthlySalaryCurrency}
+        earningsCurrency={earningsCurrency}
+        workingHoursPerDay={workingHoursPerDay}
+        workingDays={workingDays}
+        payday={payday}
+        startHour={startHour}
+        endHour={endHour}
+        theme={theme}
+        onMonthlySalaryChange={handleSetMonthlySalary}
+        onMonthlySalaryBlur={handleMonthlySalaryBlur}
+        onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
+        onEarningsCurrencyChange={handleSetEarningsCurrency}
+        onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
+        onWorkingHoursPerDayBlur={handleWorkingHoursPerDayBlur}
+        onWorkingDaysChange={handleSetWorkingDays}
+        onWorkingDaysBlur={handleWorkingDaysBlur}
+        onPaydayChange={handleSetPayday}
+        onPaydayBlur={handlePaydayBlur}
+        onStartHourChange={handleStartHourChange}
+        onEndHourChange={handleEndHourChange}
+        onThemeChange={setTheme}
       />
-      <Header onSettingsClick={handleSettingsClick} />
-      <div className="w-full px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:mx-auto sm:max-w-md">
-        {!isInputsCollapsed && (
-          <div id="salary-inputs-panel">
-            <SalaryInputs
-              monthlySalary={monthlySalary}
-              monthlySalaryCurrency={monthlySalaryCurrency}
-              earningsCurrency={earningsCurrency}
-              workingHoursPerDay={workingHoursPerDay}
-              workingDays={workingDays}
-              startHour={startHour}
-              endHour={endHour}
-              onMonthlySalaryChange={handleSetMonthlySalary}
-              onMonthlySalaryBlur={handleMonthlySalaryBlur}
-              onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
-              onEarningsCurrencyChange={handleSetEarningsCurrency}
-              onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
-              onWorkingDaysChange={handleSetWorkingDays}
-              onStartHourChange={handleStartHourChange}
-              onEndHourChange={handleEndHourChange}
-            />
-          </div>
-        )}
-        <EarningsSummary
-          currentEarnings={currentEarnings}
-          dayEarnings={dayEarnings}
-          totalDayEarnings={totalDayEarnings}
-          monthEarnings={monthEarnings}
-          earningsCurrency={earningsCurrency}
-          exchangeRate={exchangeRate}
-          monthlySalaryCurrency={monthlySalaryCurrency}
+      <BreakdownSheet
+        open={isBreakdownOpen}
+        onClose={handleCloseBreakdown}
+        earnings={earnings}
+        currency={earningsCurrency}
+        monthlySalaryCurrency={monthlySalaryCurrency}
+        exchangeRate={exchangeRate}
+      />
+      <main className="app-screen mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+        <Header
+          onSettingsClick={handleSettingsClick}
+          onBreakdownClick={handleBreakdownClick}
         />
-      </div>
+        <div className="flex flex-1 items-center justify-center py-4">
+          <EarningsDial
+            earned={earnings[selectedPeriod].earned}
+            total={earnings[selectedPeriod].total}
+            currency={earningsCurrency}
+            period={selectedPeriod}
+          />
+        </div>
+        {monthlySalary > 0 ? (
+          <StatsRow earnings={earnings} currency={earningsCurrency} />
+        ) : (
+          <SetupHint onOpenSettings={handleSetupHintSettingsClick} />
+        )}
+        <div className="mt-4">
+          <PeriodTabs value={selectedPeriod} onChange={handlePeriodChange} />
+        </div>
+      </main>
     </>
   )
 }

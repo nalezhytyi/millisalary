@@ -1,18 +1,106 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
+@custom-variant dark (&:is(.dark *));
+
+/* iOS system colors. shadcn tokens are mapped onto UIKit semantic colors:
+   background = systemGroupedBackground, card = secondarySystemGroupedBackground,
+   foreground = label, muted-foreground = secondaryLabel, secondary/muted =
+   tertiarySystemFill, border = separator, primary/ring = systemBlue. */
 :root {
-  font-family: 'Lato', sans-serif;
+  --background: #f2f2f7;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #007aff;
+  --primary-foreground: #ffffff;
+  --secondary: rgb(118 118 128 / 12%);
+  --secondary-foreground: #000000;
+  --muted: rgb(118 118 128 / 12%);
+  --muted-foreground: rgb(60 60 67 / 60%);
+  --accent: rgb(118 118 128 / 12%);
+  --accent-foreground: #000000;
+  --destructive: #ff3b30;
+  --border: rgb(60 60 67 / 29%);
+  --input: rgb(60 60 67 / 29%);
+  --ring: #007aff;
+  --radius: 0.75rem;
+
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
-  background-color: #0f172a;
+  background-color: var(--background);
   color-scheme: light dark;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #1c1c1e;
+  --card-foreground: #ffffff;
+  --popover: #1c1c1e;
+  --popover-foreground: #ffffff;
+  --primary: #0a84ff;
+  --primary-foreground: #ffffff;
+  --secondary: rgb(118 118 128 / 24%);
+  --secondary-foreground: #ffffff;
+  --muted: rgb(118 118 128 / 24%);
+  --muted-foreground: rgb(235 235 245 / 60%);
+  --accent: rgb(118 118 128 / 24%);
+  --accent-foreground: #ffffff;
+  --destructive: #ff453a;
+  --border: rgb(84 84 88 / 65%);
+  --input: rgb(84 84 88 / 65%);
+  --ring: #0a84ff;
+}
+
+@theme inline {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply bg-background text-foreground font-sans;
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 a:hover {
@@ -42,31 +130,44 @@ html.ios-standalone {
   height: 100%;
   overflow-y: auto;
 }
-.ios-standalone .app-background,
-.ios-standalone .sidebar,
-.ios-standalone .sidebar-overlay {
+
+/* Main screen: min-h-dvh is the short viewport here, which parked the period
+   control a status-bar height above the home indicator. */
+.ios-standalone .app-screen {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: calc(100% + env(safe-area-inset-top));
+  overflow-y: auto;
+}
+
+/* vaul sheets are position: fixed. The overlay left the bottom band undimmed
+   and the bottom-anchored content ended at the short viewport's edge, cutting
+   the sheet off a status-bar height above the screen bottom. */
+.ios-standalone [data-slot='drawer-overlay'] {
   position: absolute;
   bottom: auto;
   height: calc(100% + env(safe-area-inset-top));
 }
-
-/* The closed sidebar is parked a full panel-width to the right via transform.
-   While it is position: fixed (in-browser) that costs nothing, but the rule
-   above makes it absolute — and an absolute box sitting outside the viewport
-   extends the document ~380px to the right. iOS pans the visual viewport to
-   reveal a focused input, and that pan is what slid the whole app sideways
-   when a number input was tapped. Root-level clipping cannot undo it: overflow
-   on html propagates to the viewport (where clip degrades to hidden), and
-   hidden still scrolls programmatically. So in standalone the closed panel
-   stays put and is hidden in place, fading rather than sliding. */
-.ios-standalone .sidebar {
-  transition: opacity 0.3s ease-in-out;
+.ios-standalone [data-slot='drawer-content'] {
+  position: absolute;
+  bottom: calc(-1 * env(safe-area-inset-top));
+  /* dvh swings between the short and full height here, so pin the top just
+     below the status bar instead of using the 94dvh height */
+  top: calc(env(safe-area-inset-top) + 0.625rem);
+  height: auto;
+  max-height: none;
+  margin-top: 0;
 }
 
-.ios-standalone .sidebar:not(.sidebar-open) {
-  transform: none;
-  opacity: 0;
-  pointer-events: none;
+/* While a sheet is open, Radix's scroll lock (react-remove-scroll-bar) sets
+   body[data-scroll-locked] { position: relative !important }. Body is the
+   812pt-tall scroller here, so that made it the sheets' containing block and
+   its overflow clipped them at the short viewport edge again. Keep body
+   static so they stay on the initial containing block. */
+.ios-standalone body[data-scroll-locked] {
+  position: static !important;
 }
 
 input:focus,
@@ -77,4 +178,15 @@ textarea:focus,
 textarea:focus-visible {
   outline: none;
   outline-color: transparent;
+}
+
+/* The Electron wrapper hosts this app in a window that may declare drag
+   regions; keep every interactive surface (and the sheets) clickable. */
+button,
+input,
+select,
+[role='tab'],
+[data-slot='drawer-overlay'],
+[data-slot='drawer-content'] {
+  -webkit-app-region: no-drag;
 }

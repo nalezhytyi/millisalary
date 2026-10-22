@@ -10,6 +10,14 @@ export const normalizeWorkingDays = (value: number) => {
   return Math.min(value, 31)
 }
 
+export const normalizePayday = (value: number) => {
+  if (!Number.isFinite(value) || value < 1) {
+    return 1
+  }
+
+  return Math.min(Math.floor(value), 31)
+}
+
 export const normalizeWorkingHoursPerDay = (value: number) => {
   if (value > 0) {
     return Math.min(value, 24)
