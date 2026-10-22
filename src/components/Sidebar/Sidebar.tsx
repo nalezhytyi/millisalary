@@ -4,20 +4,17 @@ import './Sidebar.css'
 interface SidebarProps {
   isOpen: boolean
   onClose: () => void
-  isInputsCollapsed: boolean
-  onToggleInputsCollapsed: () => void
+  children?: React.ReactNode
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose,
-  isInputsCollapsed,
-  onToggleInputsCollapsed,
+  children,
 }) => {
   const sidebarBg =
     'linear-gradient(135deg, rgba(22, 24, 52, 0.3) 0%, rgba(55, 59, 127, 0.3) 100%)'
   const borderColor = 'rgba(255, 255, 255, 0.1)'
-  const textColor = '#fff'
   const textSecondary = 'rgba(255, 255, 255, 0.6)'
 
   return (
@@ -64,40 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        <div className="sidebar-content">
-          <div className="sidebar-section">
-            <h3 className="sidebar-section-title" style={{ color: textColor }}>
-              Layout
-            </h3>
-            <p
-              className="sidebar-section-description"
-              style={{ color: textSecondary }}
-            >
-              Choose whether the calculator inputs stay visible on the main screen
-            </p>
-
-            <button
-              type="button"
-              className="sidebar-toggle-button"
-              onClick={onToggleInputsCollapsed}
-              aria-pressed={isInputsCollapsed}
-            >
-              <div className="sidebar-toggle-copy">
-                <span className="sidebar-toggle-title">
-                  {isInputsCollapsed ? 'Compact earnings view' : 'Full calculator view'}
-                </span>
-                <span className="sidebar-toggle-description">
-                  {isInputsCollapsed
-                    ? 'Only the earnings widget is shown on the main screen.'
-                    : 'Inputs and earnings are both shown on the main screen.'}
-                </span>
-              </div>
-              <span className="sidebar-toggle-status">
-                {isInputsCollapsed ? 'Enabled' : 'Disabled'}
-              </span>
-            </button>
-          </div>
-        </div>
+        <div className="sidebar-content">{children}</div>
       </div>
     </>
   )

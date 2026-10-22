@@ -105,6 +105,8 @@ export interface PeriodEarnings {
   total: number
 }
 
+export type Period = 'hour' | 'day' | 'week' | 'month' | 'year'
+
 export interface EarningsSnapshot {
   hour: PeriodEarnings
   day: PeriodEarnings

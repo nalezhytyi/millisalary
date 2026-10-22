@@ -14,6 +14,7 @@ import {
   parseSalaryInputValue,
   parseTimeInputValue,
 } from '../utils/salaryForm'
+import type { Period } from '../utils/calculations'
 import { useEarnings } from './useEarnings'
 import { useLocalStorage } from './useLocalStorage'
 
@@ -44,9 +45,9 @@ export const useAppState = () => {
     WORKING_DAYS
   )
   const [payday, setPayday] = useLocalStorage('payday', 1)
-  const [isInputsCollapsed, setIsInputsCollapsed] = useLocalStorage(
-    'isInputsCollapsed',
-    false
+  const [selectedPeriod, setSelectedPeriod] = useLocalStorage<Period>(
+    'selectedPeriod',
+    'day'
   )
   const [startHourValue, setStartHourValue] = useLocalStorage(
     'startHour',
@@ -84,11 +85,6 @@ export const useAppState = () => {
     workingHoursPerDay,
     payday
   )
-  // Legacy shape for the old main screen; goes away with the new UI (Epic 4)
-  const currentEarnings = earnings.month.earned
-  const monthEarnings = earnings.month.total
-  const dayEarnings = earnings.day.earned
-  const totalDayEarnings = earnings.day.total
 
   const handleSetMonthlySalary = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -181,17 +177,13 @@ export const useAppState = () => {
     setIsSidebarOpen(false)
   }, [])
 
-  const handleToggleInputsCollapsed = useCallback(() => {
-    setIsInputsCollapsed((previousValue) => {
-      const nextValue = !previousValue
-
-      trackAmplitudeEvent('inputs_collapsed_toggled', {
-        is_inputs_collapsed: nextValue,
-      })
-
-      return nextValue
-    })
-  }, [setIsInputsCollapsed])
+  const handlePeriodChange = useCallback(
+    (period: Period) => {
+      setSelectedPeriod(period)
+      trackAmplitudeEvent('period_changed', { period })
+    },
+    [setSelectedPeriod]
+  )
 
   return {
     monthlySalary,
@@ -200,15 +192,11 @@ export const useAppState = () => {
     workingHoursPerDay,
     workingDays,
     payday,
-    isInputsCollapsed,
+    selectedPeriod,
     startHour,
     endHour,
     isSidebarOpen,
     earnings,
-    currentEarnings,
-    monthEarnings,
-    dayEarnings,
-    totalDayEarnings,
     exchangeRate,
     handleSetMonthlySalary,
     handleMonthlySalaryBlur,
@@ -221,6 +209,6 @@ export const useAppState = () => {
     handleEndHourChange,
     handleSettingsClick,
     handleCloseSidebar,
-    handleToggleInputsCollapsed,
+    handlePeriodChange,
   }
 }
