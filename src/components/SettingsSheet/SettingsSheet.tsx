@@ -79,7 +79,15 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
     event.target.select()
 
   return (
-    <Drawer open={open} onOpenChange={(next) => !next && onClose()}>
+    // repositionInputs is off: in an iOS home-screen app the visual viewport
+    // stays short after the keyboard closes, and vaul then left the sheet
+    // raised above the screen bottom. WebKit scrolls the focused field into
+    // view inside the sheet on its own.
+    <Drawer
+      open={open}
+      onOpenChange={(next) => !next && onClose()}
+      repositionInputs={false}
+    >
       <DrawerContent className="h-[94dvh] bg-background data-[vaul-drawer-direction=bottom]:max-h-[94dvh] data-[vaul-drawer-direction=bottom]:rounded-t-[14px]">
         <SheetHeader title="Settings" />
         <DrawerDescription className="sr-only">
