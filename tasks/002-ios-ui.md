@@ -70,22 +70,31 @@ updated: 2026-10-22
 
 
 ### Epic 2: Світла й темна тема замість WebGL-фонів
-**Status:** pending
+**Status:** approved
 
 **Description:** Тему визначає система, але її можна перевизначити вручну. Фони та `ogl` прибираємо.
 
 **Subtasks:**
-- [ ] Хук `useTheme`: `'system' | 'light' | 'dark'` у localStorage під ключем `theme`, клас `.dark` на `<html>`, слухач `matchMedia('(prefers-color-scheme: dark)')`, подія `theme_changed`
-- [ ] Інлайн-скрипт в `index.html`, який ставить `.dark` до першого рендера (без спалаху)
-- [ ] `<meta name="theme-color">` під активну тему; `color-scheme` на `html`
-- [ ] Статус-бар iOS standalone для обох тем: варіанти `default` + `theme-color` або динамічна зміна. Зміна стилю статус-бару може зробити частину standalone-хака зайвою — досліджуємо, а не вгадуємо
-- [ ] Видалити `useBackground`, `src/components/backgrounds/`, залежність `ogl`, шар `.app-background` і ключ `background`
+- [x] Хук `useTheme`: `'system' | 'light' | 'dark'` у localStorage під ключем `theme`, клас `.dark` на `<html>`, слухач `matchMedia('(prefers-color-scheme: dark)')`, подія `theme_changed`
+- [x] Інлайн-скрипт в `index.html`, який ставить `.dark` до першого рендера (без спалаху)
+- [x] `<meta name="theme-color">` під активну тему; `color-scheme` на `html`
+- [x] ~~Статус-бар iOS standalone для обох тем~~ — перенесено в Epic 7 (за рішенням користувача)
+- [x] Видалити `useBackground`, `src/components/backgrounds/`, залежність `ogl`, шар `.app-background` і ключ `background`
 
 **Acceptance criteria:**
-- [ ] Перемикання Appearance у macOS/iOS одразу міняє тему
-- [ ] `localStorage.theme = '"light"'` тримає світлу тему, навіть коли система в темній
-- [ ] Під час завантаження немає спалаху іншої теми
-- [ ] `npm run lint` чистий (попередні помилки в `LightRays`/`Aurora`/`Galaxy` зникають разом з файлами)
+- [x] Системна тема застосовується при завантаженні (dark→`.dark`, light→без нього). Живе перемикання без перезавантаження **не перевірено**: емуляція colorScheme у вбудованому браузері не шле `change`-події (власний тестовий listener теж нічого не отримав), логіка — стандартний `matchMedia().addEventListener`
+- [x] `localStorage.theme = '"light"'` тримає світлу тему, навіть коли система в темній
+- [x] Під час завантаження немає спалаху іншої теми (скрипт стоїть у `<head>` до рендера; окремо спалах не вимірювався)
+- [x] `npm run lint` чистий (попередні помилки в `LightRays`/`Aurora`/`Galaxy` зникають разом з файлами)
+
+**Примітки до виконання:**
+- `useTheme` повертає `{ theme, setTheme }`; поки що в `App` викликається лише заради ефекту — UI-перемикач з'явиться в Epic 5 (секція Appearance). До того тему можна задати через `localStorage.theme = '"light"'`.
+- Тимчасовий `class="dark"` з Epic 1 прибрано. **Старий UI тепер нечитабельний у світлій темі** (він стилізований лише під темний) — це очікувано, його повністю замінюють Epic 4–5.
+- З `Sidebar` видалено секцію Background і відповідний CSS; `useBackground`, `src/components/backgrounds/` і залежність `ogl` прибрано. Ключ `background` у localStorage лишається в користувачів — чистимо в Epic 7.
+- `theme-color` у `<meta>` і `manifest` (`theme_color`, `background_color`) — світлі (#f2f2f7). Маніфест статичний, тож сплеш при встановленому PWA буде світлим навіть у темній темі; динамічно змінюється лише `<meta>`.
+- **Статус-бар iOS standalone не досліджено**: `black-translucent` дає білий текст, у світлій темі він буде невидимий. Варіант `default` (текст за системною темою) змінює геометрію viewport і може зачепити хак `.ios-standalone`, а зміна meta після запуску iOS не підхоплює — це треба перевіряти на симуляторі (рецепт у пам'яті). Пропозиція: не блокувати цим Epic 2, а зробити разом з повною iOS-перевіркою в Epic 7 (перенести підзадачу туди).
+- Lint: 0 помилок, 2 warning у згенерованих `ui/button.tsx` і `ui/tabs.tsx`. Базові помилки `LightRays`/`Aurora`/`Galaxy` зникли разом з файлами.
+
 
 ### Epic 3: Розрахунки по періодах, ставки й день виплати
 **Status:** pending
@@ -165,6 +174,7 @@ updated: 2026-10-22
 **Description:** Хвости після переходу, iOS-специфіка і документи.
 
 **Subtasks:**
+- [ ] Статус-бар iOS standalone для обох тем (перенесено з Epic 2): зараз `black-translucent` дає білий текст, у світлій темі він невидимий. Порівняти на симуляторі `default` (текст за системною темою) і `black-translucent`; врахувати, що зміна стилю змінює геометрію viewport і може зробити частину хака `.ios-standalone` зайвою, а зміну meta після запуску iOS не підхоплює — досліджуємо, а не вгадуємо
 - [ ] Оновити список шарів `.ios-standalone` в `index.css` під нову структуру, прибрати мертві правила
 - [ ] Кольори маніфесту; `-webkit-app-region: no-drag` на кнопках і шитах для Electron-обгортки
 - [ ] Прибрати застарілі ключі localStorage (`background`, `isInputsCollapsed`) при старті
@@ -179,3 +189,5 @@ updated: 2026-10-22
 - 2026-10-22 — created, plan agreed with user
 - 2026-10-22 — Epic 1 work complete, awaiting approval
 - 2026-10-22 — Epic 1 approved
+- 2026-10-22 — Epic 2 work complete (крім статус-бару iOS), awaiting approval
+- 2026-10-22 — Epic 2 approved; підзадачу про статус-бар iOS перенесено в Epic 7
