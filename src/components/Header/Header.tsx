@@ -13,6 +13,21 @@ const Header = ({ onSettingsClick, onBreakdownClick }: HeaderProps) => {
         variant="secondary"
         size="icon"
         className="size-11 rounded-full text-primary"
+        onClick={onBreakdownClick}
+        aria-label="Open breakdown"
+      >
+        <ChartNoAxesColumn className="size-5" />
+      </Button>
+      <div className="text-center">
+        <h1 className="text-[17px] leading-tight font-semibold">Millisalary</h1>
+        <p className="text-[11px] tracking-[0.18em] text-muted-foreground uppercase">
+          Real time earnings
+        </p>
+      </div>
+      <Button
+        variant="secondary"
+        size="icon"
+        className="size-11 rounded-full text-primary"
         onClick={onSettingsClick}
         aria-label="Open settings"
       >
@@ -30,21 +45,6 @@ const Header = ({ onSettingsClick, onBreakdownClick }: HeaderProps) => {
             d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
           />
         </svg>
-      </Button>
-      <div className="text-center">
-        <h1 className="text-[17px] leading-tight font-semibold">Millisalary</h1>
-        <p className="text-[11px] tracking-[0.18em] text-muted-foreground uppercase">
-          Real time earnings
-        </p>
-      </div>
-      <Button
-        variant="secondary"
-        size="icon"
-        className="size-11 rounded-full text-primary"
-        onClick={onBreakdownClick}
-        aria-label="Open breakdown"
-      >
-        <ChartNoAxesColumn className="size-5" />
       </Button>
     </header>
   )
