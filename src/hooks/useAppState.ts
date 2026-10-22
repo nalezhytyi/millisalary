@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { trackAmplitudeEvent } from '../amplitude'
 import { WORKING_DAYS, WORKING_HOURS_PER_DAY } from '../constants'
 import {
@@ -75,6 +75,9 @@ export const useAppState = () => {
   )
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false)
+  // Number fields report one *_changed event on blur, not one per keystroke
+  const editedFields = useRef(new Set<string>())
+  const sheetOpenedAt = useRef({ settings: 0, breakdown: 0 })
 
   const { earnings, exchangeRate } = useEarnings(
     monthlySalary,
@@ -128,6 +131,7 @@ export const useAppState = () => {
     )
 
     setWorkingHoursPerDay(nextWorkingHoursPerDay)
+    editedFields.current.add('working_hours_per_day')
     if (startHour) {
       setEndHour(getEndHourFromStart(startHour, nextWorkingHoursPerDay))
     }
@@ -137,14 +141,35 @@ export const useAppState = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setWorkingDays(normalizeWorkingDays(parseSalaryInputValue(event.target.value)))
+    editedFields.current.add('working_days')
   }
+
+  const handleWorkingDaysBlur = useCallback(() => {
+    if (editedFields.current.delete('working_days')) {
+      trackAmplitudeEvent('working_days_changed', { working_days: workingDays })
+    }
+  }, [workingDays])
+
+  const handleWorkingHoursPerDayBlur = useCallback(() => {
+    if (editedFields.current.delete('working_hours_per_day')) {
+      trackAmplitudeEvent('working_hours_per_day_changed', {
+        working_hours_per_day: workingHoursPerDay,
+      })
+    }
+  }, [workingHoursPerDay])
 
   const handleSetPayday = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextPayday = normalizePayday(parseSalaryInputValue(event.target.value))
 
     setPayday(nextPayday)
-    trackAmplitudeEvent('payday_changed', { payday: nextPayday })
+    editedFields.current.add('payday')
   }
+
+  const handlePaydayBlur = useCallback(() => {
+    if (editedFields.current.delete('payday')) {
+      trackAmplitudeEvent('payday_changed', { payday })
+    }
+  }, [payday])
 
   const handleStartHourChange = (date: Date | null) => {
     const nextHours = getNextStartAndEndHours(date, endHour, workingHoursPerDay)
@@ -169,22 +194,40 @@ export const useAppState = () => {
     })
   }
 
-  const handleSettingsClick = useCallback(() => {
+  const openSettings = useCallback((source: 'header' | 'setup_hint') => {
+    sheetOpenedAt.current.settings = Date.now()
     setIsSettingsOpen(true)
-    trackAmplitudeEvent('settings_clicked')
+    trackAmplitudeEvent('settings_clicked', { source })
+  }, [])
+
+  const handleSettingsClick = useCallback(
+    () => openSettings('header'),
+    [openSettings]
+  )
+
+  const handleSetupHintSettingsClick = useCallback(
+    () => openSettings('setup_hint'),
+    [openSettings]
+  )
+
+  const handleCloseSettings = useCallback(() => {
+    setIsSettingsOpen(false)
+    trackAmplitudeEvent('settings_closed', {
+      duration_ms: Date.now() - sheetOpenedAt.current.settings,
+    })
   }, [])
 
   const handleBreakdownClick = useCallback(() => {
+    sheetOpenedAt.current.breakdown = Date.now()
     setIsBreakdownOpen(true)
     trackAmplitudeEvent('breakdown_opened')
   }, [])
 
   const handleCloseBreakdown = useCallback(() => {
     setIsBreakdownOpen(false)
-  }, [])
-
-  const handleCloseSettings = useCallback(() => {
-    setIsSettingsOpen(false)
+    trackAmplitudeEvent('breakdown_closed', {
+      duration_ms: Date.now() - sheetOpenedAt.current.breakdown,
+    })
   }, [])
 
   const handlePeriodChange = useCallback(
@@ -214,11 +257,15 @@ export const useAppState = () => {
     handleSetMonthlySalaryCurrency,
     handleSetEarningsCurrency,
     handleSetWorkingHoursPerDay,
+    handleWorkingHoursPerDayBlur,
     handleSetWorkingDays,
+    handleWorkingDaysBlur,
     handleSetPayday,
+    handlePaydayBlur,
     handleStartHourChange,
     handleEndHourChange,
     handleSettingsClick,
+    handleSetupHintSettingsClick,
     handleCloseSettings,
     handleBreakdownClick,
     handleCloseBreakdown,

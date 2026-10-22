@@ -36,8 +36,11 @@ interface SettingsSheetProps {
   onWorkingHoursPerDayChange: (
     event: React.ChangeEvent<HTMLInputElement>
   ) => void
+  onWorkingHoursPerDayBlur: () => void
   onWorkingDaysChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onWorkingDaysBlur: () => void
   onPaydayChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onPaydayBlur: () => void
   onStartHourChange: (date: Date | null) => void
   onEndHourChange: (date: Date | null) => void
   onThemeChange: (theme: Theme) => void
@@ -69,8 +72,11 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
   onMonthlySalaryCurrencyChange,
   onEarningsCurrencyChange,
   onWorkingHoursPerDayChange,
+  onWorkingHoursPerDayBlur,
   onWorkingDaysChange,
+  onWorkingDaysBlur,
   onPaydayChange,
+  onPaydayBlur,
   onStartHourChange,
   onEndHourChange,
   onThemeChange,
@@ -141,6 +147,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                 step="1"
                 value={workingDays}
                 onChange={onWorkingDaysChange}
+                onBlur={onWorkingDaysBlur}
                 onFocus={selectOnFocus}
                 className={numberInputClasses}
               />
@@ -155,6 +162,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                 step="0.5"
                 value={workingHoursPerDay}
                 onChange={onWorkingHoursPerDayChange}
+                onBlur={onWorkingHoursPerDayBlur}
                 onFocus={selectOnFocus}
                 className={numberInputClasses}
               />
@@ -189,6 +197,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                 step="1"
                 value={payday}
                 onChange={onPaydayChange}
+                onBlur={onPaydayBlur}
                 onFocus={selectOnFocus}
                 className={numberInputClasses}
               />
