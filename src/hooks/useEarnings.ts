@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { fetchExchangeRate } from '../api'
-import { WORKING_DAYS, WORKING_HOURS_PER_DAY } from '../constants'
 import {
-  calculateMillisecondsPastToday,
-  countBusinessDaysBeforeDate,
-  getWorkingDayMilliseconds,
+  calculateEarnings,
+  type EarningsSettings,
 } from '../utils/calculations'
 
 export const useEarnings = (
@@ -15,13 +13,21 @@ export const useEarnings = (
   startHour: Date | null,
   endHour: Date | null,
   workingDays: number,
-  workingHoursPerDay: number
+  workingHoursPerDay: number,
+  payday: number
 ) => {
-  const [currentEarnings, setCurrentEarnings] = useState<number>(0)
-  const [monthEarnings, setMonthEarnings] = useState<number>(0)
-  const [dayEarnings, setDayEarnings] = useState<number>(0)
-  const [totalDayEarnings, setTotalDayEarnings] = useState<number>(0)
   const [exchangeRate, setExchangeRate] = useState<number>(1)
+  const [earnings, setEarnings] = useState(() =>
+    calculateEarnings(dayjs(), {
+      monthlySalary,
+      workingDays,
+      workingHoursPerDay,
+      startHour,
+      endHour,
+      payday,
+      exchangeRate: 1,
+    })
+  )
 
   useEffect(() => {
     const updateExchangeRate = async () => {
@@ -40,52 +46,18 @@ export const useEarnings = (
   }, [monthlySalaryCurrency, earningsCurrency])
 
   useEffect(() => {
-    const updateEarnings = () => {
-      const now = dayjs()
-      const startOfDay = dayjs(startHour)
-      const endOfDay = dayjs(endHour)
-      const startOfMonth = now.startOf('month')
-      const startOfToday = now.startOf('day')
-      const safeWorkingDays = workingDays > 0 ? workingDays : WORKING_DAYS
-      const safeWorkingHoursPerDay =
-        workingHoursPerDay > 0 ? workingHoursPerDay : WORKING_HOURS_PER_DAY
-      const workingDayMilliseconds = getWorkingDayMilliseconds(
-        startHour,
-        endHour,
-        safeWorkingHoursPerDay
-      )
-      const dailySalary =
-        safeWorkingDays > 0 ? monthlySalary / safeWorkingDays : 0
-      const millisecondSalary =
-        workingDayMilliseconds > 0 ? dailySalary / workingDayMilliseconds : 0
-      const completedBusinessDays = countBusinessDaysBeforeDate(
-        startOfMonth,
-        startOfToday
-      )
-      const completedScheduledDays = Math.min(
-        completedBusinessDays,
-        safeWorkingDays
-      )
-      const isBusinessDayToday = now.day() !== 0 && now.day() !== 6
-      const isScheduledWorkingDayToday =
-        isBusinessDayToday && completedBusinessDays < safeWorkingDays
-
-      const millisecondsPastToday = isScheduledWorkingDayToday
-        ? calculateMillisecondsPastToday(now, startOfDay, endOfDay)
-        : 0
-      const estimatedEarnings = Math.min(
-        monthlySalary,
-        completedScheduledDays * dailySalary +
-          millisecondSalary * millisecondsPastToday
-      )
-      const estimatedDayEarnings = millisecondSalary * millisecondsPastToday
-
-      setCurrentEarnings(estimatedEarnings * exchangeRate)
-      setMonthEarnings(monthlySalary * exchangeRate)
-      setDayEarnings(estimatedDayEarnings * exchangeRate)
-      setTotalDayEarnings(dailySalary * exchangeRate)
+    const settings: EarningsSettings = {
+      monthlySalary,
+      workingDays,
+      workingHoursPerDay,
+      startHour,
+      endHour,
+      payday,
+      exchangeRate,
     }
+    const updateEarnings = () => setEarnings(calculateEarnings(dayjs(), settings))
 
+    updateEarnings()
     const timer = setInterval(updateEarnings, 100)
 
     return () => clearInterval(timer)
@@ -96,13 +68,8 @@ export const useEarnings = (
     exchangeRate,
     workingDays,
     workingHoursPerDay,
+    payday,
   ])
 
-  return {
-    currentEarnings,
-    monthEarnings,
-    dayEarnings,
-    totalDayEarnings,
-    exchangeRate,
-  }
+  return { earnings, exchangeRate }
 }
