@@ -33,7 +33,10 @@ const Sheet = ({
     onOpenChange={(next) => !next && onClose()}
     repositionInputs={repositionInputs}
   >
-    <DrawerContent className="h-[94dvh] bg-background data-[vaul-drawer-direction=bottom]:max-h-[94dvh] data-[vaul-drawer-direction=bottom]:rounded-t-[14px]">
+    {/* Same centered max-w-md column as the main screen, so on wide screens
+        the sheet opens over the app instead of spanning the window; side
+        borders mark its edges there (a black sheet on a black page in dark) */}
+    <DrawerContent className="mx-auto h-[94dvh] w-full max-w-md bg-background data-[vaul-drawer-direction=bottom]:max-h-[94dvh] data-[vaul-drawer-direction=bottom]:rounded-t-[14px] min-[28rem]:border-x">
       <div className="grid grid-cols-[1fr_auto_1fr] items-center px-4 pt-2 pb-2">
         <span />
         <DrawerTitle className="text-[17px] font-semibold">{title}</DrawerTitle>
