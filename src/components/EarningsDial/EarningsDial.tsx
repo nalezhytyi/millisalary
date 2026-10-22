@@ -79,12 +79,20 @@ const EarningsDial: React.FC<EarningsDialProps> = ({
         )}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-[2cqw] text-center">
-        <img
-          src={`${import.meta.env.BASE_URL}images/money-face.png`}
-          alt=""
-          className="size-[13cqw]"
-          draggable={false}
-        />
+        {/* Animated face; the static PNG (433×480, not square, hence
+            object-contain) when the user prefers reduced motion */}
+        <picture className="contents">
+          <source
+            srcSet={`${import.meta.env.BASE_URL}images/money-face.png`}
+            media="(prefers-reduced-motion: reduce)"
+          />
+          <img
+            src={`${import.meta.env.BASE_URL}images/money-face.gif`}
+            alt=""
+            className="size-[13cqw] object-contain"
+            draggable={false}
+          />
+        </picture>
         <div
           className="leading-none font-semibold whitespace-nowrap"
           style={{ fontSize: `${fontSize}cqw` }}

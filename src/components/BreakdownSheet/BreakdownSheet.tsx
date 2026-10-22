@@ -61,7 +61,7 @@ const BreakdownSheet: React.FC<BreakdownSheetProps> = ({
             <img
               src={`${import.meta.env.BASE_URL}images/money-face.png`}
               alt=""
-              className="size-14 shrink-0"
+              className="size-14 shrink-0 object-contain"
               draggable={false}
             />
             <div className="min-w-0 flex-1">
