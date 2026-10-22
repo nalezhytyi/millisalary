@@ -28,25 +28,25 @@ const EarningsSummary: React.FC<EarningsSummaryProps> = ({
             <div className="text-lg text-gray-300 sm:text-xl">
               Current earnings:
             </div>
-            <div className="leading-tight [overflow-wrap:anywhere]">
+            <div className="leading-tight wrap-anywhere">
               {formatCurrency(currentEarnings, earningsCurrency)}
             </div>
           </div>
           <div className="mb-10 text-lg text-gray-200">
             <span className="mr-1">Today:</span>
-            <span className="[overflow-wrap:anywhere]">
+            <span className="wrap-anywhere">
               {formatCurrency(dayEarnings, earningsCurrency)}
             </span>
           </div>
           <div className="text-lg text-gray-300">
             <span className="mr-1">Daily:</span>
-            <span className="[overflow-wrap:anywhere]">
+            <span className="wrap-anywhere">
               {formatCurrency(totalDayEarnings, earningsCurrency)}
             </span>
           </div>
           <div className="text-lg text-gray-300">
             <span className="mr-1">Monthly:</span>
-            <span className="[overflow-wrap:anywhere]">
+            <span className="wrap-anywhere">
               {formatCurrency(monthEarnings, earningsCurrency)}
             </span>
           </div>
@@ -58,7 +58,7 @@ const EarningsSummary: React.FC<EarningsSummaryProps> = ({
         {currentEarnings > 0 && (
           <img
             width={90}
-            className="w-16 flex-shrink-0 sm:w-[90px]"
+            className="w-16 shrink-0 sm:w-[90px]"
             src="images/money-flying.gif"
             alt=""
           />

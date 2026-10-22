@@ -30,7 +30,7 @@ const TimePicker: FC<{
         onChange={(event) =>
           onChange(parseTimeInputValue(event.target.value, selected))
         }
-        className="time-picker-input w-full rounded border border-gray-200/20 bg-gray-400/10 p-2 text-gray-200 outline-gray-200/20 backdrop-blur-md"
+        className="time-picker-input w-full rounded-sm border border-gray-200/20 bg-gray-400/10 p-2 text-gray-200 outline-gray-200/20 backdrop-blur-md"
       />
     </div>
   )

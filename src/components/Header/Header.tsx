@@ -5,7 +5,7 @@ interface HeaderProps {
 const Header = ({ onSettingsClick }: HeaderProps) => {
   return (
     <header className="flex w-full select-none items-center gap-4 border-b border-gray-200/20 bg-gray-400/10 p-4 pt-[calc(1rem+env(safe-area-inset-top))] backdrop-blur-md">
-      <h1 className="bg-gradient-to-r from-white to-orange-500 bg-clip-text text-5xl font-bold text-transparent opacity-70">
+      <h1 className="bg-linear-to-r from-white to-orange-500 bg-clip-text text-5xl font-bold text-transparent opacity-70">
         Millisalary
       </h1>
       <img

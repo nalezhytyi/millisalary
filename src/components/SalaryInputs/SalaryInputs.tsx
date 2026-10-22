@@ -28,7 +28,7 @@ interface SalaryInputsProps {
 }
 
 const fieldClasses =
-  'w-full rounded border border-gray-200/20 bg-gray-400/10 p-2 text-gray-200 outline-gray-200/20 backdrop-blur-md'
+  'w-full rounded-sm border border-gray-200/20 bg-gray-400/10 p-2 text-gray-200 outline-gray-200/20 backdrop-blur-md'
 
 const SalaryInputs: React.FC<SalaryInputsProps> = ({
   monthlySalary,

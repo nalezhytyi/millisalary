@@ -35,7 +35,7 @@ const CurrencySelect: React.FC<CurrencySelectProps> = ({
       <select
         value={selectedCurrency}
         onChange={onCurrencyChange}
-        className="form-select w-full cursor-pointer appearance-none rounded border border-gray-200/20 bg-gray-400/10 p-2 pr-8 outline-gray-200/20"
+        className="form-select w-full cursor-pointer appearance-none rounded-sm border border-gray-200/20 bg-gray-400/10 p-2 pr-8 outline-gray-200/20"
         style={{
           backgroundSize: '0.7rem',
           backgroundRepeat: 'no-repeat',
