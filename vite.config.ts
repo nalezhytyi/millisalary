@@ -12,8 +12,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: [
         'apple-touch-icon.png',
-        'pwa-192x192.png',
-        'pwa-512x512.png',
+        'pwa-square-192x192.png',
+        'pwa-square-512x512.png',
+        'pwa-maskable-512x512.png',
         // static face for the Breakdown card and reduced-motion dial
         'images/money-face.png',
       ],
@@ -40,16 +41,25 @@ export default defineConfig({
         display: 'standalone',
         scope: '/millisalary/',
         start_url: '/millisalary/',
+        // New file names whenever the artwork changes: Chrome only refreshes
+        // an installed app's icon when these entries change
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'pwa-square-192x192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'pwa-square-512x512.png',
             sizes: '512x512',
             type: 'image/png',
+          },
+          // Full bleed for Android, which crops it to the launcher's shape
+          {
+            src: 'pwa-maskable-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },
