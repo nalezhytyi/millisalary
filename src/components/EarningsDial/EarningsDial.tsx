@@ -108,7 +108,10 @@ const EarningsDial: React.FC<EarningsDialProps> = ({
           {parts.symbolPosition === 'suffix' && <> {symbol}</>}
         </div>
         <p className="max-w-[62cqw] text-[3cqw] tracking-[0.12em] text-muted-foreground uppercase">
-          of {formatCurrency(total, currency)} {PERIOD_CAPTION[period]}
+          of{' '}
+          {/* keep currency symbols like zł or Kč out of the caption's caps */}
+          <span className="normal-case">{formatCurrency(total, currency)}</span>{' '}
+          {PERIOD_CAPTION[period]}
         </p>
       </div>
     </div>
