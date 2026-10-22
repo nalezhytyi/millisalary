@@ -1,24 +1,29 @@
 import React from 'react'
 import SegmentedControl from '@/components/SegmentedControl'
-import type { Period } from '@/utils/calculations'
+import { PERIODS, type Period } from '@/utils/calculations'
 
 interface PeriodTabsProps {
   value: Period
   onChange: (period: Period) => void
 }
 
-const PERIODS: { value: Period; label: string }[] = [
-  { value: 'hour', label: 'Hour' },
-  { value: 'day', label: 'Day' },
-  { value: 'week', label: 'Week' },
-  { value: 'month', label: 'Month' },
-  { value: 'year', label: 'Year' },
-]
+const PERIOD_LABELS: Record<Period, string> = {
+  hour: 'Hour',
+  day: 'Day',
+  week: 'Week',
+  month: 'Month',
+  year: 'Year',
+}
+
+const PERIOD_OPTIONS = PERIODS.map((period) => ({
+  value: period,
+  label: PERIOD_LABELS[period],
+}))
 
 const PeriodTabs: React.FC<PeriodTabsProps> = ({ value, onChange }) => (
   <SegmentedControl
     aria-label="Earnings period"
-    options={PERIODS}
+    options={PERIOD_OPTIONS}
     value={value}
     onChange={onChange}
   />

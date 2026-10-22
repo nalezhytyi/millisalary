@@ -14,7 +14,20 @@ export default defineConfig({
         'apple-touch-icon.png',
         'pwa-192x192.png',
         'pwa-512x512.png',
+        // static face for the Breakdown card and reduced-motion dial
+        'images/money-face.png',
       ],
+      workbox: {
+        // The animated dial face (2.4 MB) is too heavy to precache; keep it
+        // after the first online load so it also shows offline
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.endsWith('/money-face.gif'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'images' },
+          },
+        ],
+      },
       manifest: {
         id: '/millisalary/',
         name: 'Millisalary',
