@@ -32,22 +32,22 @@ The UI follows native iOS conventions (system colors, bottom sheets, segmented c
 
 ## Getting Started
 
-Install dependencies:
+Install dependencies (the project uses pnpm; `packageManager` is pinned in `package.json`, so `corepack enable` picks the right version):
 
 ```bash
-npm install
+pnpm install
 ```
 
 Start the development server:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Expose the dev server on your network:
 
 ```bash
-npm run dev:host
+pnpm run dev:host
 ```
 
 The Vite dev server runs on:
@@ -61,37 +61,37 @@ http://localhost:3000
 Run the local development server:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Run the local development server and bind to `0.0.0.0`:
 
 ```bash
-npm run dev:host
+pnpm run dev:host
 ```
 
 Create a production build:
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 Preview the production build locally:
 
 ```bash
-npm run preview
+pnpm run preview
 ```
 
 Run linting:
 
 ```bash
-npm run lint
+pnpm run lint
 ```
 
 Deploy to GitHub Pages:
 
 ```bash
-npm run deploy
+pnpm run deploy
 ```
 
 ## PWA Notes
@@ -106,8 +106,8 @@ This project is configured as a PWA with:
 For the most accurate PWA testing locally, use:
 
 ```bash
-npm run build
-npm run preview
+pnpm run build
+pnpm run preview
 ```
 
 The app is configured with:
