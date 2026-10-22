@@ -19,11 +19,12 @@ export default defineConfig({
       ],
       workbox: {
         // The animated dial face (2.4 MB) is too heavy to precache; keep it
-        // after the first online load so it also shows offline
+        // after the first online load so it also shows offline, and
+        // revalidate since its URL isn't content-hashed
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.endsWith('/money-face.gif'),
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: { cacheName: 'images' },
           },
         ],
@@ -32,7 +33,8 @@ export default defineConfig({
         id: '/millisalary/',
         name: 'Millisalary',
         short_name: 'Millisalary',
-        description: 'Track your earnings in real time and estimate your salary.',
+        description:
+          'Track your earnings in real time and estimate your salary.',
         theme_color: '#f2f2f7',
         background_color: '#f2f2f7',
         display: 'standalone',
