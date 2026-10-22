@@ -5,17 +5,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev        # Vite dev server on :3000, served under /millisalary/ (opens a browser)
-npm run dev:host   # same, bound to 0.0.0.0 for testing on a phone
-npm run build      # tsc -b (the only type check) + vite build into build/
-npm run preview    # serve build/ — use this to test the service worker / install flow
-npm run lint       # eslint over **/*.ts(x)
-npm run deploy     # build, then gh-pages pushes build/ to the gh-pages branch
+pnpm install        # pnpm only (packageManager is pinned in package.json)
+pnpm run dev        # Vite dev server on :3000, served under /millisalary/ (opens a browser)
+pnpm run dev:host   # same, bound to 0.0.0.0 for testing on a phone
+pnpm run build      # tsc -b (the only type check) + vite build into build/
+pnpm run preview    # serve build/ — use this to test the service worker / install flow
+pnpm run lint       # eslint over **/*.ts(x)
+pnpm run deploy     # build, then gh-pages pushes build/ to the gh-pages branch
 ```
 
 - There is no test suite. Verify changes in the running app; `.claude/launch.json` defines a `millisalary-dev` preview server on port 5174.
 - Lint baseline: 0 errors and 2 `react-refresh/only-export-components` warnings in the generated `ui/button.tsx` and `ui/tabs.tsx` (standard shadcn output). Anything beyond that is a regression.
-- `npm run deploy` publishes to https://nalezhytyi.github.io/millisalary/ (Pages takes ~1 min to pick it up). Never `git push` or deploy without the user's explicit approval for that specific push/deploy.
+- `pnpm run deploy` (not `pnpm deploy`, which is pnpm's own workspace command) publishes to https://nalezhytyi.github.io/millisalary/ (Pages takes ~1 min to pick it up). Never `git push` or deploy without the user's explicit approval for that specific push/deploy.
+- pnpm specifics: it does not run `pre*`/`post*` scripts, so `deploy` builds explicitly; install scripts only run for packages in `pnpm.onlyBuiltDependencies` (`esbuild`); and `node_modules` is strict, so every import needs a declared dependency — e.g. `workbox-window` is a devDependency because `virtual:pwa-register` imports it.
 - Commit with the repo-local git identity (`nalezhytyi`), not the global work identity. Commit messages use Conventional Commits with a lowercase scope, e.g. `fix(pwa): …`, `feat(timepicker): …`.
 
 ## Architecture
@@ -32,7 +34,7 @@ Single-page React 19 + TypeScript + Tailwind v4 + shadcn/ui (Radix) app, no rout
 
 **UI and theme:** the main screen is the header (round Settings and Breakdown buttons), `EarningsDial`, `StatsRow`, a `PeriodTabs` segmented control and `SetupHint` when no salary is set. Settings and Breakdown are shadcn/vaul bottom sheets (`SettingsSheet`, `BreakdownSheet`) built from shared `SheetHeader`, `ListGroup` and `ListRow`. Colors are shadcn tokens in `src/index.css` mapped to iOS system colors (`systemGroupedBackground`, `label`, `separator`, `systemBlue`, …) for `:root` and `.dark`; there is no other palette. `useTheme` keeps `system | light | dark` in `localStorage.theme` and toggles `.dark`, `color-scheme` and the `theme-color` meta; an inline script in `index.html` applies it before first paint (keep both in sync). Native `<select>` and `<input type="time">` stay native on purpose so iOS shows its system wheels.
 
-**shadcn:** components live in `src/components/ui/` (`components.json`, style `radix-nova`, alias `@/`). The CLI (4.22) writes `import { cn } from "cn"`, which is an unrelated npm package: after every `npx shadcn@latest add …` run `grep -rn 'from "cn"' src/`, point those imports at `@/lib/utils` and `npm uninstall cn`.
+**shadcn:** components live in `src/components/ui/` (`components.json`, style `radix-nova`, alias `@/`). The CLI (4.22) writes `import { cn } from "cn"`, which is an unrelated npm package: after every `pnpm dlx shadcn@latest add …` run `grep -rn 'from "cn"' src/`, point those imports at `@/lib/utils` and `pnpm remove cn`.
 
 **Components** each live in their own folder with an `index.ts` re-export and, when needed, a co-located `.css` file for things Tailwind can't express (webkit pseudo-elements, platform workarounds).
 
