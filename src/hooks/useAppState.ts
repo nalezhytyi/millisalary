@@ -8,6 +8,7 @@ import {
   getEndHourFromStart,
   getNextEndAndStartHours,
   getNextStartAndEndHours,
+  normalizePayday,
   normalizeWorkingDays,
   normalizeWorkingHoursPerDay,
   parseSalaryInputValue,
@@ -42,6 +43,7 @@ export const useAppState = () => {
     'workingDays',
     WORKING_DAYS
   )
+  const [payday, setPayday] = useLocalStorage('payday', 1)
   const [isInputsCollapsed, setIsInputsCollapsed] = useLocalStorage(
     'isInputsCollapsed',
     false
@@ -72,21 +74,21 @@ export const useAppState = () => {
   )
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const {
-    currentEarnings,
-    monthEarnings,
-    dayEarnings,
-    totalDayEarnings,
-    exchangeRate,
-  } = useEarnings(
+  const { earnings, exchangeRate } = useEarnings(
     monthlySalary,
     monthlySalaryCurrency,
     earningsCurrency,
     startHour,
     endHour,
     workingDays,
-    workingHoursPerDay
+    workingHoursPerDay,
+    payday
   )
+  // Legacy shape for the old main screen; goes away with the new UI (Epic 4)
+  const currentEarnings = earnings.month.earned
+  const monthEarnings = earnings.month.total
+  const dayEarnings = earnings.day.earned
+  const totalDayEarnings = earnings.day.total
 
   const handleSetMonthlySalary = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -140,6 +142,13 @@ export const useAppState = () => {
     setWorkingDays(normalizeWorkingDays(parseSalaryInputValue(event.target.value)))
   }
 
+  const handleSetPayday = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextPayday = normalizePayday(parseSalaryInputValue(event.target.value))
+
+    setPayday(nextPayday)
+    trackAmplitudeEvent('payday_changed', { payday: nextPayday })
+  }
+
   const handleStartHourChange = (date: Date | null) => {
     const nextHours = getNextStartAndEndHours(date, endHour, workingHoursPerDay)
 
@@ -190,10 +199,12 @@ export const useAppState = () => {
     earningsCurrency,
     workingHoursPerDay,
     workingDays,
+    payday,
     isInputsCollapsed,
     startHour,
     endHour,
     isSidebarOpen,
+    earnings,
     currentEarnings,
     monthEarnings,
     dayEarnings,
@@ -205,6 +216,7 @@ export const useAppState = () => {
     handleSetEarningsCurrency,
     handleSetWorkingHoursPerDay,
     handleSetWorkingDays,
+    handleSetPayday,
     handleStartHourChange,
     handleEndHourChange,
     handleSettingsClick,
