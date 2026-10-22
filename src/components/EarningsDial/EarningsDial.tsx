@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { formatCurrency, formatCurrencyParts } from '@/utils/calculations'
 import type { Period } from '@/utils/calculations'
+import './EarningsDial.css'
 
 interface EarningsDialProps {
   earned: number
@@ -27,6 +28,39 @@ const EarningsDial: React.FC<EarningsDialProps> = ({
   period,
 }) => {
   const progress = total > 0 ? Math.min(1, Math.max(0, earned / total)) : 0
+  // Start from an empty ring so the arc grows in on first paint
+  const [hasMounted, setHasMounted] = useState(false)
+  const shownProgress = hasMounted ? progress : 0
+  // The arc only animates on mount and on a period switch; the 100 ms ticks
+  // in between apply directly instead of restarting a transition each time
+  const [animatedPeriod, setAnimatedPeriod] = useState(period)
+  const [isAnimating, setIsAnimating] = useState(true)
+
+  if (period !== animatedPeriod) {
+    // Same render as the new value, so the transition class is already there
+    setAnimatedPeriod(period)
+    setIsAnimating(true)
+  }
+
+  useEffect(() => {
+    // A timer, not requestAnimationFrame: rAF doesn't run in a hidden tab,
+    // which would leave the ring empty until the tab is shown
+    const timer = setTimeout(() => setHasMounted(true), 50)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!isAnimating) {
+      return
+    }
+
+    // A bit longer than the 700 ms transition in EarningsDial.css
+    const timer = setTimeout(() => setIsAnimating(false), 800)
+
+    return () => clearTimeout(timer)
+  }, [isAnimating, animatedPeriod])
+
   const parts = formatCurrencyParts(earned, currency, 4)
   const bigFraction = parts.fraction.slice(0, BIG_FRACTION_DIGITS)
   const smallFraction = parts.fraction.slice(BIG_FRACTION_DIGITS)
@@ -63,20 +97,19 @@ const EarningsDial: React.FC<EarningsDialProps> = ({
           strokeWidth="6"
           className="stroke-secondary"
         />
-        {progress > 0 && (
-          <circle
-            cx="50"
-            cy="50"
-            r={RADIUS}
-            fill="none"
-            strokeWidth="6"
-            strokeLinecap="round"
-            pathLength={100}
-            strokeDasharray={`${progress * 100} 100`}
-            transform="rotate(-90 50 50)"
-            className="stroke-primary"
-          />
-        )}
+        <circle
+          cx="50"
+          cy="50"
+          r={RADIUS}
+          fill="none"
+          strokeWidth="6"
+          strokeLinecap="round"
+          pathLength={100}
+          strokeDasharray={`${shownProgress * 100} 100`}
+          transform="rotate(-90 50 50)"
+          className={`stroke-primary ${isAnimating ? 'earnings-dial-arc-animated' : ''}`}
+          style={{ opacity: shownProgress > 0 ? 1 : 0 }}
+        />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-[2cqw] text-center">
         {/* Animated face; the static PNG (433×480, not square, hence
@@ -102,7 +135,10 @@ const EarningsDial: React.FC<EarningsDialProps> = ({
           {parts.integer}
           {parts.decimal}
           {bigFraction}
-          <span className="text-muted-foreground" style={{ fontSize: '0.62em' }}>
+          <span
+            className="text-muted-foreground"
+            style={{ fontSize: '0.62em' }}
+          >
             {smallFraction}
           </span>
           {parts.symbolPosition === 'suffix' && <> {symbol}</>}
@@ -110,7 +146,9 @@ const EarningsDial: React.FC<EarningsDialProps> = ({
         <p className="max-w-[62cqw] text-[3cqw] tracking-[0.12em] text-muted-foreground uppercase">
           of{' '}
           {/* keep currency symbols like zł or Kč out of the caption's caps */}
-          <span className="normal-case">{formatCurrency(total, currency)}</span>{' '}
+          <span className="normal-case">
+            {formatCurrency(total, currency)}
+          </span>{' '}
           {PERIOD_CAPTION[period]}
         </p>
       </div>
