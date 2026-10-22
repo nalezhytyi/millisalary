@@ -265,3 +265,4 @@ updated: 2026-10-22
 - 2026-10-22 — Epic 7 approved; усі епіки затверджено, задача в review
 - 2026-10-22 — після рев'ю: емодзі в циферблаті й картці Breakdown було розплющене (PNG 433×480 у квадратному боксі) — додано `object-contain`; у циферблаті повернуто анімований `money-face.gif` зі старого хедера (статичний PNG при `prefers-reduced-motion`)
 - 2026-10-22 — після рев'ю: валюти показуються вузьким символом (`currencyDisplay: 'narrowSymbol'`: ₴, $, €, zł, Kč, lei) замість «грн»/«USD», однаково в Chromium і WebKit; сума в підписі циферблата не переводиться в капс
+- 2026-10-22 — після рев'ю: Amplitude-події для нового UI — `settings_clicked` із `source` (header / setup_hint), `settings_closed` і `breakdown_closed` з `duration_ms`, `working_days_changed`, `working_hours_per_day_changed`; `payday_changed` тепер шлеться раз на blur, а не на кожне натискання

@@ -28,11 +28,15 @@ const App: React.FC = () => {
     handleSetMonthlySalaryCurrency,
     handleSetEarningsCurrency,
     handleSetWorkingHoursPerDay,
+    handleWorkingHoursPerDayBlur,
     handleSetWorkingDays,
+    handleWorkingDaysBlur,
     handleSetPayday,
+    handlePaydayBlur,
     handleStartHourChange,
     handleEndHourChange,
     handleSettingsClick,
+    handleSetupHintSettingsClick,
     handleCloseSettings,
     handleBreakdownClick,
     handleCloseBreakdown,
@@ -59,8 +63,11 @@ const App: React.FC = () => {
         onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
         onEarningsCurrencyChange={handleSetEarningsCurrency}
         onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
+        onWorkingHoursPerDayBlur={handleWorkingHoursPerDayBlur}
         onWorkingDaysChange={handleSetWorkingDays}
+        onWorkingDaysBlur={handleWorkingDaysBlur}
         onPaydayChange={handleSetPayday}
+        onPaydayBlur={handlePaydayBlur}
         onStartHourChange={handleStartHourChange}
         onEndHourChange={handleEndHourChange}
         onThemeChange={setTheme}
@@ -89,7 +96,7 @@ const App: React.FC = () => {
         {monthlySalary > 0 ? (
           <StatsRow earnings={earnings} currency={earningsCurrency} />
         ) : (
-          <SetupHint onOpenSettings={handleSettingsClick} />
+          <SetupHint onOpenSettings={handleSetupHintSettingsClick} />
         )}
         <div className="mt-4">
           <PeriodTabs value={selectedPeriod} onChange={handlePeriodChange} />
