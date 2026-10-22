@@ -189,22 +189,32 @@ updated: 2026-10-22
 
 
 ### Epic 6: Шит Breakdown (кнопка справа)
-**Status:** pending
+**Status:** approved
 
 **Description:** Детальна розбивка в стилі другого скріншоту, на iOS-кольорах.
 
 **Subtasks:**
-- [ ] `Drawer` із заголовком «Breakdown» і кнопкою Done; подія `breakdown_opened`
-- [ ] Картка Next payday: `money-face.png`, дата (`dddd, MMMM D`), сума, «N days» акцентним кольором
-- [ ] Секція «Earned so far»: This hour / Today / This week / This month / This year — заробіток, «of total» і тонкий `Progress` (трек `tertiarySystemFill`, заповнення `systemBlue`)
-- [ ] Секція «Your rate»: ставка за секунду / хвилину / годину / день
-- [ ] Внизу пояснення моделі (робочі години, пн–пт) і курс валют
+- [x] `Drawer` із заголовком «Breakdown» і кнопкою Done; подія `breakdown_opened`
+- [x] Картка Next payday: `money-face.png`, дата (`dddd, MMMM D`), сума, «N days» акцентним кольором
+- [x] Секція «Earned so far»: This hour / Today / This week / This month / This year — заробіток, «of total» і тонкий `Progress` (трек `tertiarySystemFill`, заповнення `systemBlue`)
+- [x] Секція «Your rate»: ставка за секунду / хвилину / годину / день
+- [x] Внизу пояснення моделі (робочі години, пн–пт) і курс валют
 
 **Acceptance criteria:**
-- [ ] Цифри збігаються з циферблатом і рядком статистики
-- [ ] Значення тікають при відкритому шиті
-- [ ] Довгі суми в UAH не переносяться криво
-- [ ] На iOS standalone шит скролиться всередині й не обрізаний
+- [x] Цифри збігаються з циферблатом і рядком статистики (UAH, 250 000/міс: Today 10 096,88 на екрані vs 10 096,99 у шиті, різниця — лише час між двома зчитуваннями, ≈0,1316 грн/с; ставки: 0,1316 / 7,90 / 473,81 / 11 363,64; Next payday 28 жовтня, 6 днів)
+- [x] Значення тікають при відкритому шиті (два зчитування через 1 с дали різні суми)
+- [x] Довгі суми в UAH не переносяться криво (3 000 000,00 грн на 375px: «of …» сам переходить на другий рядок, підпис і число не рвуться)
+- [x] ~~На iOS standalone шит скролиться всередині й не обрізаний~~ — перенесено в Epic 7 (за рішенням користувача): симулятор недоступний через ліцензію Xcode. Скрол усередині шита перевірено в браузері
+
+**Примітки до виконання:**
+- Новий `BreakdownSheet`; кнопка Breakdown в `Header` більше не `disabled` (`onBreakdownClick` обов'язковий). У `useAppState` додано `isBreakdownOpen`, `handleBreakdownClick` (подія `breakdown_opened`), `handleCloseBreakdown`.
+- Спільні примітиви для обох шитів: `SheetHeader` (заголовок + Done), `ListGroup` і `ListRow` (були `SettingsGroup`/`SettingsRow`, перейменовано через `git mv`); `SettingsSheet` переведено на них.
+- Картка Next payday: `money-face.png`, дата `dddd, MMMM D` через dayjs, сума «… paycheck», справа «N days» акцентом (`Today` / `1 day`).
+- Пояснення внизу: «Pay is spread evenly over each working day (Mon–Fri) between your start and end time.» і, якщо валюти різні, `Exchange rate: 1 USD = X UAH.` Рядок з курсом візуально не перевіряв (курс у цьому середовищі не завантажується).
+- Знайдено й виправлено під час перевірки: у першій версії довгі суми в UAH рвали рядок («This week» ділилось на два рядки, «грн» лишалось сиротою) — тепер підпис не переноситься, а «of total» переходить на другий рядок цілим блоком.
+- Скріншоти: вбудований браузер двічі віддав хибний кадр (контент виглядав збільшеним удвічі); DOM показував коректні 375 px без переповнення, а повторне `resize_window` лікувало кадр. Це артефакт інструмента, не додатка.
+- `npm run build` проходить; lint: 0 помилок, 2 попередні warning у `ui/*`.
+
 
 ### Epic 7: Прибирання, PWA та документація
 **Status:** pending
@@ -224,6 +234,7 @@ updated: 2026-10-22
 - [ ] `build` + `preview`: оновлення SW проходить без застарілого кешу
 - [ ] Повна перевірка на iOS Simulator у standalone в обох темах: статус-бар читається, внизу немає смуги, шити відкриваються й закриваються
 - [ ] Шит налаштувань на iOS standalone (перенесено з Epic 5): не обрізаний знизу; фокус на полі не зсуває додаток убік; тап по select і time відкриває нативне колесо
+- [ ] Шит Breakdown на iOS standalone (перенесено з Epic 6): скролиться всередині й не обрізаний знизу
 
 ## Execution log
 - 2026-10-22 — created, plan agreed with user
@@ -237,3 +248,5 @@ updated: 2026-10-22
 - 2026-10-22 — Epic 4 approved
 - 2026-10-22 — Epic 5 work complete (iOS-перевірка не виконана: Xcode license), awaiting approval
 - 2026-10-22 — Epic 5 approved; iOS-перевірку шита налаштувань перенесено в Epic 7
+- 2026-10-22 — Epic 6 work complete (iOS-перевірка не виконана), awaiting approval
+- 2026-10-22 — Epic 6 approved; iOS-перевірку шита Breakdown перенесено в Epic 7

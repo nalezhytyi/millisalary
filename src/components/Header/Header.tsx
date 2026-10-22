@@ -3,8 +3,7 @@ import { Button } from '@/components/ui/button'
 
 interface HeaderProps {
   onSettingsClick: () => void
-  /** Breakdown stays disabled until its sheet exists */
-  onBreakdownClick?: () => void
+  onBreakdownClick: () => void
 }
 
 const Header = ({ onSettingsClick, onBreakdownClick }: HeaderProps) => {
@@ -43,7 +42,6 @@ const Header = ({ onSettingsClick, onBreakdownClick }: HeaderProps) => {
         size="icon"
         className="size-11 rounded-full text-primary"
         onClick={onBreakdownClick}
-        disabled={!onBreakdownClick}
         aria-label="Open breakdown"
       >
         <ChartNoAxesColumn className="size-5" />
