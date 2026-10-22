@@ -130,7 +130,6 @@ html.ios-standalone {
   height: 100%;
   overflow-y: auto;
 }
-.ios-standalone .app-background,
 .ios-standalone .sidebar,
 .ios-standalone .sidebar-overlay {
   position: absolute;
