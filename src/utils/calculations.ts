@@ -270,6 +270,9 @@ export const formatCurrency = (
   return new Intl.NumberFormat('uk-UA', {
     style: 'currency',
     currency: currency,
+    // ₴ / $ / € / zł … on every platform; plain 'symbol' gives "грн" in
+    // Chromium, "₴" in WebKit and the ISO code for USD under uk-UA
+    currencyDisplay: 'narrowSymbol',
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   })
@@ -296,6 +299,7 @@ export const formatCurrencyParts = (
   const parts = new Intl.NumberFormat('uk-UA', {
     style: 'currency',
     currency: currency,
+    currencyDisplay: 'narrowSymbol',
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   }).formatToParts(amount)
