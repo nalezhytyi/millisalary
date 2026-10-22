@@ -18,6 +18,7 @@ pnpm run deploy     # build, then gh-pages pushes build/ to the gh-pages branch
 - Lint baseline: 0 errors and 1 `react-refresh/only-export-components` warning in the generated `ui/button.tsx` (standard shadcn output). Anything beyond that is a regression.
 - `pnpm run deploy` (not `pnpm deploy`, which is pnpm's own workspace command) publishes to https://nalezhytyi.github.io/millisalary/ (Pages takes ~1 min to pick it up). Never `git push` or deploy without the user's explicit approval for that specific push/deploy.
 - pnpm specifics: it does not run `pre*`/`post*` scripts, so `deploy` builds explicitly; install scripts only run for packages in `pnpm.onlyBuiltDependencies` (`esbuild`); and `node_modules` is strict, so every import needs a declared dependency — e.g. `workbox-window` is a devDependency because `virtual:pwa-register` imports it.
+- Prettier runs `prettier-plugin-tailwindcss` 0.7.x with `tailwindStylesheet: ./src/index.css` in `.prettierrc` (needed to sort Tailwind v4 theme classes); 0.8.1 crashed intermittently with `e.charAt is not a function`.
 - Commit with the repo-local git identity (`nalezhytyi`), not the global work identity. Commit messages use Conventional Commits with a lowercase scope, e.g. `fix(pwa): …`, `feat(timepicker): …`.
 
 ## Architecture
