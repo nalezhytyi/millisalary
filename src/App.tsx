@@ -2,9 +2,8 @@ import React from 'react'
 import EarningsDial from './components/EarningsDial'
 import Header from './components/Header'
 import PeriodTabs from './components/PeriodTabs'
-import SalaryInputs from './components/SalaryInputs'
+import SettingsSheet from './components/SettingsSheet'
 import SetupHint from './components/SetupHint'
-import Sidebar from './components/Sidebar'
 import StatsRow from './components/StatsRow'
 import { useAppState, useTheme } from './hooks'
 
@@ -15,10 +14,11 @@ const App: React.FC = () => {
     earningsCurrency,
     workingHoursPerDay,
     workingDays,
+    payday,
     selectedPeriod,
     startHour,
     endHour,
-    isSidebarOpen,
+    isSettingsOpen,
     earnings,
     handleSetMonthlySalary,
     handleMonthlySalaryBlur,
@@ -26,36 +26,40 @@ const App: React.FC = () => {
     handleSetEarningsCurrency,
     handleSetWorkingHoursPerDay,
     handleSetWorkingDays,
+    handleSetPayday,
     handleStartHourChange,
     handleEndHourChange,
     handleSettingsClick,
-    handleCloseSidebar,
+    handleCloseSettings,
     handlePeriodChange,
   } = useAppState()
-  useTheme()
+  const { theme, setTheme } = useTheme()
 
   return (
     <>
-      {/* Stopgap: the inputs live in the old sidebar until the settings sheet (Epic 5) */}
-      <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar}>
-        <SalaryInputs
-          monthlySalary={monthlySalary}
-          monthlySalaryCurrency={monthlySalaryCurrency}
-          earningsCurrency={earningsCurrency}
-          workingHoursPerDay={workingHoursPerDay}
-          workingDays={workingDays}
-          startHour={startHour}
-          endHour={endHour}
-          onMonthlySalaryChange={handleSetMonthlySalary}
-          onMonthlySalaryBlur={handleMonthlySalaryBlur}
-          onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
-          onEarningsCurrencyChange={handleSetEarningsCurrency}
-          onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
-          onWorkingDaysChange={handleSetWorkingDays}
-          onStartHourChange={handleStartHourChange}
-          onEndHourChange={handleEndHourChange}
-        />
-      </Sidebar>
+      <SettingsSheet
+        open={isSettingsOpen}
+        onClose={handleCloseSettings}
+        monthlySalary={monthlySalary}
+        monthlySalaryCurrency={monthlySalaryCurrency}
+        earningsCurrency={earningsCurrency}
+        workingHoursPerDay={workingHoursPerDay}
+        workingDays={workingDays}
+        payday={payday}
+        startHour={startHour}
+        endHour={endHour}
+        theme={theme}
+        onMonthlySalaryChange={handleSetMonthlySalary}
+        onMonthlySalaryBlur={handleMonthlySalaryBlur}
+        onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
+        onEarningsCurrencyChange={handleSetEarningsCurrency}
+        onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
+        onWorkingDaysChange={handleSetWorkingDays}
+        onPaydayChange={handleSetPayday}
+        onStartHourChange={handleStartHourChange}
+        onEndHourChange={handleEndHourChange}
+        onThemeChange={setTheme}
+      />
       <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <Header onSettingsClick={handleSettingsClick} />
         <div className="flex flex-1 items-center justify-center py-4">

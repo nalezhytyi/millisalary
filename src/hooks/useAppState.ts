@@ -73,7 +73,7 @@ export const useAppState = () => {
     (date: Date | null) => setEndHourValue(formatTimeInputValue(date)),
     [setEndHourValue]
   )
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   const { earnings, exchangeRate } = useEarnings(
     monthlySalary,
@@ -169,12 +169,12 @@ export const useAppState = () => {
   }
 
   const handleSettingsClick = useCallback(() => {
-    setIsSidebarOpen(true)
+    setIsSettingsOpen(true)
     trackAmplitudeEvent('settings_clicked')
   }, [])
 
-  const handleCloseSidebar = useCallback(() => {
-    setIsSidebarOpen(false)
+  const handleCloseSettings = useCallback(() => {
+    setIsSettingsOpen(false)
   }, [])
 
   const handlePeriodChange = useCallback(
@@ -195,7 +195,7 @@ export const useAppState = () => {
     selectedPeriod,
     startHour,
     endHour,
-    isSidebarOpen,
+    isSettingsOpen,
     earnings,
     exchangeRate,
     handleSetMonthlySalary,
@@ -208,7 +208,7 @@ export const useAppState = () => {
     handleStartHourChange,
     handleEndHourChange,
     handleSettingsClick,
-    handleCloseSidebar,
+    handleCloseSettings,
     handlePeriodChange,
   }
 }
