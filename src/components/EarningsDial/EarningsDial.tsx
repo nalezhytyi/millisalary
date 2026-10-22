@@ -1,0 +1,110 @@
+import React from 'react'
+import { formatCurrency, formatCurrencyParts } from '@/utils/calculations'
+import type { Period } from '@/utils/calculations'
+
+interface EarningsDialProps {
+  earned: number
+  total: number
+  currency: string
+  period: Period
+}
+
+const PERIOD_CAPTION: Record<Period, string> = {
+  hour: 'per hour',
+  day: 'today',
+  week: 'this week',
+  month: 'this month',
+  year: 'this year',
+}
+
+const RADIUS = 44
+const BIG_FRACTION_DIGITS = 2
+
+const EarningsDial: React.FC<EarningsDialProps> = ({
+  earned,
+  total,
+  currency,
+  period,
+}) => {
+  const progress = total > 0 ? Math.min(1, Math.max(0, earned / total)) : 0
+  const parts = formatCurrencyParts(earned, currency, 4)
+  const bigFraction = parts.fraction.slice(0, BIG_FRACTION_DIGITS)
+  const smallFraction = parts.fraction.slice(BIG_FRACTION_DIGITS)
+  // Fit the amount inside the dial: roughly 0.58em per glyph in ~60% of its width
+  const glyphs =
+    parts.integer.length +
+    1 +
+    bigFraction.length +
+    smallFraction.length * 0.6 +
+    (parts.symbol.length + 1) * 0.7
+  const fontSize = Math.min(17, 60 / (glyphs * 0.58))
+  const symbol = (
+    <span className="text-primary" style={{ fontSize: '0.7em' }}>
+      {parts.symbol}
+    </span>
+  )
+
+  return (
+    <div
+      className="relative aspect-square w-full"
+      style={{
+        containerType: 'inline-size',
+        maxWidth: 'clamp(13rem, calc(100dvh - 24rem), 24rem)',
+      }}
+      role="img"
+      aria-label={`${formatCurrency(earned, currency)} earned ${PERIOD_CAPTION[period]}, ${Math.round(progress * 100)}% of ${formatCurrency(total, currency)}`}
+    >
+      <svg viewBox="0 0 100 100" className="absolute inset-0 size-full">
+        <circle
+          cx="50"
+          cy="50"
+          r={RADIUS}
+          fill="none"
+          strokeWidth="6"
+          className="stroke-secondary"
+        />
+        {progress > 0 && (
+          <circle
+            cx="50"
+            cy="50"
+            r={RADIUS}
+            fill="none"
+            strokeWidth="6"
+            strokeLinecap="round"
+            pathLength={100}
+            strokeDasharray={`${progress * 100} 100`}
+            transform="rotate(-90 50 50)"
+            className="stroke-primary"
+          />
+        )}
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-[2cqw] text-center">
+        <img
+          src={`${import.meta.env.BASE_URL}images/money-face.png`}
+          alt=""
+          className="size-[13cqw]"
+          draggable={false}
+        />
+        <div
+          className="leading-none font-semibold whitespace-nowrap"
+          style={{ fontSize: `${fontSize}cqw` }}
+        >
+          {parts.symbolPosition === 'prefix' && symbol}
+          {parts.sign}
+          {parts.integer}
+          {parts.decimal}
+          {bigFraction}
+          <span className="text-muted-foreground" style={{ fontSize: '0.62em' }}>
+            {smallFraction}
+          </span>
+          {parts.symbolPosition === 'suffix' && <> {symbol}</>}
+        </div>
+        <p className="max-w-[62cqw] text-[3cqw] tracking-[0.12em] text-muted-foreground uppercase">
+          of {formatCurrency(total, currency)} {PERIOD_CAPTION[period]}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export default React.memo(EarningsDial)

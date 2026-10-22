@@ -125,23 +125,36 @@ updated: 2026-10-22
 
 
 ### Epic 4: Головний екран — шапка, циферблат, статистика, сегмент
-**Status:** pending
+**Status:** approved
 
 **Description:** Новий головний екран без полів вводу.
 
 **Subtasks:**
-- [ ] Шапка: кругла кнопка налаштувань зліва, по центру «Millisalary» з підписом, кругла кнопка Breakdown справа (shadcn `Button` size icon, `rounded-full`, тло `secondary`, гліф акцентного кольору)
-- [ ] `EarningsDial` на SVG: трек `tertiarySystemFill` і дуга `systemBlue` з `stroke-linecap: round`; у центрі `money-face.png`, велика сума (дробова частина дрібніше, `secondaryLabel`) і підпис «of X per hour / today / this week…»
-- [ ] Рядок Today / This week / This month у три колонки з вертикальними розділювачами
-- [ ] Сегмент Hour / Day / Week / Month / Year на shadcn `Tabs` у стилі UISegmentedControl: перемикає період циферблата, вибір у localStorage під ключем `selectedPeriod` (за замовчуванням `day`), подія `period_changed`
-- [ ] Верстка на всю висоту з safe-area-відступами, `max-w-md` по центру; розмір циферблата залежить від висоти, щоб на iPhone SE усе вміщалося без скролу
-- [ ] Порожній стан: коли `monthlySalary === 0`, під циферблатом підказка й кнопка, що відкриває налаштування
-- [ ] Видалити старі `Header`, `EarningsSummary` і використання `money-flying.gif`
+- [x] Шапка: кругла кнопка налаштувань зліва, по центру «Millisalary» з підписом, кругла кнопка Breakdown справа (shadcn `Button` size icon, `rounded-full`, тло `secondary`, гліф акцентного кольору)
+- [x] `EarningsDial` на SVG: трек `tertiarySystemFill` і дуга `systemBlue` з `stroke-linecap: round`; у центрі `money-face.png`, велика сума (дробова частина дрібніше, `secondaryLabel`) і підпис «of X per hour / today / this week…»
+- [x] Рядок Today / This week / This month у три колонки з вертикальними розділювачами
+- [x] Сегмент Hour / Day / Week / Month / Year на shadcn `Tabs` у стилі UISegmentedControl: перемикає період циферблата, вибір у localStorage під ключем `selectedPeriod` (за замовчуванням `day`), подія `period_changed`
+- [x] Верстка на всю висоту з safe-area-відступами, `max-w-md` по центру; розмір циферблата залежить від висоти, щоб на iPhone SE усе вміщалося без скролу
+- [x] Порожній стан: коли `monthlySalary === 0`, під циферблатом підказка й кнопка, що відкриває налаштування
+- [x] Видалити старі `Header`, `EarningsSummary` і використання `money-flying.gif`
 
 **Acceptance criteria:**
-- [ ] У preview з шириною 375 і 430 обидві теми мають iOS-вигляд, без горизонтального скролу
-- [ ] Кожен сегмент змінює дугу й підпис; сума тікає
-- [ ] Скріншоти обох тем приклеєні в execution log
+- [x] У preview з шириною 375 і 430 обидві теми мають iOS-вигляд, без горизонтального скролу
+- [x] Кожен сегмент змінює дугу й підпис; сума тікає
+- [x] Скріншоти обох тем: переглянуто в сесії (375 dark/light, 430, 320×568), у файл **не вкладено** — у репо їх зберігати нема куди; скажи, якщо потрібно покласти в `tasks/`
+
+**Примітки до виконання:**
+- Нові компоненти: `Header` (переписаний), `EarningsDial`, `StatsRow`, `PeriodTabs`, `SetupHint`; видалено `EarningsSummary`, `money-flying.gif` і `money-face.gif` (останній використовував лише старий `Header`).
+- Іконки: налаштування — наявний SVG із повзунками зі старого `Header`; Breakdown — `ChartNoAxesColumn` з `lucide-react` (як домовлялись); монета — `money-face.png`. Тики на циферблаті зі скріншота не робив (iOS-нативніше без них).
+- **Кнопка Breakdown поки `disabled`** (шита ще немає, Epic 6); `Header` приймає `onBreakdownClick` — Epic 6 його підключає.
+- **Тимчасова заглушка до Epic 5:** поля вводу тепер у старому `Sidebar` (він приймає `children`), бо з головного екрана вони зникли. Старий `Sidebar` темний і напівпрозорий, у світлій темі виглядає мутно, а шириною 380px трохи ширший за 375px екран — це ок, Epic 5 його видаляє.
+- Підзадачі Epic 5 про видалення `isInputsCollapsed`, ключа та події `inputs_collapsed_toggled` уже виконано тут (тумблер Layout втратив сенс). Ключ у localStorage у користувачів лишається — чистимо в Epic 7.
+- З `useAppState` прибрано застарілі поля `currentEarnings`, `monthEarnings`, `dayEarnings`, `totalDayEarnings`; додано `selectedPeriod`/`handlePeriodChange` (ключ `selectedPeriod`, подія `period_changed`). `Period` тип лежить у `utils/calculations.ts`.
+- Знайдено й виправлено: закритий старий `Sidebar` (`translateX(100%)`) підсвічував правий край `box-shadow`-ом — тепер `visibility: hidden` у закритому стані.
+- Перевірено: 375×812 dark і light, 430×932 dark, 320×568 dark; горизонтального скролу немає, на 320×568 нічого не обрізається й не скролиться; кожен сегмент міняє дугу, підпис і значення (перевірено aria-label: hour 17% від 11,37, week 78%, month 72%, year 81%); довгі суми в UAH (2 430 488,57 грн, 3 000 000,00 грн) вміщаються в циферблат. Шість-цифрові суми в рядку статистики на 375px переносять «грн» на другий рядок — прийнятно.
+- `npm run build` проходить, lint: 0 помилок, 2 попередні warning у `ui/*`.
+- Не перевірено: iOS Simulator standalone (план — Epic 7), реальний курс валют (мережа недоступна в цьому середовищі, перевіряв з курсом 1), перемикання системної теми наживо.
+
 
 ### Epic 5: Шит налаштувань (кнопка зліва)
 **Status:** pending
@@ -206,3 +219,5 @@ updated: 2026-10-22
 - 2026-10-22 — Epic 2 approved; підзадачу про статус-бар iOS перенесено в Epic 7
 - 2026-10-22 — Epic 3 work complete, awaiting approval
 - 2026-10-22 — Epic 3 approved
+- 2026-10-22 — Epic 4 work complete, awaiting approval
+- 2026-10-22 — Epic 4 approved
