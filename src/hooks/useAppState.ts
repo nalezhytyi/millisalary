@@ -74,6 +74,7 @@ export const useAppState = () => {
     [setEndHourValue]
   )
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isBreakdownOpen, setIsBreakdownOpen] = useState(false)
 
   const { earnings, exchangeRate } = useEarnings(
     monthlySalary,
@@ -173,6 +174,15 @@ export const useAppState = () => {
     trackAmplitudeEvent('settings_clicked')
   }, [])
 
+  const handleBreakdownClick = useCallback(() => {
+    setIsBreakdownOpen(true)
+    trackAmplitudeEvent('breakdown_opened')
+  }, [])
+
+  const handleCloseBreakdown = useCallback(() => {
+    setIsBreakdownOpen(false)
+  }, [])
+
   const handleCloseSettings = useCallback(() => {
     setIsSettingsOpen(false)
   }, [])
@@ -196,6 +206,7 @@ export const useAppState = () => {
     startHour,
     endHour,
     isSettingsOpen,
+    isBreakdownOpen,
     earnings,
     exchangeRate,
     handleSetMonthlySalary,
@@ -209,6 +220,8 @@ export const useAppState = () => {
     handleEndHourChange,
     handleSettingsClick,
     handleCloseSettings,
+    handleBreakdownClick,
+    handleCloseBreakdown,
     handlePeriodChange,
   }
 }

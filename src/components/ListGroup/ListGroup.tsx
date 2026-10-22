@@ -1,13 +1,13 @@
 import { ReactNode } from 'react'
 
-interface SettingsGroupProps {
+interface ListGroupProps {
   title: string
   footer?: string
   children: ReactNode
 }
 
 // Grouped list section: small caps header, rounded card of rows, footer note
-const SettingsGroup = ({ title, footer, children }: SettingsGroupProps) => (
+const ListGroup = ({ title, footer, children }: ListGroupProps) => (
   <section className="mb-6">
     <h3 className="mb-1.5 px-4 text-[13px] tracking-[0.04em] text-muted-foreground uppercase">
       {title}
@@ -21,4 +21,4 @@ const SettingsGroup = ({ title, footer, children }: SettingsGroupProps) => (
   </section>
 )
 
-export default SettingsGroup
+export default ListGroup

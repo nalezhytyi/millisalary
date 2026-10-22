@@ -1,4 +1,5 @@
 import React from 'react'
+import BreakdownSheet from './components/BreakdownSheet'
 import EarningsDial from './components/EarningsDial'
 import Header from './components/Header'
 import PeriodTabs from './components/PeriodTabs'
@@ -19,6 +20,8 @@ const App: React.FC = () => {
     startHour,
     endHour,
     isSettingsOpen,
+    isBreakdownOpen,
+    exchangeRate,
     earnings,
     handleSetMonthlySalary,
     handleMonthlySalaryBlur,
@@ -31,6 +34,8 @@ const App: React.FC = () => {
     handleEndHourChange,
     handleSettingsClick,
     handleCloseSettings,
+    handleBreakdownClick,
+    handleCloseBreakdown,
     handlePeriodChange,
   } = useAppState()
   const { theme, setTheme } = useTheme()
@@ -60,8 +65,19 @@ const App: React.FC = () => {
         onEndHourChange={handleEndHourChange}
         onThemeChange={setTheme}
       />
+      <BreakdownSheet
+        open={isBreakdownOpen}
+        onClose={handleCloseBreakdown}
+        earnings={earnings}
+        currency={earningsCurrency}
+        monthlySalaryCurrency={monthlySalaryCurrency}
+        exchangeRate={exchangeRate}
+      />
       <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-        <Header onSettingsClick={handleSettingsClick} />
+        <Header
+          onSettingsClick={handleSettingsClick}
+          onBreakdownClick={handleBreakdownClick}
+        />
         <div className="flex flex-1 items-center justify-center py-4">
           <EarningsDial
             earned={earnings[selectedPeriod].earned}
