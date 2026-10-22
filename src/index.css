@@ -130,30 +130,44 @@ html.ios-standalone {
   height: 100%;
   overflow-y: auto;
 }
-.ios-standalone .sidebar,
-.ios-standalone .sidebar-overlay {
+
+/* Main screen: min-h-dvh is the short viewport here, which parked the period
+   control a status-bar height above the home indicator. */
+.ios-standalone .app-screen {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: calc(100% + env(safe-area-inset-top));
+  overflow-y: auto;
+}
+
+/* vaul sheets are position: fixed. The overlay left the bottom band undimmed
+   and the bottom-anchored content ended at the short viewport's edge, cutting
+   the sheet off a status-bar height above the screen bottom. */
+.ios-standalone [data-slot='drawer-overlay'] {
   position: absolute;
   bottom: auto;
   height: calc(100% + env(safe-area-inset-top));
 }
-
-/* The closed sidebar is parked a full panel-width to the right via transform.
-   While it is position: fixed (in-browser) that costs nothing, but the rule
-   above makes it absolute — and an absolute box sitting outside the viewport
-   extends the document ~380px to the right. iOS pans the visual viewport to
-   reveal a focused input, and that pan is what slid the whole app sideways
-   when a number input was tapped. Root-level clipping cannot undo it: overflow
-   on html propagates to the viewport (where clip degrades to hidden), and
-   hidden still scrolls programmatically. So in standalone the closed panel
-   stays put and is hidden in place, fading rather than sliding. */
-.ios-standalone .sidebar {
-  transition: opacity 0.3s ease-in-out;
+.ios-standalone [data-slot='drawer-content'] {
+  position: absolute;
+  bottom: calc(-1 * env(safe-area-inset-top));
+  /* dvh swings between the short and full height here, so pin the top just
+     below the status bar instead of using the 94dvh height */
+  top: calc(env(safe-area-inset-top) + 0.625rem);
+  height: auto;
+  max-height: none;
+  margin-top: 0;
 }
 
-.ios-standalone .sidebar:not(.sidebar-open) {
-  transform: none;
-  opacity: 0;
-  pointer-events: none;
+/* While a sheet is open, Radix's scroll lock (react-remove-scroll-bar) sets
+   body[data-scroll-locked] { position: relative !important }. Body is the
+   812pt-tall scroller here, so that made it the sheets' containing block and
+   its overflow clipped them at the short viewport edge again. Keep body
+   static so they stay on the initial containing block. */
+.ios-standalone body[data-scroll-locked] {
+  position: static !important;
 }
 
 input:focus,
@@ -164,4 +178,15 @@ textarea:focus,
 textarea:focus-visible {
   outline: none;
   outline-color: transparent;
+}
+
+/* The Electron wrapper hosts this app in a window that may declare drag
+   regions; keep every interactive surface (and the sheets) clickable. */
+button,
+input,
+select,
+[role='tab'],
+[data-slot='drawer-overlay'],
+[data-slot='drawer-content'] {
+  -webkit-app-region: no-drag;
 }

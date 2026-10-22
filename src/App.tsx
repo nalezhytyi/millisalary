@@ -73,7 +73,7 @@ const App: React.FC = () => {
         monthlySalaryCurrency={monthlySalaryCurrency}
         exchangeRate={exchangeRate}
       />
-      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <main className="app-screen mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <Header
           onSettingsClick={handleSettingsClick}
           onBreakdownClick={handleBreakdownClick}

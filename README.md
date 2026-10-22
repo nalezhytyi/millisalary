@@ -3,12 +3,11 @@
 Millisalary is a small React app for tracking salary progress in real time.  
 You enter your monthly salary, working schedule, and preferred display currency, and the app estimates:
 
-- current earnings
-- earnings for today
-- full daily earnings
-- monthly salary in the selected display currency
+- earnings for the current hour, day, week, month and year
+- your rate per second, minute, hour and day
+- the next payday and how many days are left
 
-It also includes installable PWA support and animated backgrounds.
+The UI follows native iOS conventions (system colors, bottom sheets, segmented control) with light and dark themes. It is also an installable PWA.
 
 ## Features
 
@@ -16,7 +15,9 @@ It also includes installable PWA support and animated backgrounds.
 - Configurable `Working Days / Month` and `Working Hours / Day`
 - Currency conversion for salary display
 - Installable PWA setup with service worker and manifest
-- Multiple animated background themes
+- Light, dark or system theme
+- Settings and Breakdown bottom sheets
+- Configurable payday
 - Amplitude Analytics + Session Replay instrumentation
 - Native time input for workday start/end
 
@@ -25,7 +26,8 @@ It also includes installable PWA support and animated backgrounds.
 - React 19
 - TypeScript
 - Vite
-- Tailwind CSS
+- Tailwind CSS v4
+- shadcn/ui (Radix, vaul)
 - `vite-plugin-pwa`
 
 ## Getting Started
@@ -125,16 +127,21 @@ Main app composition:
 Hooks:
 
 - [src/hooks/useAppState.ts](/Users/tab/Projects/pet/milli/millisalary/src/hooks/useAppState.ts)
-- [src/hooks/useBackground.tsx](/Users/tab/Projects/pet/milli/millisalary/src/hooks/useBackground.tsx)
+- [src/hooks/useTheme.ts](/Users/tab/Projects/pet/milli/millisalary/src/hooks/useTheme.ts)
 - [src/hooks/useEarnings.ts](/Users/tab/Projects/pet/milli/millisalary/src/hooks/useEarnings.ts)
 - [src/hooks/useLocalStorage.ts](/Users/tab/Projects/pet/milli/millisalary/src/hooks/useLocalStorage.ts)
 
 UI components:
 
-- [src/components/SalaryInputs/SalaryInputs.tsx](/Users/tab/Projects/pet/milli/millisalary/src/components/SalaryInputs/SalaryInputs.tsx)
-- [src/components/EarningsSummary/EarningsSummary.tsx](/Users/tab/Projects/pet/milli/millisalary/src/components/EarningsSummary/EarningsSummary.tsx)
-- [src/components/Sidebar/Sidebar.tsx](/Users/tab/Projects/pet/milli/millisalary/src/components/Sidebar/Sidebar.tsx)
+- [src/components/EarningsDial/EarningsDial.tsx](/Users/tab/Projects/pet/milli/millisalary/src/components/EarningsDial/EarningsDial.tsx)
+- [src/components/SettingsSheet/SettingsSheet.tsx](/Users/tab/Projects/pet/milli/millisalary/src/components/SettingsSheet/SettingsSheet.tsx)
+- [src/components/BreakdownSheet/BreakdownSheet.tsx](/Users/tab/Projects/pet/milli/millisalary/src/components/BreakdownSheet/BreakdownSheet.tsx)
 - [src/components/Header/Header.tsx](/Users/tab/Projects/pet/milli/millisalary/src/components/Header/Header.tsx)
+- [src/components/ui/](/Users/tab/Projects/pet/milli/millisalary/src/components/ui) — shadcn components
+
+Calculations:
+
+- [src/utils/calculations.ts](/Users/tab/Projects/pet/milli/millisalary/src/utils/calculations.ts)
 
 ## Defaults
 
@@ -150,5 +157,5 @@ Current defaults:
 ## Notes
 
 - `Monthly Salary` is treated as the entered monthly salary value and does not change when working days or working hours are adjusted.
-- `Current earnings` and `Daily` values are derived from the configured schedule.
+- Hour, day, week, month and year earnings are derived from the configured schedule; the Breakdown sheet shows all of them with your per-second to per-day rate.
 - If you change PWA or frontend assets and do not see updates immediately, clear the service worker cache or do a hard reload.

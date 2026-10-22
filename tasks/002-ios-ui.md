@@ -1,7 +1,7 @@
 ---
 id: 002
 title: Новий UI в стилі нативного iOS (shadcn, світла/темна тема)
-status: in-progress
+status: review
 created: 2026-10-22
 updated: 2026-10-22
 ---
@@ -217,24 +217,33 @@ updated: 2026-10-22
 
 
 ### Epic 7: Прибирання, PWA та документація
-**Status:** pending
+**Status:** approved
 
 **Description:** Хвости після переходу, iOS-специфіка і документи.
 
 **Subtasks:**
-- [ ] Статус-бар iOS standalone для обох тем (перенесено з Epic 2): зараз `black-translucent` дає білий текст, у світлій темі він невидимий. Порівняти на симуляторі `default` (текст за системною темою) і `black-translucent`; врахувати, що зміна стилю змінює геометрію viewport і може зробити частину хака `.ios-standalone` зайвою, а зміну meta після запуску iOS не підхоплює — досліджуємо, а не вгадуємо
-- [ ] Оновити список шарів `.ios-standalone` в `index.css` під нову структуру, прибрати мертві правила (`.ios-standalone .sidebar*` уже мертві після Epic 5). Перевірити на симуляторі гіпотезу з Epic 5: `position: fixed` оверлей і контент vaul (`[data-slot="drawer-overlay"]`, `[data-slot="drawer-content"]`) у standalone, ймовірно, треба перевести на absolute — інакше оверлей не затемнить смугу внизу, а шит може зависнути над нею
-- [ ] Передумова для iOS-перевірок: на машині прийнята ліцензія Xcode (`sudo xcodebuild -license`, робить користувач), інакше `xcrun simctl` не працює
-- [ ] Кольори маніфесту; `-webkit-app-region: no-drag` на кнопках і шитах для Electron-обгортки
-- [ ] Прибрати застарілі ключі localStorage (`background`, `isInputsCollapsed`) при старті
-- [ ] Оновити `CLAUDE.md` (shadcn, теми, шити, ключі, розрахунки, нове чисте lint-базове значення) і `README`
+- [x] Статус-бар iOS standalone для обох тем (перенесено з Epic 2). Перевірено на симуляторах iOS 26 (iPhone 17 Pro) і iOS 18.5 (iPhone 16 Pro) через webclip-и з `WebClipStatusBarStyle` = `LegacyBlackTranslucent` і `Default`: в обох версіях текст статус-бару підлаштовується під сторінку (темний на світлій темі, білий на темній, у т. ч. при ручному Light поверх системної Dark), а геометрія для обох стилів однакова. **Рішення: `black-translucent` лишаємо, нічого не міняємо**
+- [x] Оновити список шарів `.ios-standalone` в `index.css` під нову структуру, прибрати мертві правила (`.ios-standalone .sidebar*` видалено). Гіпотезу з Epic 5 підтверджено й виправлено (деталі в примітках): absolute для `.app-screen`, оверлея і контенту vaul; `body[data-scroll-locked]` примусово `static`; верх шита прибито під статус-бар; `repositionInputs={false}` у `SettingsSheet`
+- [x] Передумова для iOS-перевірок: ліцензію Xcode прийнято користувачем
+- [x] Кольори маніфесту (`theme_color`/`background_color` #f2f2f7, зроблено в Epic 2); `-webkit-app-region: no-drag` на кнопках, інпутах, селектах, табах і шитах (глобальне правило в `index.css`)
+- [x] Прибрати застарілі ключі localStorage (`background`, `isInputsCollapsed`) при старті (`src/utils/legacyStorage.ts`, виклик у `main.tsx`; перевірено в браузері: після перезавантаження обидва ключі `null`)
+- [x] Оновити `CLAUDE.md` (shadcn і пастка з `cn`, теми, шити, ключі, модель розрахунків, події, lint-базове значення, iOS standalone, статус-бар, оновлення SW) і `README`
 
 **Acceptance criteria:**
-- [ ] `npm run build` і `npm run lint` чисті
-- [ ] `build` + `preview`: оновлення SW проходить без застарілого кешу
-- [ ] Повна перевірка на iOS Simulator у standalone в обох темах: статус-бар читається, внизу немає смуги, шити відкриваються й закриваються
-- [ ] Шит налаштувань на iOS standalone (перенесено з Epic 5): не обрізаний знизу; фокус на полі не зсуває додаток убік; тап по select і time відкриває нативне колесо
-- [ ] Шит Breakdown на iOS standalone (перенесено з Epic 6): скролиться всередині й не обрізаний знизу
+- [x] `npm run build` і `npm run lint` чисті (0 помилок; 2 warning `react-refresh` у згенерованих `ui/button.tsx`, `ui/tabs.tsx`)
+- [x] `build` + `preview`: оновлення SW проходить без застарілого кешу — перевірено у встановленому web app на iOS-симуляторі (`vite preview` на 4173): після нової збірки перший запуск віддає кеш і ставить новий service worker, другий запуск показує нову збірку; застряглого кешу немає. У вбудованому браузері Claude SW не реєструється (обмеження інструмента)
+- [x] Повна перевірка на iOS Simulator у standalone в обох темах: статус-бар читається (iOS 26 light/dark, iOS 18.5 light), внизу немає смуги (головний екран і шити доходять до низу екрана), шити відкриваються й закриваються; живе перемикання системної теми одразу міняє тему застосунку (закриває неперевірений пункт з Epic 2)
+- [x] Шит налаштувань на iOS standalone (перенесено з Epic 5): не обрізаний знизу; фокус на полі не зсуває додаток убік (клавіатура numeric, WebKit підтягує поле над клавіатурою, після закриття шит повертається вниз); `<select>` відкриває нативне меню iOS 26, `<input type="time">` — нативне колесо
+- [x] Шит Breakdown на iOS standalone (перенесено з Epic 6): скролиться всередині до кінця й не обрізаний знизу; рядок курсу валют у футері видно (`1 USD = 45.03 UAH`, курс реально завантажився в симуляторі)
+
+**Примітки до виконання:**
+- **Що показав симулятор (до виправлень):** у standalone initial containing block = 812pt при екрані 874pt (мінус статус-бар 62pt). (1) Головний екран (`min-h-dvh`) закінчувався на 812 — сегмент періодів висів на 62pt вище, ніж треба. (2) Шит налаштувань обрізався на 812: картка Appearance різалась, під шитом видно незатемнену смугу сторінки. (3) Після переведення шарів vaul на absolute вони все одно обрізались на 812 — причина: Radix scroll lock (`react-remove-scroll-bar`) ставить `body[data-scroll-locked] { position: relative !important }`, а `body` у standalone — 812pt-скролер, тож він ставав containing block і своїм overflow різав шити. (4) З `repositionInputs` vaul після закриття клавіатури лишав шит піднятим на 68pt (iOS тримає visualViewport 806pt). (5) Після фіксу `body` `100dvh` став 874, і шит на 94dvh заїжджав під статус-бар; також діяв shadcn `mt-24`.
+- **Виправлення (усе під `.ios-standalone`, поза standalone нічого не змінилось — перевірено в браузері: шит `fixed`, 94dvh):** `.app-screen` (новий клас на `<main>`) — absolute на всю висоту + safe-area-top; `[data-slot=drawer-overlay]` — absolute, висота `100% + safe-area-top`; `[data-slot=drawer-content]` — absolute, `bottom: -safe-area-top`, `top: safe-area-top + 10px`, `height: auto`, `max-height: none`, `margin-top: 0`; `body[data-scroll-locked] { position: static !important }`. У `SettingsSheet` — `repositionInputs={false}` (коментар у коді пояснює). Кожне правило має коментар в `index.css`.
+- Вимірювання — тимчасовим debug-скриптом в `index.html` (видалено, `index.html` збігається з комітом).
+- На симуляторах лишились тестові webclip-и «MS translucent» / «MS default» (iPhone 17 Pro iOS 26, iPhone 16 Pro iOS 18.5) на `http://localhost:4173/millisalary/`; симулятори вимкнено.
+- `.claude/launch.json` доповнено конфігом `millisalary-preview` (vite preview на 4173, `--host 0.0.0.0`) — файл як і раніше не в git.
+- Пам'ять harness-у для iOS оновлено (процес `com.apple.webapp`, ключ `WebClipStatusBarStyle`, пастка з `SafariViewService`, два запуски для SW, пастка з positioned `body`).
+- Ідея на потім (не робив): в iOS шити в темній темі зазвичай «піднесені» (`#1c1c1e` фон, `#2c2c2e` комірки); зараз шит чорний з картками `#1c1c1e`, як головний екран.
 
 ## Execution log
 - 2026-10-22 — created, plan agreed with user
@@ -250,3 +259,7 @@ updated: 2026-10-22
 - 2026-10-22 — Epic 5 approved; iOS-перевірку шита налаштувань перенесено в Epic 7
 - 2026-10-22 — Epic 6 work complete (iOS-перевірка не виконана), awaiting approval
 - 2026-10-22 — Epic 6 approved; iOS-перевірку шита Breakdown перенесено в Epic 7
+- 2026-10-22 — Epic 7: виконано все, що не потребує iOS Simulator і service worker; awaiting approval
+- 2026-10-22 — Epic 7 повернуто в in-progress: користувач приймає ліцензію Xcode, доробляємо iOS-частину на симуляторі
+- 2026-10-22 — Epic 7: iOS-частину перевірено й виправлено на симуляторах iOS 26 і 18.5; awaiting approval
+- 2026-10-22 — Epic 7 approved; усі епіки затверджено, задача в review
