@@ -1,5 +1,8 @@
 import { FC } from 'react'
-import { formatTimeInputValue, parseTimeInputValue } from '../../utils/salaryForm'
+import {
+  formatTimeInputValue,
+  parseTimeInputValue,
+} from '../../utils/salaryForm'
 import './TimePicker.css'
 
 const TimePicker: FC<{
@@ -15,7 +18,7 @@ const TimePicker: FC<{
     onChange={(event) =>
       onChange(parseTimeInputValue(event.target.value, selected))
     }
-    className="time-picker-input min-w-0 rounded-lg bg-secondary px-3 text-[17px] text-foreground"
+    className="time-picker-input h-11 min-w-0 bg-transparent text-[17px] text-foreground"
   />
 )
 
