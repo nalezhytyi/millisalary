@@ -1,5 +1,6 @@
 export { useEarnings } from './useEarnings'
 export { useLocalStorage } from './useLocalStorage'
 export { useAppState } from './useAppState'
+export { useInstallPrompt } from './useInstallPrompt'
 export { useTheme } from './useTheme'
 export type { Theme } from './useTheme'

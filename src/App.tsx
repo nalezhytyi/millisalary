@@ -2,11 +2,13 @@ import React from 'react'
 import BreakdownSheet from './components/BreakdownSheet'
 import EarningsDial from './components/EarningsDial'
 import Header from './components/Header'
+import InstallBanner from './components/InstallBanner'
+import InstallSheet from './components/InstallSheet'
 import PeriodTabs from './components/PeriodTabs'
 import SettingsSheet from './components/SettingsSheet'
 import SetupHint from './components/SetupHint'
 import StatsRow from './components/StatsRow'
-import { useAppState, useTheme } from './hooks'
+import { useAppState, useInstallPrompt, useTheme } from './hooks'
 
 const App: React.FC = () => {
   const {
@@ -43,6 +45,13 @@ const App: React.FC = () => {
     handlePeriodChange,
   } = useAppState()
   const { theme, setTheme } = useTheme()
+  const {
+    isInstallBannerVisible,
+    isInstallSheetOpen,
+    handleInstallClick,
+    handleDismissInstallBanner,
+    handleCloseInstallSheet,
+  } = useInstallPrompt()
 
   return (
     <>
@@ -80,6 +89,10 @@ const App: React.FC = () => {
         monthlySalaryCurrency={monthlySalaryCurrency}
         exchangeRate={exchangeRate}
       />
+      <InstallSheet
+        open={isInstallSheetOpen}
+        onClose={handleCloseInstallSheet}
+      />
       <main className="app-screen mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <Header
           onSettingsClick={handleSettingsClick}
@@ -102,6 +115,12 @@ const App: React.FC = () => {
           <PeriodTabs value={selectedPeriod} onChange={handlePeriodChange} />
         </div>
       </main>
+      {isInstallBannerVisible && (
+        <InstallBanner
+          onInstall={handleInstallClick}
+          onDismiss={handleDismissInstallBanner}
+        />
+      )}
     </>
   )
 }
