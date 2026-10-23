@@ -63,3 +63,6 @@ yarn.lock
 
 # Optional build directories
 out/
+
+# Bundle report from `pnpm run analyze`
+bundle-stats.html

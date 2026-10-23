@@ -6,7 +6,6 @@ import { initAmplitude } from './amplitude'
 import { removeLegacyStorageKeys } from './utils/legacyStorage'
 import './index.css'
 
-void initAmplitude()
 removeLegacyStorageKeys()
 
 if (import.meta.env.PROD) {
@@ -18,3 +17,12 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 )
+
+// Analytics isn't needed for the first paint: load the SDK and session replay
+// once the browser is idle after it, or after a timeout where
+// requestIdleCallback is missing
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(() => void initAmplitude(), { timeout: 1000 })
+} else {
+  setTimeout(() => void initAmplitude(), 1)
+}

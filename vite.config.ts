@@ -2,9 +2,10 @@ import path from 'node:path'
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { visualizer } from 'rollup-plugin-visualizer'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     tailwindcss(),
@@ -64,6 +65,15 @@ export default defineConfig({
         ],
       },
     }),
+    // `pnpm run analyze` only: a treemap of the bundle, written outside
+    // build/ so the service worker doesn't precache it
+    mode === 'analyze' &&
+      visualizer({
+        filename: 'bundle-stats.html',
+        template: 'treemap',
+        gzipSize: true,
+        brotliSize: true,
+      }),
   ],
   resolve: {
     alias: {
@@ -80,9 +90,16 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react'],
+          // Changes rarely, so a deploy doesn't make the service worker
+          // download React again
+          vendor: [
+            'react',
+            'react/jsx-runtime',
+            'react-dom',
+            'react-dom/client',
+          ],
         },
       },
     },
   },
-})
+}))

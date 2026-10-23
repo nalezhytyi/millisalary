@@ -1,14 +1,17 @@
-import React from 'react'
-import BreakdownSheet from './components/BreakdownSheet'
+import React, { lazy, Suspense } from 'react'
 import EarningsDial from './components/EarningsDial'
 import Header from './components/Header'
 import InstallBanner from './components/InstallBanner'
-import InstallSheet from './components/InstallSheet'
 import PeriodTabs from './components/PeriodTabs'
-import SettingsSheet from './components/SettingsSheet'
 import SetupHint from './components/SetupHint'
 import StatsRow from './components/StatsRow'
 import { useAppState, useInstallPrompt, useTheme } from './hooks'
+
+// The sheets start closed, so they (with vaul and Radix Dialog) load in their
+// own chunks while the main screen paints instead of delaying it
+const BreakdownSheet = lazy(() => import('./components/BreakdownSheet'))
+const InstallSheet = lazy(() => import('./components/InstallSheet'))
+const SettingsSheet = lazy(() => import('./components/SettingsSheet'))
 
 const App: React.FC = () => {
   const {
@@ -55,44 +58,46 @@ const App: React.FC = () => {
 
   return (
     <>
-      <SettingsSheet
-        open={isSettingsOpen}
-        onClose={handleCloseSettings}
-        monthlySalary={monthlySalary}
-        monthlySalaryCurrency={monthlySalaryCurrency}
-        earningsCurrency={earningsCurrency}
-        workingHoursPerDay={workingHoursPerDay}
-        workingDays={workingDays}
-        payday={payday}
-        startHour={startHour}
-        endHour={endHour}
-        theme={theme}
-        onMonthlySalaryChange={handleSetMonthlySalary}
-        onMonthlySalaryBlur={handleMonthlySalaryBlur}
-        onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
-        onEarningsCurrencyChange={handleSetEarningsCurrency}
-        onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
-        onWorkingHoursPerDayBlur={handleWorkingHoursPerDayBlur}
-        onWorkingDaysChange={handleSetWorkingDays}
-        onWorkingDaysBlur={handleWorkingDaysBlur}
-        onPaydayChange={handleSetPayday}
-        onPaydayBlur={handlePaydayBlur}
-        onStartHourChange={handleStartHourChange}
-        onEndHourChange={handleEndHourChange}
-        onThemeChange={setTheme}
-      />
-      <BreakdownSheet
-        open={isBreakdownOpen}
-        onClose={handleCloseBreakdown}
-        earnings={earnings}
-        currency={earningsCurrency}
-        monthlySalaryCurrency={monthlySalaryCurrency}
-        exchangeRate={exchangeRate}
-      />
-      <InstallSheet
-        open={isInstallSheetOpen}
-        onClose={handleCloseInstallSheet}
-      />
+      <Suspense fallback={null}>
+        <SettingsSheet
+          open={isSettingsOpen}
+          onClose={handleCloseSettings}
+          monthlySalary={monthlySalary}
+          monthlySalaryCurrency={monthlySalaryCurrency}
+          earningsCurrency={earningsCurrency}
+          workingHoursPerDay={workingHoursPerDay}
+          workingDays={workingDays}
+          payday={payday}
+          startHour={startHour}
+          endHour={endHour}
+          theme={theme}
+          onMonthlySalaryChange={handleSetMonthlySalary}
+          onMonthlySalaryBlur={handleMonthlySalaryBlur}
+          onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
+          onEarningsCurrencyChange={handleSetEarningsCurrency}
+          onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
+          onWorkingHoursPerDayBlur={handleWorkingHoursPerDayBlur}
+          onWorkingDaysChange={handleSetWorkingDays}
+          onWorkingDaysBlur={handleWorkingDaysBlur}
+          onPaydayChange={handleSetPayday}
+          onPaydayBlur={handlePaydayBlur}
+          onStartHourChange={handleStartHourChange}
+          onEndHourChange={handleEndHourChange}
+          onThemeChange={setTheme}
+        />
+        <BreakdownSheet
+          open={isBreakdownOpen}
+          onClose={handleCloseBreakdown}
+          earnings={earnings}
+          currency={earningsCurrency}
+          monthlySalaryCurrency={monthlySalaryCurrency}
+          exchangeRate={exchangeRate}
+        />
+        <InstallSheet
+          open={isInstallSheetOpen}
+          onClose={handleCloseInstallSheet}
+        />
+      </Suspense>
       <main className="app-screen mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <Header
           onSettingsClick={handleSettingsClick}
