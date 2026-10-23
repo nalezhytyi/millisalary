@@ -1,16 +1,3 @@
-import * as amplitude from '@amplitude/analytics-browser'
-import { sessionReplayPlugin } from '@amplitude/plugin-session-replay-browser'
-
-const AMPLITUDE_API_KEY = '919afd003429ad6d69798aacb0c0c0a7'
-
-const AMPLITUDE_ANALYTICS_OPTIONS = {
-  autocapture: true,
-} as const
-
-const AMPLITUDE_SESSION_REPLAY_OPTIONS = {
-  sampleRate: 1,
-} as const
-
 declare global {
   interface Window {
     __millisalaryAmplitudeInitialized__?: boolean
@@ -34,12 +21,8 @@ export const initAmplitude = () => {
     return Promise.resolve()
   }
 
-  amplitudeInitPromise = amplitude
-    .init(AMPLITUDE_API_KEY, AMPLITUDE_ANALYTICS_OPTIONS)
-    .promise
-    .then(() =>
-      amplitude.add(sessionReplayPlugin(AMPLITUDE_SESSION_REPLAY_OPTIONS)).promise
-    )
+  amplitudeInitPromise = import('./amplitudeClient')
+    .then(({ startAmplitude }) => startAmplitude())
     .then(() => {
       window.__millisalaryAmplitudeInitialized__ = true
     })
@@ -60,7 +43,9 @@ export const trackAmplitudeEvent = (
     return
   }
 
-  void (amplitudeInitPromise ?? Promise.resolve()).then(() => {
-    amplitude.track(eventName, eventProperties)
+  // initAmplitude already loaded the client, so this resolves from the
+  // module cache (and still works after a hot reload of this file)
+  void import('./amplitudeClient').then(({ track }) => {
+    track(eventName, eventProperties)
   })
 }
