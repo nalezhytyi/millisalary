@@ -120,7 +120,7 @@ const EarningsDial: React.FC<EarningsDialProps> = ({
             media="(prefers-reduced-motion: reduce)"
           />
           <img
-            src={`${import.meta.env.BASE_URL}images/money-face.gif`}
+            src={`${import.meta.env.BASE_URL}images/money-face.webp`}
             alt=""
             className="size-[16cqw] object-contain"
             draggable={false}

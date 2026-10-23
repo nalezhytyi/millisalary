@@ -20,12 +20,13 @@ export default defineConfig(({ mode }) => ({
         'images/money-face.png',
       ],
       workbox: {
-        // The animated dial face (2.4 MB) is too heavy to precache; keep it
-        // after the first online load so it also shows offline, and
-        // revalidate since its URL isn't content-hashed
+        // The animated dial face (0.7 MB) is too heavy to precache; keep it
+        // after the first online load (main.tsx covers the first visit) so
+        // it also shows offline, and revalidate since its URL isn't
+        // content-hashed
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.pathname.endsWith('/money-face.gif'),
+            urlPattern: ({ url }) => url.pathname.endsWith('/money-face.webp'),
             handler: 'StaleWhileRevalidate',
             options: { cacheName: 'images' },
           },
