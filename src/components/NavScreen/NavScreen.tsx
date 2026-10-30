@@ -193,7 +193,9 @@ const NavScreen = ({
               onClick={onClose}
               aria-label="Back"
             >
-              <ChevronLeft strokeWidth={2.5} />
+              {/* ~9.5 x 17.5pt glyph with a ~2.7pt stroke, like the native
+                  back chevron */}
+              <ChevronLeft className="size-[35px]" strokeWidth={2.25} />
             </Button>
             <span
               ref={barTitleRef}

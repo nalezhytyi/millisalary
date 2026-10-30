@@ -8,9 +8,10 @@ interface DiscardAlertProps {
 }
 
 // iOS 27 alert: 300pt wide, 34pt corners, 14pt padding, two 48pt pill buttons
-// 8pt apart; the cancel button is regular in the label color, the destructive
-// one semibold red, over the kit's alert overlay. Solid, not glass: glass is kept to the header buttons, the back
-// chevron and the install banner. Above the pushed screen (z-50).
+// 8pt apart, both glass like the kit's buttons; the cancel label is regular in
+// the label color, the destructive one semibold red, over the kit's alert
+// overlay. The platter itself stays solid so the buttons' glass isn't nested
+// in glass. Above the pushed screen (z-50).
 const DiscardAlert = ({
   open,
   onKeepEditing,
@@ -34,9 +35,9 @@ const DiscardAlert = ({
         <div className="grid grid-cols-2 gap-2">
           <AlertDialog.Cancel asChild>
             <Button
-              variant="bordered"
+              variant="glass"
               size="large"
-              className="h-12 px-4 text-callout font-normal text-foreground"
+              className="h-12 px-4 text-callout font-normal"
             >
               Keep Editing
             </Button>
@@ -45,7 +46,7 @@ const DiscardAlert = ({
             <Button
               variant="destructive"
               size="large"
-              className="h-12 px-4 text-callout"
+              className="h-12 px-4 text-callout font-semibold"
               onClick={onDiscard}
             >
               Discard

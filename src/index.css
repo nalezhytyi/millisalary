@@ -34,8 +34,29 @@
   --fill-tertiary: rgb(118 118 128 / 12%);
   --fill-quaternary: rgb(116 116 128 / 8%);
   --segment-selected: #ffffff;
-  --glass-fill: rgb(255 255 255 / 70%);
-  --glass-rim: #dbdbdb;
+  /* The iOS 27 kit's Glass button as rendered (Buttons page, light): a lens
+     that is greyer at the top and brighter towards the bottom, grey hairline
+     crescents on the left and right edges (the kit's 1.25px #d0d0d0, a touch
+     wider and darker so they render as strongly in a browser), a 0.5pt ring
+     and a 2% shadow */
+  --glass-fill: linear-gradient(
+    to bottom,
+    rgb(238 238 238 / 85%),
+    rgb(248 248 248 / 85%) 55%,
+    rgb(252 252 252 / 90%)
+  );
+  --glass-shadow:
+    1.5px 0 0 -0.75px #c8c8c8, -1.5px 0 0 -0.75px #c8c8c8,
+    0 0 0 0.5px #e8e8e8, 0 8px 15px rgb(0 0 0 / 2%);
+  /* Glass Prominent (blue) buttons, as the kit renders them: the accent fill
+     with lighter 1px rims at the top and bottom and a 2% shadow */
+  --glass-prominent-fill: var(--primary);
+  --glass-prominent-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 18%), inset 0 -1px 0 rgb(255 255 255 / 18%),
+    0 8px 15px rgb(0 0 0 / 2%);
+  /* Glyphs on glass: the kit's vibrant labels (primary, tertiary) */
+  --glass-label: #1a1a1a;
+  --glass-label-disabled: #bfbfbf;
   --overlay-alert: rgb(41 41 58 / 23%);
   --radius: 0.75rem;
 
@@ -75,8 +96,29 @@
   --fill-tertiary: rgb(118 118 128 / 24%);
   --fill-quaternary: rgb(118 118 128 / 18%);
   --segment-selected: rgb(255 255 255 / 27%);
-  --glass-fill: rgb(26 26 26 / 70%);
-  --glass-rim: #a6a6a6;
+  /* The kit's dark Glass button shape (darker at the top, brighter towards
+     the bottom, a bright 1px rim on top and a softer one at the bottom) at
+     the brightness of native iOS 27 glass on black (~#383838); the kit's own
+     Figma render is a near-black #1b1b1b disc */
+  --glass-fill: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 15%),
+    rgb(255 255 255 / 22%) 55%,
+    rgb(255 255 255 / 27%)
+  );
+  --glass-label: #f5f5f5;
+  /* The kit's #0091ff tint burned into its 94% white backing on a dark page */
+  --glass-prominent-fill: #0082f0;
+  --glass-prominent-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 18%), inset 0 -1px 0 rgb(255 255 255 / 18%),
+    0 8px 15px rgb(0 0 0 / 2%);
+  /* The kit's dark tertiary (#404040) disappears on this lighter disc */
+  --glass-label-disabled: rgb(235 235 245 / 70%);
+  --glass-shadow:
+    0 0 2px rgb(0 0 0 / 10%), 0 1px 8px rgb(0 0 0 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 28%),
+    inset 0 -1.5px 0 rgb(255 255 255 / 12%),
+    inset 0 0 0 0.5px rgb(255 255 255 / 8%);
   --overlay-alert: rgb(18 18 18 / 56%);
 }
 
@@ -159,19 +201,17 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Liquid Glass for floating controls only (kit 27.0.2 Regular: 70% fill,
-   0.5pt light rim, soft drop shadow; the blur radius is a web approximation).
+/* Liquid Glass for floating controls only: the --glass-fill disc with the
+   --glass-shadow edge (see :root and .dark) and a 6px backdrop blur.
    Reduce Transparency turns it into a solid card. */
 @utility glass {
-  background-color: var(--glass-fill);
-  -webkit-backdrop-filter: blur(9px) saturate(180%);
-  backdrop-filter: blur(9px) saturate(180%);
-  box-shadow:
-    0 0 0 0.5px var(--glass-rim),
-    0 8px 24px rgb(0 0 0 / 12%);
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--glass-shadow);
 
   @media (prefers-reduced-transparency: reduce) {
-    background-color: var(--card);
+    background: var(--card);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }

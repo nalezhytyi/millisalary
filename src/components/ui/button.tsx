@@ -3,25 +3,28 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 import { Slot } from "radix-ui"
 
-// iOS 27 buttons (kit 27.0.2): every style is a pill (or a circle for icons).
-// Pressed dims to 70% like UIKit's highlighted state, disabled shows at 30%.
+// iOS 27 buttons (kit 27.0.2): every style is a pill (or a circle for icons)
+// with a Medium label like the kit's Liquid Glass buttons. Pressed dims to 70%
+// like UIKit's highlighted state, disabled shows at 30%.
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-full font-semibold whitespace-nowrap transition-opacity duration-100 outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:opacity-70 disabled:pointer-events-none disabled:opacity-30 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-full font-medium whitespace-nowrap transition-opacity duration-100 outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:opacity-70 disabled:pointer-events-none disabled:opacity-30 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        // Bordered Prominent: accent fill. Disabled it turns into the kit's
-        // inactive pill (8% fill, 0.5pt rim, grey glyph), not a faded blue
+        // Glass Prominent: accent fill with the kit's lit top and bottom rims
+        // (the side shadows in the kit sit under its backing). Disabled
+        // it turns into a plain glass pill with a grey glyph (kit inactive
+        // state), not a faded blue
         prominent:
-          "bg-primary text-primary-foreground disabled:bg-fill-quaternary disabled:text-muted-foreground disabled:opacity-100 disabled:shadow-[0_0_0_0.5px_var(--glass-rim)]",
-        // Bordered: grey fill with accent text
-        bordered: "bg-fill-quaternary text-primary active:bg-fill-tertiary",
+          "bg-[var(--glass-prominent-fill)] text-primary-foreground shadow-[var(--glass-prominent-shadow)] disabled:glass disabled:text-[var(--glass-label-disabled)] disabled:opacity-100",
+        // Bordered (kit Button - Content Area): grey fill with accent text
+        bordered: "bg-fill-tertiary text-primary active:bg-fill-secondary",
         plain: "text-primary",
-        // Bordered with the destructive color, for a discard choice
-        destructive:
-          "bg-fill-quaternary text-destructive active:bg-fill-tertiary",
+        // Glass with the destructive color (kit Glass, Destructive=True)
+        destructive: "glass text-destructive",
         // Floating controls over content; see the glass utility in index.css
-        glass: "glass text-primary",
+        // Glyphs in the label color like iOS 27 bar buttons (kit Default state)
+        glass: "glass text-[var(--glass-label)]",
       },
       size: {
         small:
@@ -29,7 +32,7 @@ const buttonVariants = cva(
         medium:
           "h-[34px] gap-1.5 px-4 text-subheadline [&_svg:not([class*='size-'])]:size-4",
         large:
-          "h-[50px] gap-2 px-6 text-body [&_svg:not([class*='size-'])]:size-5",
+          "h-[50px] gap-2 px-5 text-body [&_svg:not([class*='size-'])]:size-5",
         // 44pt bar button item
         icon: "size-11 [&_svg:not([class*='size-'])]:size-5",
       },

@@ -127,7 +127,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             disabled={!hasChanges}
             onClick={() => onSave(draft)}
           >
-            <Check strokeWidth={2.5} />
+            <Check className="size-[26px]" strokeWidth={2.75} />
           </Button>
         }
       >
