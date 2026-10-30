@@ -338,12 +338,11 @@ html.ios-standalone {
 }
 .ios-standalone [data-slot='drawer-content'] {
   position: absolute;
-  bottom: calc(-1 * env(safe-area-inset-top));
-  /* dvh swings between the short and full height here, so pin the top just
-     below the status bar instead of using the 94dvh height */
-  top: calc(env(safe-area-inset-top) + 0.625rem);
-  height: auto;
-  max-height: none;
+  /* the floating card ends 6pt above the physical screen edge */
+  bottom: calc(6px - env(safe-area-inset-top));
+  /* dvh swings between the short and full height here, so cap it by the
+     containing block (screen minus status bar) instead */
+  max-height: calc(100% - 1.5rem);
   margin-top: 0;
 }
 
@@ -380,6 +379,13 @@ textarea:focus,
 textarea:focus-visible {
   outline: none;
   outline-color: transparent;
+}
+
+/* Sheets in dark mode sit on iOS's elevated grouped colors, so the floating
+   card stands out from the dimmed black page and its cards from the sheet */
+.dark [data-slot='drawer-content'] {
+  --background: #1c1c1e;
+  --card: #2c2c2e;
 }
 
 /* The Electron wrapper hosts this app in a window that may declare drag
