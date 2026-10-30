@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App.tsx'
 import { initAmplitude } from './amplitude'
+import { runSplash } from './splash'
 import { removeLegacyStorageKeys } from './utils/legacyStorage'
 import './index.css'
 
@@ -48,6 +49,8 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>
 )
+
+void runSplash()
 
 // Analytics isn't needed for the first paint: load the SDK and session replay
 // once the browser is idle after it, or after a timeout where

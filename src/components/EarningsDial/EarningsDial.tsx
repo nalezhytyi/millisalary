@@ -122,6 +122,7 @@ const EarningsDial: React.FC<EarningsDialProps> = ({
           <img
             src={`${import.meta.env.BASE_URL}images/money-face.webp`}
             alt=""
+            data-dial-face
             className="size-[16cqw] object-contain"
             draggable={false}
           />

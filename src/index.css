@@ -166,6 +166,14 @@ html.ios-standalone {
   margin-top: 0;
 }
 
+/* Splash (index.html): fixed like the sheets, so it also stopped a status-bar
+   height short of the screen bottom. */
+.ios-standalone #splash {
+  position: absolute;
+  bottom: auto;
+  height: calc(100% + env(safe-area-inset-top));
+}
+
 /* While a sheet is open, Radix's scroll lock (react-remove-scroll-bar) sets
    body[data-scroll-locked] { position: relative !important }. Body is the
    812pt-tall scroller here, so that made it the sheets' containing block and
