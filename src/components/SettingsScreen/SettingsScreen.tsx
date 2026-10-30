@@ -24,6 +24,8 @@ import {
 interface SettingsScreenProps {
   open: boolean
   onClose: (method: NavCloseMethod) => void
+  /** The browser went forward to Settings after it closed */
+  onReopen: () => void
   onSave: (values: SettingsValues) => void
   onDiscard: () => void
   monthlySalary: number
@@ -50,6 +52,7 @@ const numberInputClasses =
 const SettingsScreen: React.FC<SettingsScreenProps> = ({
   open,
   onClose,
+  onReopen,
   onSave,
   onDiscard,
   monthlySalary,
@@ -101,9 +104,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   const hasChanges = getChangedFields(saved, draft).length > 0
 
-  // ‹, Esc, the browser's back and (later) the swipe all ask here: with
-  // unsaved changes the page stays and asks first. An open alert owns Esc,
-  // so the screen's own Esc does nothing then.
+  // ‹, Esc and the browser's back all ask here: with unsaved changes the
+  // page stays and asks first. An open alert owns Esc, so the screen's own
+  // Esc does nothing then.
   const handleBeforeClose = () => {
     if (isDiscardAlertOpen) {
       return false
@@ -120,6 +123,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
       <NavScreen
         open={open}
         onClose={onClose}
+        onReopen={onReopen}
         onBeforeClose={handleBeforeClose}
         title="Settings"
         action={

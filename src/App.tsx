@@ -31,6 +31,7 @@ const App: React.FC = () => {
     earnings,
     handleSettingsClick,
     handleSetupHintSettingsClick,
+    handleSettingsReopen,
     handleCloseSettings,
     handleSaveSettings,
     handleDiscardSettings,
@@ -53,6 +54,7 @@ const App: React.FC = () => {
         <SettingsScreen
           open={isSettingsOpen}
           onClose={handleCloseSettings}
+          onReopen={handleSettingsReopen}
           onSave={handleSaveSettings}
           onDiscard={handleDiscardSettings}
           monthlySalary={monthlySalary}
@@ -69,6 +71,7 @@ const App: React.FC = () => {
         <BreakdownScreen
           open={isBreakdownOpen}
           onClose={handleCloseBreakdown}
+          onReopen={handleBreakdownClick}
           earnings={earnings}
           currency={earningsCurrency}
           monthlySalaryCurrency={monthlySalaryCurrency}

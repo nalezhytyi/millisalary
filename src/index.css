@@ -282,6 +282,16 @@ html[data-nav-screen='open'] .app-screen {
   transform: translateX(-30%);
   opacity: 0.8;
 }
+/* The browser already animated this push or pop itself (Safari's back or
+   forward swipe; NavScreen sets data-nav-instant to `open` or `close`), so
+   nothing slides a second time: the main screen snaps, and a page reopened
+   by going forward appears without its slide-in */
+html[data-nav-instant] .app-screen {
+  transition: none;
+}
+html[data-nav-instant='open'] .nav-screen-layer:not([data-closing]) .nav-screen-page {
+  animation: none;
+}
 @media (prefers-reduced-motion: reduce) {
   .nav-screen-page {
     box-shadow: none;

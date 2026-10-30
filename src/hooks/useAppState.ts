@@ -87,11 +87,15 @@ export const useAppState = () => {
 
   // Handlers are stable (useCallback) so the memoized screens skip the 100 ms
   // earnings re-render
-  const openSettings = useCallback((source: 'header' | 'setup_hint') => {
-    sheetOpenedAt.current.settings = Date.now()
-    setIsSettingsOpen(true)
-    trackAmplitudeEvent('settings_clicked', { source })
-  }, [])
+  // `history`: the browser went forward to Settings after it closed
+  const openSettings = useCallback(
+    (source: 'header' | 'setup_hint' | 'history') => {
+      sheetOpenedAt.current.settings = Date.now()
+      setIsSettingsOpen(true)
+      trackAmplitudeEvent('settings_clicked', { source })
+    },
+    []
+  )
 
   const handleSettingsClick = useCallback(
     () => openSettings('header'),
@@ -100,6 +104,11 @@ export const useAppState = () => {
 
   const handleSetupHintSettingsClick = useCallback(
     () => openSettings('setup_hint'),
+    [openSettings]
+  )
+
+  const handleSettingsReopen = useCallback(
+    () => openSettings('history'),
     [openSettings]
   )
 
@@ -243,6 +252,7 @@ export const useAppState = () => {
     exchangeRate,
     handleSettingsClick,
     handleSetupHintSettingsClick,
+    handleSettingsReopen,
     handleCloseSettings,
     handleSaveSettings,
     handleDiscardSettings,

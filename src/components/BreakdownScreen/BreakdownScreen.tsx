@@ -10,6 +10,8 @@ import type { EarningsSnapshot } from '@/utils/calculations'
 interface BreakdownScreenProps {
   open: boolean
   onClose: (method: NavCloseMethod) => void
+  /** The browser went forward to Breakdown after it closed */
+  onReopen: () => void
   earnings: EarningsSnapshot
   currency: string
   monthlySalaryCurrency: string
@@ -35,6 +37,7 @@ const formatDaysLeft = (daysLeft: number) => {
 const BreakdownScreen: React.FC<BreakdownScreenProps> = ({
   open,
   onClose,
+  onReopen,
   earnings,
   currency,
   monthlySalaryCurrency,
@@ -44,7 +47,12 @@ const BreakdownScreen: React.FC<BreakdownScreenProps> = ({
   const showExchangeRate = currency !== monthlySalaryCurrency
 
   return (
-    <NavScreen open={open} onClose={onClose} title="Breakdown">
+    <NavScreen
+      open={open}
+      onClose={onClose}
+      onReopen={onReopen}
+      title="Breakdown"
+    >
       <section className="mb-6 flex items-center gap-4 rounded-card bg-card p-4">
         <img
           src={`${import.meta.env.BASE_URL}images/money-face.png`}
