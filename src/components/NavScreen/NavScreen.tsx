@@ -27,6 +27,7 @@ const NavScreen = ({ open, onClose, title, children }: NavScreenProps) => {
   const [mounted, setMounted] = useState(open)
   const [closing, setClosing] = useState(false)
   const returnFocusTo = useRef<HTMLElement | null>(null)
+  const pageRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const barTitleRef = useRef<HTMLSpanElement>(null)
   const barEdgeRef = useRef<HTMLDivElement>(null)
@@ -86,6 +87,41 @@ const NavScreen = ({ open, onClose, title, children }: NavScreenProps) => {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
+  // In an iOS home-screen app the keyboard covers the page without resizing
+  // it, and WebKit left a field near the bottom hidden behind the keyboard.
+  // The visual viewport does shrink, so pad the scroller by the covered part
+  // and bring the focused field to the middle of what is left
+  useEffect(() => {
+    const viewport = window.visualViewport
+
+    if (!isOpen || !viewport) {
+      return
+    }
+
+    const handleResize = () => {
+      const page = pageRef.current
+      const keyboardInset = Math.max(
+        0,
+        window.innerHeight - viewport.height - viewport.offsetTop
+      )
+      const focused = document.activeElement
+
+      page?.style.setProperty('--keyboard-inset', `${keyboardInset}px`)
+      if (
+        keyboardInset > 0 &&
+        focused instanceof HTMLElement &&
+        page?.contains(focused) &&
+        focused.matches('input, textarea')
+      ) {
+        focused.scrollIntoView({ block: 'center' })
+      }
+    }
+
+    viewport.addEventListener('resize', handleResize)
+
+    return () => viewport.removeEventListener('resize', handleResize)
+  }, [isOpen])
+
   useEffect(() => {
     if (!closing) {
       return
@@ -133,13 +169,17 @@ const NavScreen = ({ open, onClose, title, children }: NavScreenProps) => {
     >
       <div className="nav-screen-dim absolute inset-0 bg-black/30" />
       <div
+        ref={pageRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="nav-screen-title"
         className="nav-screen-page absolute inset-0 flex flex-col bg-background"
       >
         <div className="relative shrink-0 bg-background pt-[env(safe-area-inset-top)]">
-          <div className="mx-auto grid h-[54px] w-full max-w-md grid-cols-[1fr_auto_1fr] items-center px-4">
+          {/* The back button sits 8pt below the safe area like the main
+              screen's header buttons, so it doesn't jump on the push; the
+              bar stays 54pt */}
+          <div className="mx-auto grid h-[54px] w-full max-w-md grid-cols-[1fr_auto_1fr] items-start px-4 pt-2">
             <Button
               variant="glass"
               size="icon"
@@ -151,7 +191,7 @@ const NavScreen = ({ open, onClose, title, children }: NavScreenProps) => {
             <span
               ref={barTitleRef}
               aria-hidden
-              className="text-headline font-semibold opacity-0"
+              className="text-headline leading-11 font-semibold opacity-0"
             >
               {title}
             </span>
@@ -166,7 +206,7 @@ const NavScreen = ({ open, onClose, title, children }: NavScreenProps) => {
           onScroll={handleScroll}
           className="flex-1 overflow-y-auto overscroll-contain"
         >
-          <div className="mx-auto w-full max-w-md px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+          <div className="mx-auto w-full max-w-md px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom)+var(--keyboard-inset,0px))]">
             <h1
               id="nav-screen-title"
               ref={titleRef}

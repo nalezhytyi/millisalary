@@ -12,7 +12,7 @@ import { useAppState, useInstallPrompt, useTheme } from './hooks'
 // delaying it
 const BreakdownScreen = lazy(() => import('./components/BreakdownScreen'))
 const InstallSheet = lazy(() => import('./components/InstallSheet'))
-const SettingsSheet = lazy(() => import('./components/SettingsSheet'))
+const SettingsScreen = lazy(() => import('./components/SettingsScreen'))
 
 const App: React.FC = () => {
   const {
@@ -60,7 +60,7 @@ const App: React.FC = () => {
   return (
     <>
       <Suspense fallback={null}>
-        <SettingsSheet
+        <SettingsScreen
           open={isSettingsOpen}
           onClose={handleCloseSettings}
           monthlySalary={monthlySalary}

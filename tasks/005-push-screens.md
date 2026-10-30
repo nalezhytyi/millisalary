@@ -71,14 +71,21 @@ Settings і Breakdown зараз — нижні шити на vaul. Хочемо
 - `pnpm run build` і `pnpm run lint` на базовому рівні
 
 ### Epic 2: Settings на `NavScreen`
-**Status:** pending
+**Status:** approved
 
 **Description:** Найбільший екран, з полями вводу й нативними пікерами.
 
 **Subtasks:**
-- [ ] `SettingsSheet` → `SettingsScreen` на `NavScreen`, групи й рядки без змін
-- [ ] Перевірити поведінку клавіатури в iOS standalone (обхід `repositionInputs` був потрібен саме через vaul)
-- [ ] Відкриття з шапки й із SetupHint як і раніше, події `settings_clicked` з `source`
+- [x] `SettingsSheet` → `SettingsScreen` на `NavScreen`, групи й рядки без змін
+- [x] Перевірити поведінку клавіатури в iOS standalone (обхід `repositionInputs` був потрібен саме через vaul)
+- [x] Відкриття з шапки й із SetupHint як і раніше, події `settings_clicked` з `source`
+
+**Нотатки:**
+- `SettingsSheet` перейменовано в `SettingsScreen` на `NavScreen`; `repositionInputs` і коментар про vaul прибрано.
+- Знайдено й виправлено: в iOS standalone поле внизу (Day of month) лишалось під клавіатурою — WebKit сам його не прокручував. `NavScreen` тепер слухає `visualViewport`, додає знизу відступ на висоту клавіатури (`--keyboard-inset`) і прокручує поле з фокусом до середини.
+- Після затвердження користувач помітив, що `‹` стоїть вище за кнопки шапки головного екрана: шапка відступає 8pt від safe area, а кнопка в барі 54pt була по центру (5pt). Бар тепер `items-start pt-2`, заголовок у барі `leading-11`, щоб бути по центру кнопки; виміряно однакові 8pt / 16pt у Chromium і однаковий край кнопки на симуляторі.
+- Поки клавіатура відкрита, iOS зсуває весь вид угору, і бар із `‹` тимчасово ховається; після закриття клавіатури все повертається. Це стандартна поведінка WebKit, не виправляли.
+- На симуляторі перевірено колесо часу в standalone; нативне меню валют — лише в епіку 7 задачі 004 (той самий `<select>`), тут окремо не відкривав. Safari-вкладку iOS з `SettingsScreen` не перевіряв.
 
 **Acceptance criteria:**
 - Усі поля, нативні меню валют і колеса часу працюють на симуляторі iOS 27 у Safari й standalone
@@ -139,3 +146,7 @@ Settings і Breakdown зараз — нижні шити на vaul. Хочемо
 - 2026-10-30 — created, plan agreed with user
 - 2026-10-30 — Epic 1 work complete, awaiting approval
 - 2026-10-30 — Epic 1 approved
+- 2026-10-30 — Epic 1 committed (`fa703da`)
+- 2026-10-30 — Epic 2 work complete, awaiting approval
+- 2026-10-30 — Epic 2 approved
+- 2026-10-30 — Epic 2: кнопку «назад» вирівняно з кнопками шапки (зауваження користувача)

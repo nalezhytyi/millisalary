@@ -3,12 +3,12 @@ import CurrencySelect from '@/components/CurrencySelect'
 import ListGroup from '@/components/ListGroup'
 import ListRow from '@/components/ListRow'
 import NumberInput from '@/components/NumberInput'
+import NavScreen from '@/components/NavScreen'
 import SegmentedControl from '@/components/SegmentedControl'
-import Sheet from '@/components/Sheet'
 import TimePicker from '@/components/TimePicker'
 import type { Theme } from '@/hooks'
 
-interface SettingsSheetProps {
+interface SettingsScreenProps {
   open: boolean
   onClose: () => void
   monthlySalary: number
@@ -50,7 +50,7 @@ const THEME_OPTIONS: { value: Theme; label: string }[] = [
 const numberInputClasses =
   'h-[52px] w-32 border-0 bg-transparent p-0 text-right text-body shadow-none focus-visible:ring-0 dark:bg-transparent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield] md:text-body'
 
-const SettingsSheet: React.FC<SettingsSheetProps> = ({
+const SettingsScreen: React.FC<SettingsScreenProps> = ({
   open,
   onClose,
   monthlySalary,
@@ -77,17 +77,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
   onThemeChange,
 }) => {
   return (
-    // repositionInputs is off: in an iOS home-screen app the visual viewport
-    // stays short after the keyboard closes, and vaul then left the sheet
-    // raised above the screen bottom. WebKit scrolls the focused field into
-    // view inside the sheet on its own.
-    <Sheet
-      open={open}
-      onClose={onClose}
-      title="Settings"
-      description="Salary, working schedule, payday and appearance"
-      repositionInputs={false}
-    >
+    <NavScreen open={open} onClose={onClose} title="Settings">
       <ListGroup
         title="Salary"
         footer="Your monthly salary is spread over your working days and hours. Earnings are shown in the display currency."
@@ -197,8 +187,8 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
           />
         </div>
       </ListGroup>
-    </Sheet>
+    </NavScreen>
   )
 }
 
-export default React.memo(SettingsSheet)
+export default React.memo(SettingsScreen)
