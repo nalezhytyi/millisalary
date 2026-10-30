@@ -5,11 +5,12 @@ import { Slot } from "radix-ui"
 
 // iOS 27 buttons (kit 27.0.2): every style is a pill (or a circle for icons)
 // with a Medium label like the kit's Liquid Glass buttons. Pressed, it swells
-// by 8% and brightens like an iOS 27 glass button under a finger, springing
-// back on release (under reduced motion it dims to 70% instead); disabled
-// shows at 30%.
+// and brightens like an iOS 27 glass button under a finger, over 450 ms on the
+// CSS ease curve, and eases back over 600 ms with no bounce (under reduced
+// motion it quickly dims to 70% instead); disabled shows at 30%. Round icon buttons swell the most: a native 44pt bar button grows to
+// 60pt, glyph included (1.36, measured on the iOS 27 simulator).
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-full font-medium whitespace-nowrap transition-[scale,filter,opacity] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[1.08] active:brightness-110 active:duration-150 motion-reduce:transition-opacity motion-reduce:active:scale-100 motion-reduce:active:brightness-100 motion-reduce:active:opacity-70 disabled:pointer-events-none disabled:opacity-30 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-full font-medium whitespace-nowrap transition-[scale,filter,opacity] duration-600 ease-[cubic-bezier(0.25,0.1,0.25,1)] outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[var(--press-scale,1.08)] active:brightness-110 active:duration-450 motion-reduce:transition-opacity motion-reduce:duration-200 motion-reduce:active:duration-100 motion-reduce:active:scale-100 motion-reduce:active:brightness-100 motion-reduce:active:opacity-70 disabled:pointer-events-none disabled:opacity-30 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -38,7 +39,7 @@ const buttonVariants = cva(
         large:
           "h-[50px] gap-2 px-5 text-body [&_svg:not([class*='size-'])]:size-5",
         // 44pt bar button item
-        icon: "size-11 [&_svg:not([class*='size-'])]:size-5",
+        icon: "size-11 [--press-scale:1.36] [&_svg:not([class*='size-'])]:size-5",
       },
     },
     defaultVariants: {
