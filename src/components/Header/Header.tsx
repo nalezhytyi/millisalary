@@ -10,9 +10,8 @@ const Header = ({ onSettingsClick, onBreakdownClick }: HeaderProps) => {
   return (
     <header className="flex w-full items-center justify-between gap-3 pt-[calc(0.5rem+env(safe-area-inset-top))] select-none">
       <Button
-        variant="secondary"
+        variant="bordered"
         size="icon"
-        className="size-11 rounded-full text-primary"
         onClick={onBreakdownClick}
         aria-label="Open breakdown"
       >
@@ -25,9 +24,8 @@ const Header = ({ onSettingsClick, onBreakdownClick }: HeaderProps) => {
         </p>
       </div>
       <Button
-        variant="secondary"
+        variant="bordered"
         size="icon"
-        className="size-11 rounded-full text-primary"
         onClick={onSettingsClick}
         aria-label="Open settings"
       >

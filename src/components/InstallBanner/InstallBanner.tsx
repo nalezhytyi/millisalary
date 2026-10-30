@@ -36,13 +36,7 @@ const InstallBanner = ({ onInstall, onDismiss }: InstallBannerProps) => (
           Add to Home Screen
         </p>
       </div>
-      <Button
-        size="sm"
-        className="h-8 shrink-0 rounded-full px-4 text-[15px] font-semibold"
-        onClick={onInstall}
-      >
-        Install
-      </Button>
+      <Button onClick={onInstall}>Install</Button>
     </aside>
   </div>
 )

@@ -34,6 +34,8 @@
   --fill-tertiary: rgb(118 118 128 / 12%);
   --fill-quaternary: rgb(116 116 128 / 8%);
   --segment-selected: #ffffff;
+  --glass-fill: rgb(255 255 255 / 70%);
+  --glass-rim: #dbdbdb;
   --radius: 0.75rem;
 
   font-family: var(--font-sans);
@@ -72,6 +74,8 @@
   --fill-tertiary: rgb(118 118 128 / 24%);
   --fill-quaternary: rgb(118 118 128 / 18%);
   --segment-selected: rgb(255 255 255 / 27%);
+  --glass-fill: rgb(26 26 26 / 70%);
+  --glass-rim: #a6a6a6;
 }
 
 /* The kit's increased-contrast accents and secondary label (the kit dropped
@@ -145,6 +149,24 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Liquid Glass for floating controls only (kit 27.0.2 Regular: 70% fill,
+   0.5pt light rim, soft drop shadow; the blur radius is a web approximation).
+   Reduce Transparency turns it into a solid card. */
+@utility glass {
+  background-color: var(--glass-fill);
+  -webkit-backdrop-filter: blur(9px) saturate(180%);
+  backdrop-filter: blur(9px) saturate(180%);
+  box-shadow:
+    0 0 0 0.5px var(--glass-rim),
+    0 8px 24px rgb(0 0 0 / 12%);
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 @layer base {

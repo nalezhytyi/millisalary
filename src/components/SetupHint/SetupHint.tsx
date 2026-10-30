@@ -9,7 +9,9 @@ const SetupHint = ({ onOpenSettings }: SetupHintProps) => (
     <p className="text-[15px] text-muted-foreground">
       Add your monthly salary to start tracking earnings.
     </p>
-    <Button onClick={onOpenSettings}>Open settings</Button>
+    <Button size="large" onClick={onOpenSettings}>
+      Open settings
+    </Button>
   </div>
 )
 

@@ -41,10 +41,7 @@ const Sheet = ({
         <span />
         <DrawerTitle className="text-[17px] font-semibold">{title}</DrawerTitle>
         <DrawerClose asChild>
-          <Button
-            variant="ghost"
-            className="h-9 justify-self-end px-2 text-[17px] font-semibold text-primary hover:bg-transparent"
-          >
+          <Button variant="plain" className="justify-self-end px-2 text-body">
             Done
           </Button>
         </DrawerClose>
