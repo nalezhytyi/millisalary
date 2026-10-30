@@ -9,7 +9,8 @@ const SLOP = 8
 // when the finger was still moving right faster than this (px/ms)
 const CLOSE_FRACTION = 1 / 3
 const CLOSE_VELOCITY = 0.5
-// Speed is measured over the last part of the drag only
+// Speed is measured over the last moments before release only, so a finger
+// that stopped before lifting counts as still
 const VELOCITY_WINDOW_MS = 100
 // The push/pop timing from index.css
 const SETTLE = 'transform 0.35s var(--ease-ios)'
@@ -21,6 +22,9 @@ interface Sample {
 
 interface Gesture {
   id: number
+  // The page it started on: NavScreen stays mounted between opens, so a
+  // gesture whose page closed under the finger never sees its pointerup
+  page: HTMLDivElement
   startX: number
   startY: number
   dragging: boolean
@@ -71,7 +75,9 @@ export const useEdgeSwipe = (
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     const page = pageRef.current
 
-    if (gesture.current || event.button !== 0 || !page) {
+    // A second finger on the same page is ignored; a gesture left over from
+    // a page that has since closed is replaced
+    if (gesture.current?.page === page || event.button !== 0 || !page) {
       return
     }
     if (event.clientX - page.getBoundingClientRect().left > EDGE_WIDTH) {
@@ -79,6 +85,7 @@ export const useEdgeSwipe = (
     }
     gesture.current = {
       id: event.pointerId,
+      page,
       startX: event.clientX,
       startY: event.clientY,
       dragging: false,
@@ -139,10 +146,14 @@ export const useEdgeSwipe = (
     }
 
     const last = current.samples[current.samples.length - 1]
-    const first = current.samples[0]
+    const end = { x: last.x, t: event.timeStamp }
+    // The window ends at the release, not at the last move
+    const recent = current.samples.filter(
+      (sample) => end.t - sample.t <= VELOCITY_WINDOW_MS
+    )
+    const first = recent[0] ?? end
     const dx = Math.max(0, last.x - current.startX)
-    const velocity =
-      last.t > first.t ? (last.x - first.x) / (last.t - first.t) : 0
+    const velocity = end.t > first.t ? (end.x - first.x) / (end.t - first.t) : 0
     const wantsClose =
       event.type === 'pointerup' &&
       dx > 0 &&
