@@ -1,19 +1,14 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { trackAmplitudeEvent } from '../amplitude'
 import { WORKING_DAYS, WORKING_HOURS_PER_DAY } from '../constants'
 import {
-  calculateWorkingHoursPerDayValue,
   formatEventTime,
   formatTimeInputValue,
   getEndHourFromStart,
-  getNextEndAndStartHours,
-  getNextStartAndEndHours,
-  normalizePayday,
-  normalizeWorkingDays,
-  normalizeWorkingHoursPerDay,
-  parseSalaryInputValue,
   parseTimeInputValue,
 } from '../utils/salaryForm'
+import { getChangedFields, type SettingsValues } from '../utils/settingsDraft'
+import type { NavCloseMethod } from '../components/NavScreen'
 import { isPeriod, type Period } from '../utils/calculations'
 import { useEarnings } from './useEarnings'
 import { useLocalStorage } from './useLocalStorage'
@@ -77,8 +72,6 @@ export const useAppState = () => {
   )
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false)
-  // Number fields report one *_changed event on blur, not one per keystroke
-  const editedFields = useRef(new Set<string>())
   const sheetOpenedAt = useRef({ settings: 0, breakdown: 0 })
 
   const { earnings, exchangeRate } = useEarnings(
@@ -92,135 +85,17 @@ export const useAppState = () => {
     payday
   )
 
-  // Handlers are stable (useCallback) so the memoized sheets skip the 100 ms
+  // Handlers are stable (useCallback) so the memoized screens skip the 100 ms
   // earnings re-render
-  const handleSetMonthlySalary = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setMonthlySalary(parseSalaryInputValue(event.target.value))
+  // `history`: the browser went forward to Settings after it closed
+  const openSettings = useCallback(
+    (source: 'header' | 'setup_hint' | 'history') => {
+      sheetOpenedAt.current.settings = Date.now()
+      setIsSettingsOpen(true)
+      trackAmplitudeEvent('settings_clicked', { source })
     },
-    [setMonthlySalary]
+    []
   )
-
-  const handleMonthlySalaryBlur = useCallback(() => {
-    trackAmplitudeEvent('salary_input_blurred', {
-      salary_value: monthlySalary,
-      has_salary_value: monthlySalary > 0,
-    })
-  }, [monthlySalary])
-
-  const handleSetMonthlySalaryCurrency = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      const nextCurrency = event.target.value
-      setMonthlySalaryCurrency(nextCurrency)
-      trackAmplitudeEvent('salary_currency_changed', {
-        currency: nextCurrency,
-      })
-    },
-    [setMonthlySalaryCurrency]
-  )
-
-  const handleSetEarningsCurrency = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      const nextCurrency = event.target.value
-      setEarningsCurrency(nextCurrency)
-      trackAmplitudeEvent('earnings_currency_changed', {
-        currency: nextCurrency,
-      })
-    },
-    [setEarningsCurrency]
-  )
-
-  const handleSetWorkingHoursPerDay = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const nextWorkingHoursPerDay = normalizeWorkingHoursPerDay(
-        parseSalaryInputValue(event.target.value)
-      )
-
-      setWorkingHoursPerDay(nextWorkingHoursPerDay)
-      editedFields.current.add('working_hours_per_day')
-      if (startHour) {
-        setEndHour(getEndHourFromStart(startHour, nextWorkingHoursPerDay))
-      }
-    },
-    [setWorkingHoursPerDay, setEndHour, startHour]
-  )
-
-  const handleSetWorkingDays = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setWorkingDays(
-        normalizeWorkingDays(parseSalaryInputValue(event.target.value))
-      )
-      editedFields.current.add('working_days')
-    },
-    [setWorkingDays]
-  )
-
-  const handleWorkingDaysBlur = useCallback(() => {
-    if (editedFields.current.delete('working_days')) {
-      trackAmplitudeEvent('working_days_changed', { working_days: workingDays })
-    }
-  }, [workingDays])
-
-  const handleWorkingHoursPerDayBlur = useCallback(() => {
-    if (editedFields.current.delete('working_hours_per_day')) {
-      trackAmplitudeEvent('working_hours_per_day_changed', {
-        working_hours_per_day: workingHoursPerDay,
-      })
-    }
-  }, [workingHoursPerDay])
-
-  const handleSetPayday = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setPayday(normalizePayday(parseSalaryInputValue(event.target.value)))
-      editedFields.current.add('payday')
-    },
-    [setPayday]
-  )
-
-  const handlePaydayBlur = useCallback(() => {
-    if (editedFields.current.delete('payday')) {
-      trackAmplitudeEvent('payday_changed', { payday })
-    }
-  }, [payday])
-
-  const handleStartHourChange = useCallback(
-    (date: Date | null) => {
-      const nextHours = getNextStartAndEndHours(
-        date,
-        endHour,
-        workingHoursPerDay
-      )
-
-      setStartHour(nextHours.startHour)
-      setEndHour(nextHours.endHour)
-      trackAmplitudeEvent('workday_start_time_changed', {
-        start_time: formatEventTime(date),
-      })
-    },
-    [endHour, workingHoursPerDay, setStartHour, setEndHour]
-  )
-
-  const handleEndHourChange = useCallback(
-    (date: Date | null) => {
-      const nextHours = getNextEndAndStartHours(date, startHour)
-
-      setStartHour(nextHours.startHour)
-      setEndHour(nextHours.endHour)
-      setWorkingHoursPerDay(
-        calculateWorkingHoursPerDayValue(nextHours.startHour, nextHours.endHour)
-      )
-      trackAmplitudeEvent('workday_end_time_changed', {
-        end_time: formatEventTime(date),
-      })
-    },
-    [startHour, setStartHour, setEndHour, setWorkingHoursPerDay]
-  )
-
-  const openSettings = useCallback((source: 'header' | 'setup_hint') => {
-    sheetOpenedAt.current.settings = Date.now()
-    setIsSettingsOpen(true)
-    trackAmplitudeEvent('settings_clicked', { source })
-  }, [])
 
   const handleSettingsClick = useCallback(
     () => openSettings('header'),
@@ -232,17 +107,116 @@ export const useAppState = () => {
     [openSettings]
   )
 
-  const handleCloseSettings = useCallback(() => {
-    // A field still focused when the sheet closes may never get its blur
-    // (iOS keeps focus on the input while Done is tapped), so flush it here
-    handleWorkingDaysBlur()
-    handleWorkingHoursPerDayBlur()
-    handlePaydayBlur()
-    setIsSettingsOpen(false)
-    trackAmplitudeEvent('settings_closed', {
-      duration_ms: Date.now() - sheetOpenedAt.current.settings,
-    })
-  }, [handleWorkingDaysBlur, handleWorkingHoursPerDayBlur, handlePaydayBlur])
+  const handleSettingsReopen = useCallback(
+    () => openSettings('history'),
+    [openSettings]
+  )
+
+  // `method` says how: the screen's ‹, Esc or the browser's back, or the
+  // save / discard that close Settings from inside
+  const handleCloseSettings = useCallback(
+    (method: NavCloseMethod | 'save' | 'discard') => {
+      setIsSettingsOpen(false)
+      trackAmplitudeEvent('settings_closed', {
+        method,
+        duration_ms: Date.now() - sheetOpenedAt.current.settings,
+      })
+    },
+    []
+  )
+
+  // Settings edit a draft; this is the only place they reach storage. The
+  // per-field events fire here, once, for the fields that actually changed.
+  // The theme lives in useTheme: SettingsScreen saves it just before and
+  // names it in `extraChangedFields`
+  const handleSaveSettings = useCallback(
+    (next: SettingsValues, extraChangedFields: string[] = []) => {
+      const saved: SettingsValues = {
+        monthlySalary,
+        monthlySalaryCurrency,
+        earningsCurrency,
+        workingHoursPerDay,
+        workingDays,
+        payday,
+        startHour,
+        endHour,
+      }
+      const changedFields = getChangedFields(saved, next)
+
+      setMonthlySalary(next.monthlySalary)
+      setMonthlySalaryCurrency(next.monthlySalaryCurrency)
+      setEarningsCurrency(next.earningsCurrency)
+      setWorkingHoursPerDay(next.workingHoursPerDay)
+      setWorkingDays(next.workingDays)
+      setPayday(next.payday)
+      setStartHour(next.startHour)
+      setEndHour(next.endHour)
+
+      const events: Record<string, () => void> = {
+        monthly_salary: () =>
+          trackAmplitudeEvent('salary_input_blurred', {
+            salary_value: next.monthlySalary,
+            has_salary_value: next.monthlySalary > 0,
+          }),
+        monthly_salary_currency: () =>
+          trackAmplitudeEvent('salary_currency_changed', {
+            currency: next.monthlySalaryCurrency,
+          }),
+        earnings_currency: () =>
+          trackAmplitudeEvent('earnings_currency_changed', {
+            currency: next.earningsCurrency,
+          }),
+        working_days: () =>
+          trackAmplitudeEvent('working_days_changed', {
+            working_days: next.workingDays,
+          }),
+        working_hours_per_day: () =>
+          trackAmplitudeEvent('working_hours_per_day_changed', {
+            working_hours_per_day: next.workingHoursPerDay,
+          }),
+        start_time: () =>
+          trackAmplitudeEvent('workday_start_time_changed', {
+            start_time: formatEventTime(next.startHour),
+          }),
+        end_time: () =>
+          trackAmplitudeEvent('workday_end_time_changed', {
+            end_time: formatEventTime(next.endHour),
+          }),
+        payday: () =>
+          trackAmplitudeEvent('payday_changed', { payday: next.payday }),
+      }
+
+      changedFields.forEach((field) => events[field]?.())
+      trackAmplitudeEvent('settings_saved', {
+        changed_fields: [...changedFields, ...extraChangedFields],
+      })
+      handleCloseSettings('save')
+    },
+    [
+      monthlySalary,
+      monthlySalaryCurrency,
+      earningsCurrency,
+      workingHoursPerDay,
+      workingDays,
+      payday,
+      startHour,
+      endHour,
+      setMonthlySalary,
+      setMonthlySalaryCurrency,
+      setEarningsCurrency,
+      setWorkingHoursPerDay,
+      setWorkingDays,
+      setPayday,
+      setStartHour,
+      setEndHour,
+      handleCloseSettings,
+    ]
+  )
+
+  const handleDiscardSettings = useCallback(() => {
+    trackAmplitudeEvent('settings_discarded')
+    handleCloseSettings('discard')
+  }, [handleCloseSettings])
 
   const handleBreakdownClick = useCallback(() => {
     sheetOpenedAt.current.breakdown = Date.now()
@@ -250,9 +224,10 @@ export const useAppState = () => {
     trackAmplitudeEvent('breakdown_opened')
   }, [])
 
-  const handleCloseBreakdown = useCallback(() => {
+  const handleCloseBreakdown = useCallback((method: NavCloseMethod) => {
     setIsBreakdownOpen(false)
     trackAmplitudeEvent('breakdown_closed', {
+      method,
       duration_ms: Date.now() - sheetOpenedAt.current.breakdown,
     })
   }, [])
@@ -279,21 +254,12 @@ export const useAppState = () => {
     isBreakdownOpen,
     earnings,
     exchangeRate,
-    handleSetMonthlySalary,
-    handleMonthlySalaryBlur,
-    handleSetMonthlySalaryCurrency,
-    handleSetEarningsCurrency,
-    handleSetWorkingHoursPerDay,
-    handleWorkingHoursPerDayBlur,
-    handleSetWorkingDays,
-    handleWorkingDaysBlur,
-    handleSetPayday,
-    handlePaydayBlur,
-    handleStartHourChange,
-    handleEndHourChange,
     handleSettingsClick,
     handleSetupHintSettingsClick,
+    handleSettingsReopen,
     handleCloseSettings,
+    handleSaveSettings,
+    handleDiscardSettings,
     handleBreakdownClick,
     handleCloseBreakdown,
     handlePeriodChange,

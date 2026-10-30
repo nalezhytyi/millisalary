@@ -7,11 +7,12 @@ import SetupHint from './components/SetupHint'
 import StatsRow from './components/StatsRow'
 import { useAppState, useInstallPrompt, useTheme } from './hooks'
 
-// The sheets start closed, so they (with vaul and Radix Dialog) load in their
-// own chunks while the main screen paints instead of delaying it
-const BreakdownSheet = lazy(() => import('./components/BreakdownSheet'))
+// The sheets and pushed screens start closed, so they (with vaul and Radix
+// Dialog) load in their own chunks while the main screen paints instead of
+// delaying it
+const BreakdownScreen = lazy(() => import('./components/BreakdownScreen'))
 const InstallSheet = lazy(() => import('./components/InstallSheet'))
-const SettingsSheet = lazy(() => import('./components/SettingsSheet'))
+const SettingsScreen = lazy(() => import('./components/SettingsScreen'))
 
 const App: React.FC = () => {
   const {
@@ -28,21 +29,12 @@ const App: React.FC = () => {
     isBreakdownOpen,
     exchangeRate,
     earnings,
-    handleSetMonthlySalary,
-    handleMonthlySalaryBlur,
-    handleSetMonthlySalaryCurrency,
-    handleSetEarningsCurrency,
-    handleSetWorkingHoursPerDay,
-    handleWorkingHoursPerDayBlur,
-    handleSetWorkingDays,
-    handleWorkingDaysBlur,
-    handleSetPayday,
-    handlePaydayBlur,
-    handleStartHourChange,
-    handleEndHourChange,
     handleSettingsClick,
     handleSetupHintSettingsClick,
+    handleSettingsReopen,
     handleCloseSettings,
+    handleSaveSettings,
+    handleDiscardSettings,
     handleBreakdownClick,
     handleCloseBreakdown,
     handlePeriodChange,
@@ -59,9 +51,12 @@ const App: React.FC = () => {
   return (
     <>
       <Suspense fallback={null}>
-        <SettingsSheet
+        <SettingsScreen
           open={isSettingsOpen}
           onClose={handleCloseSettings}
+          onReopen={handleSettingsReopen}
+          onSave={handleSaveSettings}
+          onDiscard={handleDiscardSettings}
           monthlySalary={monthlySalary}
           monthlySalaryCurrency={monthlySalaryCurrency}
           earningsCurrency={earningsCurrency}
@@ -71,23 +66,12 @@ const App: React.FC = () => {
           startHour={startHour}
           endHour={endHour}
           theme={theme}
-          onMonthlySalaryChange={handleSetMonthlySalary}
-          onMonthlySalaryBlur={handleMonthlySalaryBlur}
-          onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
-          onEarningsCurrencyChange={handleSetEarningsCurrency}
-          onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
-          onWorkingHoursPerDayBlur={handleWorkingHoursPerDayBlur}
-          onWorkingDaysChange={handleSetWorkingDays}
-          onWorkingDaysBlur={handleWorkingDaysBlur}
-          onPaydayChange={handleSetPayday}
-          onPaydayBlur={handlePaydayBlur}
-          onStartHourChange={handleStartHourChange}
-          onEndHourChange={handleEndHourChange}
           onThemeChange={setTheme}
         />
-        <BreakdownSheet
+        <BreakdownScreen
           open={isBreakdownOpen}
           onClose={handleCloseBreakdown}
+          onReopen={handleBreakdownClick}
           earnings={earnings}
           currency={earningsCurrency}
           monthlySalaryCurrency={monthlySalaryCurrency}

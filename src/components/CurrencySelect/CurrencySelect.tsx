@@ -19,7 +19,7 @@ const CurrencySelect: React.FC<CurrencySelectProps> = ({
     aria-label={ariaLabel}
     value={selectedCurrency}
     onChange={onCurrencyChange}
-    className="[&_select]:h-11 [&_select]:border-0 [&_select]:bg-transparent [&_select]:pr-6 [&_select]:pl-0 [&_select]:text-right [&_select]:text-[17px] [&_select]:text-muted-foreground [&_select]:focus-visible:ring-0 dark:[&_select]:bg-transparent [&_svg]:right-0"
+    className="[&_select]:h-[52px] [&_select]:border-0 [&_select]:bg-transparent [&_select]:pr-6 [&_select]:pl-0 [&_select]:text-right [&_select]:text-body [&_select]:text-muted-foreground [&_select]:focus-visible:ring-0 dark:[&_select]:bg-transparent [&_svg]:right-0"
   >
     {CURRENCIES.map((currency) => (
       <NativeSelectOption key={currency} value={currency}>

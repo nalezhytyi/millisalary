@@ -6,7 +6,7 @@
    space in a flex row on iOS Safari; appearance/min-width let it shrink to
    what the row actually has. */
 .time-picker-input {
-  min-height: 2.25rem;
+  min-height: 52px;
   -webkit-appearance: none;
   appearance: none;
   min-width: 0;

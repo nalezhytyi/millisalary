@@ -6,15 +6,16 @@ interface ListGroupProps {
   children: ReactNode
 }
 
-// Grouped list section: small caps header, rounded card of rows, footer note
+// Grouped list section: sentence-case header, rounded card of rows, footer
+// note (iOS 27: 17pt semibold header, 26pt card corners)
 const ListGroup = ({ title, footer, children }: ListGroupProps) => (
   <section className="mb-6">
-    <h3 className="mb-1.5 px-4 text-[13px] tracking-[0.04em] text-muted-foreground uppercase">
+    <h3 className="px-4 py-2.5 text-headline font-semibold text-muted-foreground">
       {title}
     </h3>
-    <div className="overflow-hidden rounded-xl bg-card">{children}</div>
+    <div className="overflow-hidden rounded-card bg-card">{children}</div>
     {footer && (
-      <p className="mt-1.5 px-4 text-[13px] leading-snug text-muted-foreground">
+      <p className="px-4 pt-2 pb-1.5 text-footnote text-muted-foreground">
         {footer}
       </p>
     )}

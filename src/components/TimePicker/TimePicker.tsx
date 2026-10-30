@@ -18,7 +18,7 @@ const TimePicker: FC<{
     onChange={(event) =>
       onChange(parseTimeInputValue(event.target.value, selected))
     }
-    className="time-picker-input h-11 min-w-0 bg-transparent text-[17px] text-foreground"
+    className="time-picker-input h-[52px] min-w-0 bg-transparent text-body text-foreground"
   />
 )
 

@@ -66,3 +66,6 @@ out/
 
 # Bundle report from `pnpm run analyze`
 bundle-stats.html
+
+# Task plans from /task-plan and /task-run, kept locally only
+tasks/

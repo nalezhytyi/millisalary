@@ -21,10 +21,10 @@ const StatsRow: React.FC<StatsRowProps> = ({ earnings, currency }) => {
         <React.Fragment key={stat.label}>
           {index > 0 && <Separator orientation="vertical" />}
           <div className="min-w-0 flex-1 px-1 text-center">
-            <div className="text-[13px] leading-tight font-semibold [overflow-wrap:anywhere]">
+            <div className="text-footnote font-semibold [overflow-wrap:anywhere]">
               {formatCurrency(stat.amount, currency)}
             </div>
-            <div className="mt-1 text-[11px] tracking-[0.12em] text-muted-foreground uppercase">
+            <div className="mt-0.5 text-caption1 text-muted-foreground">
               {stat.label}
             </div>
           </div>

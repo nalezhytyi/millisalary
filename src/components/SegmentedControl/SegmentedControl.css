@@ -1,0 +1,30 @@
+/* The segmented control's track is glass, as in the iOS 27 Photos control
+   (dark values measured on a recording of it: page #090909, track #212121
+   with rims about #4a4a4a on top and #3e3e3e at the bottom): a translucent
+   capsule with lit rims at the top and bottom and a light blur of what is
+   behind it. Reduce Transparency makes it the solid fill it used to be. */
+.segmented-track {
+  background: rgb(255 255 255 / 70%);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 95%),
+    inset 0 -1px 1px rgb(255 255 255 / 80%),
+    0 0 0 0.5px rgb(0 0 0 / 7%),
+    0 4px 12px rgb(0 0 0 / 5%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.dark .segmented-track {
+  background: rgb(255 255 255 / 12%);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 20%),
+    inset 0 -1px 1px rgb(255 255 255 / 14%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .segmented-track {
+    background: var(--fill-tertiary);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

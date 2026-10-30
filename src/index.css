@@ -4,10 +4,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* iOS system colors. shadcn tokens are mapped onto UIKit semantic colors:
-   background = systemGroupedBackground, card = secondarySystemGroupedBackground,
+/* iOS 27 system colors (values from the kit's Colors page, 27.0.2). shadcn
+   tokens are mapped onto UIKit semantic colors: background =
+   systemGroupedBackground, card = secondarySystemGroupedBackground,
    foreground = label, muted-foreground = secondaryLabel, secondary/muted =
-   tertiarySystemFill, border = separator, primary/ring = systemBlue. */
+   tertiarySystemFill, border = non-opaque separator, primary/ring =
+   systemBlue. The --fill-* tokens are the four system fill levels. */
 :root {
   --background: #f2f2f7;
   --foreground: #000000;
@@ -15,7 +17,7 @@
   --card-foreground: #000000;
   --popover: #ffffff;
   --popover-foreground: #000000;
-  --primary: #007aff;
+  --primary: #0088ff;
   --primary-foreground: #ffffff;
   --secondary: rgb(118 118 128 / 12%);
   --secondary-foreground: #000000;
@@ -23,10 +25,39 @@
   --muted-foreground: rgb(60 60 67 / 60%);
   --accent: rgb(118 118 128 / 12%);
   --accent-foreground: #000000;
-  --destructive: #ff3b30;
-  --border: rgb(60 60 67 / 29%);
-  --input: rgb(60 60 67 / 29%);
-  --ring: #007aff;
+  --destructive: #ff383c;
+  --border: rgb(0 0 0 / 12%);
+  --input: rgb(0 0 0 / 12%);
+  --ring: #0088ff;
+  --fill-primary: rgb(120 120 128 / 20%);
+  --fill-secondary: rgb(120 120 128 / 16%);
+  --fill-tertiary: rgb(118 118 128 / 12%);
+  --fill-quaternary: rgb(116 116 128 / 8%);
+  --segment-selected: #ffffff;
+  /* The iOS 27 kit's Glass button as rendered (Buttons page, light): a lens
+     that is greyer at the top and brighter towards the bottom, grey hairline
+     crescents on the left and right edges (the kit's 1.25px #d0d0d0, a touch
+     wider and darker so they render as strongly in a browser), a 0.5pt ring
+     and a 2% shadow */
+  --glass-fill: linear-gradient(
+    to bottom,
+    rgb(238 238 238 / 85%),
+    rgb(248 248 248 / 85%) 55%,
+    rgb(252 252 252 / 90%)
+  );
+  --glass-shadow:
+    1.5px 0 0 -0.75px #c8c8c8, -1.5px 0 0 -0.75px #c8c8c8,
+    0 0 0 0.5px #e8e8e8, 0 8px 15px rgb(0 0 0 / 2%);
+  /* Glass Prominent (blue) buttons, as the kit renders them: the accent fill
+     with lighter 1px rims at the top and bottom and a 2% shadow */
+  --glass-prominent-fill: var(--primary);
+  --glass-prominent-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 18%), inset 0 -1px 0 rgb(255 255 255 / 18%),
+    0 8px 15px rgb(0 0 0 / 2%);
+  /* Glyphs on glass: the kit's vibrant labels (primary, tertiary) */
+  --glass-label: #1a1a1a;
+  --glass-label-disabled: #bfbfbf;
+  --overlay-alert: rgb(41 41 58 / 23%);
   --radius: 0.75rem;
 
   font-family: var(--font-sans);
@@ -48,24 +79,78 @@
   --card-foreground: #ffffff;
   --popover: #1c1c1e;
   --popover-foreground: #ffffff;
-  --primary: #0a84ff;
+  --primary: #0091ff;
   --primary-foreground: #ffffff;
   --secondary: rgb(118 118 128 / 24%);
   --secondary-foreground: #ffffff;
   --muted: rgb(118 118 128 / 24%);
-  --muted-foreground: rgb(235 235 245 / 60%);
+  --muted-foreground: rgb(235 235 245 / 70%);
   --accent: rgb(118 118 128 / 24%);
   --accent-foreground: #ffffff;
-  --destructive: #ff453a;
-  --border: rgb(84 84 88 / 65%);
-  --input: rgb(84 84 88 / 65%);
-  --ring: #0a84ff;
+  --destructive: #ff4245;
+  --border: rgb(255 255 255 / 17%);
+  --input: rgb(255 255 255 / 17%);
+  --ring: #0091ff;
+  --fill-primary: rgb(120 120 128 / 36%);
+  --fill-secondary: rgb(120 120 128 / 32%);
+  --fill-tertiary: rgb(118 118 128 / 24%);
+  --fill-quaternary: rgb(118 118 128 / 18%);
+  --segment-selected: rgb(255 255 255 / 27%);
+  /* The kit's dark Glass button shape (darker at the top, brighter towards
+     the bottom, a bright 1px rim on top and a softer one at the bottom) at
+     the brightness of native iOS 27 glass on black (~#383838); the kit's own
+     Figma render is a near-black #1b1b1b disc */
+  --glass-fill: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 15%),
+    rgb(255 255 255 / 22%) 55%,
+    rgb(255 255 255 / 27%)
+  );
+  --glass-label: #f5f5f5;
+  /* The kit's #0091ff tint burned into its 94% white backing on a dark page */
+  --glass-prominent-fill: #0082f0;
+  --glass-prominent-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 18%), inset 0 -1px 0 rgb(255 255 255 / 18%),
+    0 8px 15px rgb(0 0 0 / 2%);
+  /* The kit's dark tertiary (#404040) disappears on this lighter disc */
+  --glass-label-disabled: rgb(235 235 245 / 70%);
+  --glass-shadow:
+    0 0 2px rgb(0 0 0 / 10%), 0 1px 8px rgb(0 0 0 / 10%),
+    inset 0 1px 0 rgb(255 255 255 / 28%),
+    inset 0 -1.5px 0 rgb(255 255 255 / 12%),
+    inset 0 0 0 0.5px rgb(255 255 255 / 8%);
+  --overlay-alert: rgb(18 18 18 / 56%);
+}
+
+/* The kit's increased-contrast accents and secondary label (the kit dropped
+   it as an authoring mode, but the setting is still honored at runtime).
+   `.dark` sits on the same <html> as :root, so it must restate every token
+   :root changes here, or the light value wins in dark mode too */
+@media (prefers-contrast: more) {
+  :root {
+    --primary: #1e6ef4;
+    --ring: #1e6ef4;
+    --destructive: #e9152d;
+    --muted-foreground: rgb(60 60 67 / 80%);
+  }
+  .dark {
+    --primary: #5cb8ff;
+    --ring: #5cb8ff;
+    --destructive: #ff6165;
+    --muted-foreground: rgb(235 235 245 / 70%);
+  }
 }
 
 @theme inline {
   --font-sans:
     -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   --font-heading: var(--font-sans);
+  --color-fill-primary: var(--fill-primary);
+  --color-fill-secondary: var(--fill-secondary);
+  --color-fill-tertiary: var(--fill-tertiary);
+  --color-fill-quaternary: var(--fill-quaternary);
+  --color-segment-selected: var(--segment-selected);
+  --color-overlay-alert: var(--overlay-alert);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -84,6 +169,29 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+  /* iOS text styles (SF Pro Text, regular size / line height / tracking) */
+  --text-headline: 17px;
+  --text-headline--line-height: 22px;
+  --text-headline--letter-spacing: -0.43px;
+  --text-body: 17px;
+  --text-body--line-height: 22px;
+  --text-body--letter-spacing: -0.43px;
+  --text-callout: 16px;
+  --text-callout--line-height: 21px;
+  --text-callout--letter-spacing: -0.31px;
+  --text-subheadline: 15px;
+  --text-subheadline--line-height: 20px;
+  --text-subheadline--letter-spacing: -0.23px;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-footnote--letter-spacing: -0.08px;
+  --text-caption1: 12px;
+  --text-caption1--line-height: 16px;
+  --text-caption2: 11px;
+  --text-caption2--line-height: 13px;
+  --text-caption2--letter-spacing: 0.06px;
+  /* Grouped list cards, measured on the iOS 27 simulator's Settings app */
+  --radius-card: 26px;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -91,6 +199,22 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Liquid Glass for floating controls only: the --glass-fill disc with the
+   --glass-shadow edge (see :root and .dark) and a 6px backdrop blur.
+   Reduce Transparency turns it into a solid card. */
+@utility glass {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--glass-shadow);
+
+  @media (prefers-reduced-transparency: reduce) {
+    background: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 @layer base {
@@ -108,13 +232,111 @@
   }
 }
 
-a:hover {
-  color: #535bf2;
-}
-
 body {
   margin: 0;
   padding: 0;
+}
+
+/* Pushed full-screen pages (NavScreen), timed like the kit's push/pop
+   transitions (animations.json: 0.35 s, appleEaseOut): the page slides in
+   from the right while the main screen shifts left by 30% and fades to 80%;
+   under reduced motion the page only fades. The page is rendered only while
+   open or closing, never parked off-screen (an off-screen layer widens the
+   document and iOS pans to it). */
+:root {
+  --ease-ios: cubic-bezier(0, 0, 0.6, 1);
+}
+@keyframes nav-screen-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes nav-screen-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes nav-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes nav-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+.nav-screen-page {
+  box-shadow: -8px 0 24px rgb(0 0 0 / 12%);
+  animation: nav-screen-in 0.35s var(--ease-ios);
+}
+.nav-screen-layer[data-closing] .nav-screen-page {
+  animation: nav-screen-out 0.35s var(--ease-ios) forwards;
+}
+.app-screen {
+  transition:
+    transform 0.35s var(--ease-ios),
+    opacity 0.35s var(--ease-ios);
+}
+html[data-nav-screen='open'] .app-screen {
+  transform: translateX(-30%);
+  opacity: 0.8;
+}
+/* The browser already animated this push or pop itself (Safari's back or
+   forward swipe; NavScreen sets data-nav-instant to `open` or `close`), so
+   nothing slides a second time: the main screen snaps, and a page reopened
+   by going forward appears without its slide-in */
+html[data-nav-instant] .app-screen {
+  transition: none;
+}
+html[data-nav-instant='open'] .nav-screen-layer:not([data-closing]) .nav-screen-page {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-screen-page {
+    box-shadow: none;
+    animation: nav-fade-in 0.15s linear;
+  }
+  .nav-screen-layer[data-closing] .nav-screen-page {
+    animation: nav-fade-out 0.15s linear forwards;
+  }
+  .app-screen {
+    transition: none;
+  }
+  html[data-nav-screen='open'] .app-screen {
+    transform: none;
+  }
+}
+
+/* NavScreen's bar: the iOS 27 scroll edge effect (kit "soft" style). There is
+   no bar background or hairline; a layer behind the buttons fades from the
+   page color at the top to transparent below the button row and blurs what
+   scrolls under it, more strongly near the top. */
+.nav-scroll-edge {
+  isolation: isolate;
+}
+.nav-scroll-edge::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -16px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--background) 0%,
+    color-mix(in srgb, var(--background) 85%, transparent) 45%,
+    transparent 100%
+  );
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent);
+  mask-image: linear-gradient(to bottom, black 55%, transparent);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .nav-scroll-edge::before {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* iOS standalone (home-screen) web apps anchor the layout viewport at the top
@@ -157,13 +379,20 @@ html.ios-standalone {
 }
 .ios-standalone [data-slot='drawer-content'] {
   position: absolute;
-  bottom: calc(-1 * env(safe-area-inset-top));
-  /* dvh swings between the short and full height here, so pin the top just
-     below the status bar instead of using the 94dvh height */
-  top: calc(env(safe-area-inset-top) + 0.625rem);
-  height: auto;
-  max-height: none;
+  /* the floating card ends 6pt above the physical screen edge */
+  bottom: calc(6px - env(safe-area-inset-top));
+  /* dvh swings between the short and full height here, so cap it by the
+     containing block (screen minus status bar) instead */
+  max-height: calc(100% - 1.5rem);
   margin-top: 0;
+}
+
+/* NavScreen: a fixed full-screen page, so it also stopped a status-bar height
+   short of the screen bottom. Joins the absolute layers like .app-screen. */
+.ios-standalone .nav-screen-layer {
+  position: absolute;
+  bottom: auto;
+  height: calc(100% + env(safe-area-inset-top));
 }
 
 /* Splash (index.html): fixed like the sheets, so it also stopped a status-bar
@@ -191,6 +420,13 @@ textarea:focus,
 textarea:focus-visible {
   outline: none;
   outline-color: transparent;
+}
+
+/* Sheets in dark mode sit on iOS's elevated grouped colors, so the floating
+   card stands out from the dimmed black page and its cards from the sheet */
+.dark [data-slot='drawer-content'] {
+  --background: #1c1c1e;
+  --card: #2c2c2e;
 }
 
 /* The Electron wrapper hosts this app in a window that may declare drag
