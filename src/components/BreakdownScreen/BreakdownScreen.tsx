@@ -2,12 +2,12 @@ import React from 'react'
 import dayjs from 'dayjs'
 import ListGroup from '@/components/ListGroup'
 import ListRow from '@/components/ListRow'
-import Sheet from '@/components/Sheet'
+import NavScreen from '@/components/NavScreen'
 import { Progress } from '@/components/ui/progress'
 import { formatCurrency } from '@/utils/calculations'
 import type { EarningsSnapshot } from '@/utils/calculations'
 
-interface BreakdownSheetProps {
+interface BreakdownScreenProps {
   open: boolean
   onClose: () => void
   earnings: EarningsSnapshot
@@ -32,7 +32,7 @@ const formatDaysLeft = (daysLeft: number) => {
   return daysLeft === 1 ? '1 day' : `${daysLeft} days`
 }
 
-const BreakdownSheet: React.FC<BreakdownSheetProps> = ({
+const BreakdownScreen: React.FC<BreakdownScreenProps> = ({
   open,
   onClose,
   earnings,
@@ -44,12 +44,7 @@ const BreakdownSheet: React.FC<BreakdownSheetProps> = ({
   const showExchangeRate = currency !== monthlySalaryCurrency
 
   return (
-    <Sheet
-      open={open}
-      onClose={onClose}
-      title="Breakdown"
-      description="Next payday, earnings so far and your rate"
-    >
+    <NavScreen open={open} onClose={onClose} title="Breakdown">
       <section className="mb-6 flex items-center gap-4 rounded-card bg-card p-4">
         <img
           src={`${import.meta.env.BASE_URL}images/money-face.png`}
@@ -132,8 +127,8 @@ const BreakdownSheet: React.FC<BreakdownSheetProps> = ({
           </span>
         </ListRow>
       </ListGroup>
-    </Sheet>
+    </NavScreen>
   )
 }
 
-export default React.memo(BreakdownSheet)
+export default React.memo(BreakdownScreen)

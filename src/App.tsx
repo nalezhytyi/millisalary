@@ -7,9 +7,10 @@ import SetupHint from './components/SetupHint'
 import StatsRow from './components/StatsRow'
 import { useAppState, useInstallPrompt, useTheme } from './hooks'
 
-// The sheets start closed, so they (with vaul and Radix Dialog) load in their
-// own chunks while the main screen paints instead of delaying it
-const BreakdownSheet = lazy(() => import('./components/BreakdownSheet'))
+// The sheets and pushed screens start closed, so they (with vaul and Radix
+// Dialog) load in their own chunks while the main screen paints instead of
+// delaying it
+const BreakdownScreen = lazy(() => import('./components/BreakdownScreen'))
 const InstallSheet = lazy(() => import('./components/InstallSheet'))
 const SettingsSheet = lazy(() => import('./components/SettingsSheet'))
 
@@ -85,7 +86,7 @@ const App: React.FC = () => {
           onEndHourChange={handleEndHourChange}
           onThemeChange={setTheme}
         />
-        <BreakdownSheet
+        <BreakdownScreen
           open={isBreakdownOpen}
           onClose={handleCloseBreakdown}
           earnings={earnings}

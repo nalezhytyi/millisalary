@@ -122,6 +122,9 @@
   --color-foreground: var(--foreground);
   --color-background: var(--background);
   /* iOS text styles (SF Pro Text, regular size / line height / tracking) */
+  --text-large-title: 34px;
+  --text-large-title--line-height: 41px;
+  --text-large-title--letter-spacing: 0.4px;
   --text-headline: 17px;
   --text-headline--line-height: 22px;
   --text-headline--letter-spacing: -0.43px;
@@ -191,6 +194,85 @@ body {
   padding: 0;
 }
 
+/* Pushed full-screen pages (NavScreen). They slide in from the right while
+   the main screen shifts left by 30% and a dim layer fades in, on the iOS
+   push curve; under reduced motion the page only fades. The page is rendered
+   only while open or closing, never parked off-screen (an off-screen layer
+   widens the document and iOS pans to it). */
+:root {
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes nav-screen-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes nav-screen-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes nav-dim-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes nav-dim-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes nav-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes nav-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+.nav-screen-page {
+  box-shadow: -8px 0 24px rgb(0 0 0 / 12%);
+  animation: nav-screen-in 0.4s var(--ease-ios);
+}
+.nav-screen-dim {
+  animation: nav-dim-in 0.4s var(--ease-ios);
+}
+.nav-screen-layer[data-closing] .nav-screen-page {
+  animation: nav-screen-out 0.4s var(--ease-ios) forwards;
+}
+.nav-screen-layer[data-closing] .nav-screen-dim {
+  animation: nav-dim-out 0.4s var(--ease-ios) forwards;
+}
+.app-screen {
+  transition: transform 0.4s var(--ease-ios);
+}
+html[data-nav-screen='open'] .app-screen {
+  transform: translateX(-30%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-screen-page {
+    box-shadow: none;
+    animation: nav-fade-in 0.15s linear;
+  }
+  .nav-screen-dim {
+    animation: none;
+  }
+  .nav-screen-layer[data-closing] .nav-screen-page {
+    animation: nav-fade-out 0.15s linear forwards;
+  }
+  .nav-screen-layer[data-closing] .nav-screen-dim {
+    animation: none;
+  }
+  .app-screen {
+    transition: none;
+  }
+  html[data-nav-screen='open'] .app-screen {
+    transform: none;
+  }
+}
+
 /* iOS standalone (home-screen) web apps anchor the layout viewport at the top
    of the screen (viewport-fit=cover) but size it to screen minus the status
    bar and never resize it, and WebKit clips the painting of position: fixed
@@ -238,6 +320,14 @@ html.ios-standalone {
   height: auto;
   max-height: none;
   margin-top: 0;
+}
+
+/* NavScreen: a fixed full-screen page, so it also stopped a status-bar height
+   short of the screen bottom. Joins the absolute layers like .app-screen. */
+.ios-standalone .nav-screen-layer {
+  position: absolute;
+  bottom: auto;
+  height: calc(100% + env(safe-area-inset-top));
 }
 
 /* Splash (index.html): fixed like the sheets, so it also stopped a status-bar
