@@ -15,24 +15,15 @@ interface SheetProps {
   title: string
   /** Screen-reader description of the sheet */
   description: string
-  /** Trailing bar button, e.g. a done checkmark */
-  action?: ReactNode
   children: ReactNode
 }
 
 // The iOS 27 kit's large sheet ("Sheet - iPhone", Large): it starts at the
 // top safe area (62pt on an iPhone 17 Pro, so the dimmed page shows above it)
 // and runs to the bottom edge with 38pt top corners; a 6pt grabber area, then
-// a toolbar row with a glass close button and an optional trailing action
-// 16pt in from the corner and the centered title, then a scrolling body
-const Sheet = ({
-  open,
-  onClose,
-  title,
-  description,
-  action,
-  children,
-}: SheetProps) => (
+// a toolbar row with a glass close button 16pt in from the corner and the
+// centered title, then a scrolling body
+const Sheet = ({ open, onClose, title, description, children }: SheetProps) => (
   <Drawer open={open} onOpenChange={(next) => !next && onClose()}>
     {/* Capped to the same centered max-w-md column as the main screen, so on
         wide screens it rises over the app instead of spanning the window;
@@ -49,7 +40,7 @@ const Sheet = ({
         <DrawerTitle className="translate-y-0.5 text-headline font-semibold">
           {title}
         </DrawerTitle>
-        <div className="justify-self-end">{action}</div>
+        <span />
       </div>
       <DrawerDescription className="sr-only">{description}</DrawerDescription>
 
