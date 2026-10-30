@@ -123,7 +123,9 @@
 }
 
 /* The kit's increased-contrast accents and secondary label (the kit dropped
-   it as an authoring mode, but the setting is still honored at runtime) */
+   it as an authoring mode, but the setting is still honored at runtime).
+   `.dark` sits on the same <html> as :root, so it must restate every token
+   :root changes here, or the light value wins in dark mode too */
 @media (prefers-contrast: more) {
   :root {
     --primary: #1e6ef4;
@@ -135,6 +137,7 @@
     --primary: #5cb8ff;
     --ring: #5cb8ff;
     --destructive: #ff6165;
+    --muted-foreground: rgb(235 235 245 / 70%);
   }
 }
 
