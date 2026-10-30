@@ -379,12 +379,10 @@ html.ios-standalone {
 }
 .ios-standalone [data-slot='drawer-content'] {
   position: absolute;
-  /* the floating card ends 6pt above the physical screen edge */
-  bottom: calc(6px - env(safe-area-inset-top));
-  /* dvh swings between the short and full height here, so cap it by the
-     containing block (screen minus status bar) instead */
-  max-height: calc(100% - 1.5rem);
-  margin-top: 0;
+  /* the sheet runs to the physical screen edge; its top stays at the safe
+     area, so it never depends on dvh, which swings between the short and
+     full height here */
+  bottom: calc(0px - env(safe-area-inset-top));
 }
 
 /* NavScreen: a fixed full-screen page, so it also stopped a status-bar height
@@ -422,8 +420,14 @@ textarea:focus-visible {
   outline-color: transparent;
 }
 
-/* Sheets in dark mode sit on iOS's elevated grouped colors, so the floating
-   card stands out from the dimmed black page and its cards from the sheet */
+/* Sheets sit on iOS's system background colors instead of the grouped ones:
+   white like the kit's large sheet, with secondarySystemBackground cards, and
+   the elevated pair in dark, so the sheet stands out from the dimmed black
+   page and its cards from the sheet */
+[data-slot='drawer-content'] {
+  --background: #ffffff;
+  --card: #f2f2f7;
+}
 .dark [data-slot='drawer-content'] {
   --background: #1c1c1e;
   --card: #2c2c2e;

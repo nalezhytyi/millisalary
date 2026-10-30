@@ -1,7 +1,9 @@
 import { ReactNode } from 'react'
 import { Share, SquarePlus, TextAlignStart } from 'lucide-react'
 import ListGroup from '@/components/ListGroup'
+import { CheckmarkSymbol } from '@/components/SFSymbol'
 import Sheet from '@/components/Sheet'
+import { Button } from '@/components/ui/button'
 
 interface InstallSheetProps {
   open: boolean
@@ -70,6 +72,11 @@ const InstallSheet = ({ open, onClose }: InstallSheetProps) => (
     onClose={onClose}
     title="Install"
     description="How to add Millisalary to your Home Screen from Safari"
+    action={
+      <Button size="icon" aria-label="Done" onClick={onClose}>
+        <CheckmarkSymbol />
+      </Button>
+    }
   >
     <section className="mb-6 flex flex-col items-center gap-2 pt-2 text-center">
       <img
