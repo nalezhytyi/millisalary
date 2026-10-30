@@ -14,7 +14,7 @@ const InstallBanner = ({ onInstall, onDismiss }: InstallBannerProps) => (
   <div className="pointer-events-none fixed inset-x-0 top-[calc(0.5rem+env(safe-area-inset-top))] z-40 mx-auto w-full max-w-md px-3">
     <aside
       aria-label="Install the app"
-      className="pointer-events-auto flex animate-in items-center gap-3 rounded-2xl bg-card py-2.5 pr-3 pl-1.5 shadow-lg ring-1 ring-black/5 duration-300 fade-in slide-in-from-top-2 motion-reduce:animate-none dark:ring-white/10"
+      className="pointer-events-auto flex animate-in items-center gap-3 rounded-[24px] glass py-2.5 pr-3 pl-1.5 duration-300 fade-in slide-in-from-top-2 motion-reduce:animate-none"
     >
       <button
         type="button"
@@ -31,8 +31,8 @@ const InstallBanner = ({ onInstall, onDismiss }: InstallBannerProps) => (
         draggable={false}
       />
       <div className="min-w-0 flex-1">
-        <p className="text-[15px] leading-tight font-semibold">Millisalary</p>
-        <p className="truncate text-[13px] text-muted-foreground">
+        <p className="text-subheadline font-semibold">Millisalary</p>
+        <p className="truncate text-footnote text-muted-foreground">
           Add to Home Screen
         </p>
       </div>

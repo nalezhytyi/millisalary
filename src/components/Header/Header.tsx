@@ -10,7 +10,7 @@ const Header = ({ onSettingsClick, onBreakdownClick }: HeaderProps) => {
   return (
     <header className="flex w-full items-center justify-between gap-3 pt-[calc(0.5rem+env(safe-area-inset-top))] select-none">
       <Button
-        variant="bordered"
+        variant="glass"
         size="icon"
         onClick={onBreakdownClick}
         aria-label="Open breakdown"
@@ -18,13 +18,13 @@ const Header = ({ onSettingsClick, onBreakdownClick }: HeaderProps) => {
         <ChartNoAxesColumn className="size-5" />
       </Button>
       <div className="text-center">
-        <h1 className="text-[17px] leading-tight font-semibold">Millisalary</h1>
-        <p className="text-[11px] tracking-[0.18em] text-muted-foreground uppercase">
+        <h1 className="text-headline font-semibold">Millisalary</h1>
+        <p className="text-footnote text-muted-foreground">
           Real time earnings
         </p>
       </div>
       <Button
-        variant="bordered"
+        variant="glass"
         size="icon"
         onClick={onSettingsClick}
         aria-label="Open settings"
