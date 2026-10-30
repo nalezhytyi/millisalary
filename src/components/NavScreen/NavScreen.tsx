@@ -2,8 +2,10 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeftSymbol } from '@/components/SFSymbol'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { resetAppScreen, useEdgeSwipe } from './useEdgeSwipe'
 
-export type NavCloseMethod = 'back_button' | 'escape' | 'history'
+export type NavCloseMethod = 'back_button' | 'escape' | 'history' | 'swipe'
 
 interface NavScreenProps {
   open: boolean
@@ -19,6 +21,12 @@ interface NavScreenProps {
 // The page animation (index.css) takes 0.35 s; this timer only covers a missed
 // animationend, e.g. in a hidden tab where animations don't run
 const EXIT_FALLBACK_MS = 500
+
+// The edge swipe is only ours in the installed iOS app: a Safari tab has its
+// own back swipe, and Android its system back, both of which reach the page
+// through history (popstate)
+const hasEdgeSwipe = () =>
+  document.documentElement.classList.contains('ios-standalone')
 
 // A reload keeps history.state, but not the open page: forget the entry so the
 // next open pushes a fresh one
@@ -70,15 +78,16 @@ const NavScreen = ({
 
   const isOpen = open && mounted
 
-  // ‹ and Esc: ask the page first, then leave through history so the entry
-  // pushed on open goes too; popstate does the actual close
+  // ‹, Esc and the swipe: ask the page first, then leave through history so
+  // the entry pushed on open goes too; popstate does the actual close. Returns
+  // whether the page is closing
   const requestClose = useCallback((method: NavCloseMethod) => {
     // A second tap before popstate would go one entry too far back
     if (pendingMethod.current !== null) {
-      return
+      return false
     }
     if (onBeforeCloseRef.current?.() === false) {
-      return
+      return false
     }
     if (hasHistoryEntry.current) {
       pendingMethod.current = method
@@ -86,7 +95,9 @@ const NavScreen = ({
     } else {
       onCloseRef.current(method)
     }
+    return true
   }, [])
+  const edgeSwipe = useEdgeSwipe(pageRef, () => requestClose('swipe'))
 
   // The main screen slides left (index.css) and cannot be focused or read
   // while the page is up; both end as soon as the page starts to leave
@@ -106,6 +117,7 @@ const NavScreen = ({
 
     return () => {
       delete document.documentElement.dataset.navScreen
+      resetAppScreen()
       if (root) {
         root.inert = false
       }
@@ -268,7 +280,15 @@ const NavScreen = ({
             <div className="justify-self-end">{action}</div>
           </div>
         </div>
-        <div className="absolute inset-0 overflow-y-auto overscroll-contain">
+        {/* The edge swipe lives on the scroller, which only gives up
+            horizontal pans (touch-action: pan-y); the bar above keeps ‹ */}
+        <div
+          className={cn(
+            'absolute inset-0 overflow-y-auto overscroll-contain',
+            hasEdgeSwipe() && 'touch-pan-y'
+          )}
+          {...(hasEdgeSwipe() ? edgeSwipe : {})}
+        >
           {/* Content starts 8pt below the bar, so a card doesn't sit right
               under the buttons; it scrolls on under the bar */}
           <div className="mx-auto w-full max-w-md px-4 pt-[calc(env(safe-area-inset-top)+70px)] pb-[calc(1.5rem+env(safe-area-inset-bottom)+var(--keyboard-inset,0px))]">
