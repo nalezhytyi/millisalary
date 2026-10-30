@@ -8,6 +8,7 @@ import {
   parseTimeInputValue,
 } from '../utils/salaryForm'
 import { getChangedFields, type SettingsValues } from '../utils/settingsDraft'
+import type { NavCloseMethod } from '../components/NavScreen'
 import { isPeriod, type Period } from '../utils/calculations'
 import { useEarnings } from './useEarnings'
 import { useLocalStorage } from './useLocalStorage'
@@ -102,12 +103,18 @@ export const useAppState = () => {
     [openSettings]
   )
 
-  const handleCloseSettings = useCallback(() => {
-    setIsSettingsOpen(false)
-    trackAmplitudeEvent('settings_closed', {
-      duration_ms: Date.now() - sheetOpenedAt.current.settings,
-    })
-  }, [])
+  // `method` says how: the screen's ‹, Esc or the browser's back, or the
+  // save / discard that close Settings from inside
+  const handleCloseSettings = useCallback(
+    (method: NavCloseMethod | 'save' | 'discard') => {
+      setIsSettingsOpen(false)
+      trackAmplitudeEvent('settings_closed', {
+        method,
+        duration_ms: Date.now() - sheetOpenedAt.current.settings,
+      })
+    },
+    []
+  )
 
   // Settings edit a draft; this is the only place they reach storage. The
   // per-field events fire here, once, for the fields that actually changed
@@ -170,7 +177,7 @@ export const useAppState = () => {
 
       changedFields.forEach((field) => events[field]?.())
       trackAmplitudeEvent('settings_saved', { changed_fields: changedFields })
-      handleCloseSettings()
+      handleCloseSettings('save')
     },
     [
       monthlySalary,
@@ -195,7 +202,7 @@ export const useAppState = () => {
 
   const handleDiscardSettings = useCallback(() => {
     trackAmplitudeEvent('settings_discarded')
-    handleCloseSettings()
+    handleCloseSettings('discard')
   }, [handleCloseSettings])
 
   const handleBreakdownClick = useCallback(() => {
@@ -204,9 +211,10 @@ export const useAppState = () => {
     trackAmplitudeEvent('breakdown_opened')
   }, [])
 
-  const handleCloseBreakdown = useCallback(() => {
+  const handleCloseBreakdown = useCallback((method: NavCloseMethod) => {
     setIsBreakdownOpen(false)
     trackAmplitudeEvent('breakdown_closed', {
+      method,
       duration_ms: Date.now() - sheetOpenedAt.current.breakdown,
     })
   }, [])

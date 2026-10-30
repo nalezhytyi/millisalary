@@ -3,7 +3,7 @@ import CurrencySelect from '@/components/CurrencySelect'
 import DiscardAlert from '@/components/DiscardAlert'
 import ListGroup from '@/components/ListGroup'
 import ListRow from '@/components/ListRow'
-import NavScreen from '@/components/NavScreen'
+import NavScreen, { type NavCloseMethod } from '@/components/NavScreen'
 import NumberInput from '@/components/NumberInput'
 import { CheckmarkSymbol } from '@/components/SFSymbol'
 import SegmentedControl from '@/components/SegmentedControl'
@@ -23,7 +23,7 @@ import {
 
 interface SettingsScreenProps {
   open: boolean
-  onClose: () => void
+  onClose: (method: NavCloseMethod) => void
   onSave: (values: SettingsValues) => void
   onDiscard: () => void
   monthlySalary: number
@@ -101,24 +101,26 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   const hasChanges = getChangedFields(saved, draft).length > 0
 
-  // Back, Esc and (later) the swipe all come here: with unsaved changes they
-  // ask first. An open alert owns Esc, so ignore the screen's own Esc then.
-  const requestClose = () => {
+  // ‹, Esc, the browser's back and (later) the swipe all ask here: with
+  // unsaved changes the page stays and asks first. An open alert owns Esc,
+  // so the screen's own Esc does nothing then.
+  const handleBeforeClose = () => {
     if (isDiscardAlertOpen) {
-      return
+      return false
     }
     if (hasChanges) {
       setIsDiscardAlertOpen(true)
-    } else {
-      onClose()
+      return false
     }
+    return true
   }
 
   return (
     <>
       <NavScreen
         open={open}
-        onClose={requestClose}
+        onClose={onClose}
+        onBeforeClose={handleBeforeClose}
         title="Settings"
         action={
           <Button

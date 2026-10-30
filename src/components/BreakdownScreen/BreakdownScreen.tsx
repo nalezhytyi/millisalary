@@ -2,14 +2,14 @@ import React from 'react'
 import dayjs from 'dayjs'
 import ListGroup from '@/components/ListGroup'
 import ListRow from '@/components/ListRow'
-import NavScreen from '@/components/NavScreen'
+import NavScreen, { type NavCloseMethod } from '@/components/NavScreen'
 import { Progress } from '@/components/ui/progress'
 import { formatCurrency } from '@/utils/calculations'
 import type { EarningsSnapshot } from '@/utils/calculations'
 
 interface BreakdownScreenProps {
   open: boolean
-  onClose: () => void
+  onClose: (method: NavCloseMethod) => void
   earnings: EarningsSnapshot
   currency: string
   monthlySalaryCurrency: string

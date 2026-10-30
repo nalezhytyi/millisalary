@@ -1,11 +1,15 @@
-import { ReactNode, useEffect, useRef, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeftSymbol } from '@/components/SFSymbol'
 import { Button } from '@/components/ui/button'
 
+export type NavCloseMethod = 'back_button' | 'escape' | 'history'
+
 interface NavScreenProps {
   open: boolean
-  onClose: () => void
+  onClose: (method: NavCloseMethod) => void
+  /** Return false to keep the page open, e.g. to ask about unsaved changes */
+  onBeforeClose?: () => boolean
   title: string
   /** Trailing bar button, e.g. a save checkmark */
   action?: ReactNode
@@ -16,6 +20,12 @@ interface NavScreenProps {
 // animationend, e.g. in a hidden tab where animations don't run
 const EXIT_FALLBACK_MS = 500
 
+// A reload keeps history.state, but not the open page: forget the entry so the
+// next open pushes a fresh one
+if (window.history.state?.navScreen) {
+  window.history.replaceState(null, '')
+}
+
 // iOS 27 pushed page: slides in from the right over the main screen, with a
 // bar holding a round glass back chevron and the 17pt title. Rendered in a
 // portal on <body>
@@ -24,6 +34,7 @@ const EXIT_FALLBACK_MS = 500
 const NavScreen = ({
   open,
   onClose,
+  onBeforeClose,
   title,
   action,
   children,
@@ -33,6 +44,17 @@ const NavScreen = ({
   const returnFocusTo = useRef<HTMLElement | null>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const onCloseRef = useRef(onClose)
+  const onBeforeCloseRef = useRef(onBeforeClose)
+  // Whether the history entry pushed on open is still there, and how the
+  // close that called history.back() was asked for
+  const hasHistoryEntry = useRef(false)
+  const pendingMethod = useRef<NavCloseMethod | null>(null)
+
+  useEffect(() => {
+    onCloseRef.current = onClose
+    onBeforeCloseRef.current = onBeforeClose
+  })
 
   // Same render as the prop change, so the layer and its animation class are
   // there on the first frame
@@ -47,6 +69,24 @@ const NavScreen = ({
   }
 
   const isOpen = open && mounted
+
+  // ‹ and Esc: ask the page first, then leave through history so the entry
+  // pushed on open goes too; popstate does the actual close
+  const requestClose = useCallback((method: NavCloseMethod) => {
+    // A second tap before popstate would go one entry too far back
+    if (pendingMethod.current !== null) {
+      return
+    }
+    if (onBeforeCloseRef.current?.() === false) {
+      return
+    }
+    if (hasHistoryEntry.current) {
+      pendingMethod.current = method
+      window.history.back()
+    } else {
+      onCloseRef.current(method)
+    }
+  }, [])
 
   // The main screen slides left (index.css) and cannot be focused or read
   // while the page is up; both end as soon as the page starts to leave
@@ -80,14 +120,56 @@ const NavScreen = ({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose()
+        requestClose('escape')
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
 
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose])
+  }, [isOpen, requestClose])
+
+  // The page is a history entry, so the browser's and Android's back close it
+  // like ‹ does. Pushing only when the current entry isn't ours keeps
+  // StrictMode's second mount from adding another one
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    if (!window.history.state?.navScreen) {
+      window.history.pushState({ navScreen: true }, '')
+    }
+    hasHistoryEntry.current = true
+
+    const handlePopState = () => {
+      const method = pendingMethod.current ?? 'history'
+      const fromBrowser = pendingMethod.current === null
+
+      pendingMethod.current = null
+      // ‹ and Esc asked onBeforeClose already; a browser back can't be
+      // cancelled, so put the entry back while the page asks
+      if (fromBrowser && onBeforeCloseRef.current?.() === false) {
+        window.history.pushState({ navScreen: true }, '')
+        return
+      }
+      hasHistoryEntry.current = false
+      onCloseRef.current(method)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [isOpen])
+
+  // Closed from inside (save, discard): drop the entry it pushed. The
+  // popstate listener is already gone, so this back closes nothing else
+  useEffect(() => {
+    if (!open && hasHistoryEntry.current) {
+      hasHistoryEntry.current = false
+      window.history.back()
+    }
+  }, [open])
 
   // In an iOS home-screen app the keyboard covers the page without resizing
   // it, and WebKit left a field near the bottom hidden behind the keyboard.
@@ -170,7 +252,7 @@ const NavScreen = ({
             <Button
               variant="glass"
               size="icon"
-              onClick={onClose}
+              onClick={() => requestClose('back_button')}
               aria-label="Back"
             >
               <ChevronLeftSymbol />
