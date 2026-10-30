@@ -58,7 +58,8 @@ function DrawerContent({
         )}
         {...props}
       >
-        <div className="mx-auto mt-4 hidden h-[5px] w-9 shrink-0 rounded-full bg-muted-foreground/40 group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
+        {/* iOS 27 grabber: 58×4, 5pt from the top, black/white at 18% */}
+        <div className="absolute top-[5px] left-1/2 hidden h-1 w-[58px] -translate-x-1/2 rounded-full bg-foreground/[0.18] group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
         {children}
       </DrawerPrimitive.Content>
     </DrawerPortal>
