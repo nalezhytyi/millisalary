@@ -29,21 +29,11 @@ const App: React.FC = () => {
     isBreakdownOpen,
     exchangeRate,
     earnings,
-    handleSetMonthlySalary,
-    handleMonthlySalaryBlur,
-    handleSetMonthlySalaryCurrency,
-    handleSetEarningsCurrency,
-    handleSetWorkingHoursPerDay,
-    handleWorkingHoursPerDayBlur,
-    handleSetWorkingDays,
-    handleWorkingDaysBlur,
-    handleSetPayday,
-    handlePaydayBlur,
-    handleStartHourChange,
-    handleEndHourChange,
     handleSettingsClick,
     handleSetupHintSettingsClick,
     handleCloseSettings,
+    handleSaveSettings,
+    handleDiscardSettings,
     handleBreakdownClick,
     handleCloseBreakdown,
     handlePeriodChange,
@@ -63,6 +53,8 @@ const App: React.FC = () => {
         <SettingsScreen
           open={isSettingsOpen}
           onClose={handleCloseSettings}
+          onSave={handleSaveSettings}
+          onDiscard={handleDiscardSettings}
           monthlySalary={monthlySalary}
           monthlySalaryCurrency={monthlySalaryCurrency}
           earningsCurrency={earningsCurrency}
@@ -72,18 +64,6 @@ const App: React.FC = () => {
           startHour={startHour}
           endHour={endHour}
           theme={theme}
-          onMonthlySalaryChange={handleSetMonthlySalary}
-          onMonthlySalaryBlur={handleMonthlySalaryBlur}
-          onMonthlySalaryCurrencyChange={handleSetMonthlySalaryCurrency}
-          onEarningsCurrencyChange={handleSetEarningsCurrency}
-          onWorkingHoursPerDayChange={handleSetWorkingHoursPerDay}
-          onWorkingHoursPerDayBlur={handleWorkingHoursPerDayBlur}
-          onWorkingDaysChange={handleSetWorkingDays}
-          onWorkingDaysBlur={handleWorkingDaysBlur}
-          onPaydayChange={handleSetPayday}
-          onPaydayBlur={handlePaydayBlur}
-          onStartHourChange={handleStartHourChange}
-          onEndHourChange={handleEndHourChange}
           onThemeChange={setTheme}
         />
         <BreakdownScreen

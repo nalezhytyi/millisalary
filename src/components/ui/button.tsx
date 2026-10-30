@@ -10,11 +10,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Bordered Prominent: accent fill
-        prominent: "bg-primary text-primary-foreground",
+        // Bordered Prominent: accent fill. Disabled it turns into the kit's
+        // inactive pill (8% fill, 0.5pt rim, grey glyph), not a faded blue
+        prominent:
+          "bg-primary text-primary-foreground disabled:bg-fill-quaternary disabled:text-muted-foreground disabled:opacity-100 disabled:shadow-[0_0_0_0.5px_var(--glass-rim)]",
         // Bordered: grey fill with accent text
         bordered: "bg-fill-quaternary text-primary active:bg-fill-tertiary",
         plain: "text-primary",
+        // Bordered with the destructive color, for a discard choice
+        destructive:
+          "bg-fill-quaternary text-destructive active:bg-fill-tertiary",
         // Floating controls over content; see the glass utility in index.css
         glass: "glass text-primary",
       },

@@ -7,10 +7,12 @@ interface NavScreenProps {
   open: boolean
   onClose: () => void
   title: string
+  /** Trailing bar button, e.g. a save checkmark */
+  action?: ReactNode
   children: ReactNode
 }
 
-// The page animation (index.css) takes 0.4 s; this timer only covers a missed
+// The page animation (index.css) takes 0.35 s; this timer only covers a missed
 // animationend, e.g. in a hidden tab where animations don't run
 const EXIT_FALLBACK_MS = 500
 
@@ -23,7 +25,13 @@ const COLLAPSE_RANGE = 24
 // the bar's 17pt title as the content scrolls. Rendered in a portal on <body>
 // while open or closing so #root can be made inert without taking the page
 // with it, and so nothing waits off-screen.
-const NavScreen = ({ open, onClose, title, children }: NavScreenProps) => {
+const NavScreen = ({
+  open,
+  onClose,
+  title,
+  action,
+  children,
+}: NavScreenProps) => {
   const [mounted, setMounted] = useState(open)
   const [closing, setClosing] = useState(false)
   const returnFocusTo = useRef<HTMLElement | null>(null)
@@ -167,7 +175,6 @@ const NavScreen = ({ open, onClose, title, children }: NavScreenProps) => {
         }
       }}
     >
-      <div className="nav-screen-dim absolute inset-0 bg-black/30" />
       <div
         ref={pageRef}
         role="dialog"
@@ -195,6 +202,7 @@ const NavScreen = ({ open, onClose, title, children }: NavScreenProps) => {
             >
               {title}
             </span>
+            <div className="justify-self-end">{action}</div>
           </div>
           <div
             ref={barEdgeRef}
@@ -211,7 +219,7 @@ const NavScreen = ({ open, onClose, title, children }: NavScreenProps) => {
               id="nav-screen-title"
               ref={titleRef}
               tabIndex={-1}
-              className="pt-1 pb-3 text-large-title font-bold outline-none"
+              className="pt-2 pb-2.5 text-large-title font-bold outline-none"
             >
               {title}
             </h1>
