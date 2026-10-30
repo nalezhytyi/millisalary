@@ -4,10 +4,12 @@ import { cn } from "@/lib/utils"
 import { Slot } from "radix-ui"
 
 // iOS 27 buttons (kit 27.0.2): every style is a pill (or a circle for icons)
-// with a Medium label like the kit's Liquid Glass buttons. Pressed dims to 70%
-// like UIKit's highlighted state, disabled shows at 30%.
+// with a Medium label like the kit's Liquid Glass buttons. Pressed, it swells
+// by 8% and brightens like an iOS 27 glass button under a finger, springing
+// back on release (under reduced motion it dims to 70% instead); disabled
+// shows at 30%.
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-full font-medium whitespace-nowrap transition-opacity duration-100 outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:opacity-70 disabled:pointer-events-none disabled:opacity-30 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-full font-medium whitespace-nowrap transition-[scale,filter,opacity] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[1.08] active:brightness-110 active:duration-150 motion-reduce:transition-opacity motion-reduce:active:scale-100 motion-reduce:active:brightness-100 motion-reduce:active:opacity-70 disabled:pointer-events-none disabled:opacity-30 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -19,7 +21,9 @@ const buttonVariants = cva(
           "bg-[var(--glass-prominent-fill)] text-primary-foreground shadow-[var(--glass-prominent-shadow)] disabled:glass disabled:text-[var(--glass-label-disabled)] disabled:opacity-100",
         // Bordered (kit Button - Content Area): grey fill with accent text
         bordered: "bg-fill-tertiary text-primary active:bg-fill-secondary",
-        plain: "text-primary",
+        // Borderless text dims like UIKit's highlighted state instead
+        plain:
+          "text-primary active:scale-100 active:brightness-100 active:opacity-70",
         // Glass with the destructive color (kit Glass, Destructive=True)
         destructive: "glass text-destructive",
         // Floating controls over content; see the glass utility in index.css

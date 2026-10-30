@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeftSymbol } from '@/components/SFSymbol'
 import { Button } from '@/components/ui/button'
 
 interface NavScreenProps {
@@ -193,9 +193,7 @@ const NavScreen = ({
               onClick={onClose}
               aria-label="Back"
             >
-              {/* ~9.5 x 17.5pt glyph with a ~2.7pt stroke, like the native
-                  back chevron */}
-              <ChevronLeft className="size-[35px]" strokeWidth={2.25} />
+              <ChevronLeftSymbol />
             </Button>
             <span
               ref={barTitleRef}

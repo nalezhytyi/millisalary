@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { X } from 'lucide-react'
+import { XmarkSymbol } from '@/components/SFSymbol'
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -43,7 +43,7 @@ const Sheet = ({
       <div className="grid shrink-0 grid-cols-[1fr_auto_1fr] items-center px-4 pt-4 pb-2.5">
         <DrawerClose asChild>
           <Button variant="glass" size="icon" aria-label="Close">
-            <X className="size-[22px]" strokeWidth={2.25} />
+            <XmarkSymbol />
           </Button>
         </DrawerClose>
         <DrawerTitle className="text-headline font-semibold">

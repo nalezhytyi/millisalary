@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react'
-import { Check } from 'lucide-react'
 import CurrencySelect from '@/components/CurrencySelect'
 import DiscardAlert from '@/components/DiscardAlert'
 import ListGroup from '@/components/ListGroup'
 import ListRow from '@/components/ListRow'
 import NavScreen from '@/components/NavScreen'
 import NumberInput from '@/components/NumberInput'
+import { CheckmarkSymbol } from '@/components/SFSymbol'
 import SegmentedControl from '@/components/SegmentedControl'
 import TimePicker from '@/components/TimePicker'
 import { Button } from '@/components/ui/button'
@@ -127,7 +127,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             disabled={!hasChanges}
             onClick={() => onSave(draft)}
           >
-            <Check className="size-[26px]" strokeWidth={2.75} />
+            <CheckmarkSymbol />
           </Button>
         }
       >
