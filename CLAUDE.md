@@ -59,5 +59,5 @@ Single-page React 19 + TypeScript + Tailwind v4 + shadcn/ui (Radix) app, no rout
 
 ## Related
 
-- `tasks/NNN-slug.md` hold task plans (written in Ukrainian) with epics, subtasks and acceptance criteria; keep a task's checkboxes and status current when working from one.
+- `tasks/NNN-slug.md` hold task plans (written in Ukrainian) with epics, subtasks and acceptance criteria; keep a task's checkboxes and status current when working from one. The folder is local only (gitignored, removed from the repo on 2026-10-30), so plans don't ship with the code.
 - The Electron desktop wrapper is a separate repo at `../electron-millisalary`.
