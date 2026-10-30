@@ -15,7 +15,6 @@ interface SheetProps {
   title: string
   /** Screen-reader description of the sheet */
   description: string
-  repositionInputs?: boolean
   children: ReactNode
 }
 
@@ -23,19 +22,8 @@ interface SheetProps {
 // 6pt in from the screen edges with 34pt top and 58pt bottom corners, sized
 // to its content; a 16pt grabber area, then a toolbar row with a glass close
 // button on the left and the centered title, then a scrolling body
-const Sheet = ({
-  open,
-  onClose,
-  title,
-  description,
-  repositionInputs,
-  children,
-}: SheetProps) => (
-  <Drawer
-    open={open}
-    onOpenChange={(next) => !next && onClose()}
-    repositionInputs={repositionInputs}
-  >
+const Sheet = ({ open, onClose, title, description, children }: SheetProps) => (
+  <Drawer open={open} onOpenChange={(next) => !next && onClose()}>
     {/* Capped to the same centered max-w-md column as the main screen, so on
         wide screens it floats over the app instead of spanning the window */}
     <DrawerContent className="mx-auto max-w-[calc(28rem-12px)] bg-background data-[vaul-drawer-direction=bottom]:inset-x-1.5 data-[vaul-drawer-direction=bottom]:bottom-1.5 data-[vaul-drawer-direction=bottom]:mt-0 data-[vaul-drawer-direction=bottom]:max-h-[calc(100dvh-env(safe-area-inset-top)-1.5rem)] data-[vaul-drawer-direction=bottom]:rounded-t-[34px] data-[vaul-drawer-direction=bottom]:rounded-b-[58px] data-[vaul-drawer-direction=bottom]:border-0">
