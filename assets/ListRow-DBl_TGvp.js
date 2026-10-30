@@ -1,1 +1,0 @@
-import{j as e}from"./vendor-AyqsT9M-.js";const i=({label:t,htmlFor:a,children:r})=>e.jsxs("div",{className:"relative flex min-h-11 items-center justify-between gap-4 px-4 after:absolute after:right-0 after:bottom-0 after:left-4 after:h-px after:bg-border last:after:hidden",children:[e.jsx("label",{htmlFor:a,className:"text-[17px]",children:t}),r]});export{i as L};
