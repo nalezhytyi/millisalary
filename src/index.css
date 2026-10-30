@@ -142,6 +142,8 @@
   --text-caption2: 11px;
   --text-caption2--line-height: 13px;
   --text-caption2--letter-spacing: 0.06px;
+  /* Grouped list cards, measured on the iOS 27 simulator's Settings app */
+  --radius-card: 26px;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);

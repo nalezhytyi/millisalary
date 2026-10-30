@@ -48,7 +48,7 @@ const THEME_OPTIONS: { value: Theme; label: string }[] = [
 ]
 
 const numberInputClasses =
-  'h-11 w-32 border-0 bg-transparent p-0 text-right text-[17px] shadow-none focus-visible:ring-0 dark:bg-transparent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield] md:text-[17px]'
+  'h-[52px] w-32 border-0 bg-transparent p-0 text-right text-body shadow-none focus-visible:ring-0 dark:bg-transparent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield] md:text-body'
 
 const SettingsSheet: React.FC<SettingsSheetProps> = ({
   open,

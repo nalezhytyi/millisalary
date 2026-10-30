@@ -50,7 +50,7 @@ const BreakdownSheet: React.FC<BreakdownSheetProps> = ({
       title="Breakdown"
       description="Next payday, earnings so far and your rate"
     >
-      <section className="mb-6 flex items-center gap-4 rounded-2xl bg-card p-4">
+      <section className="mb-6 flex items-center gap-4 rounded-card bg-card p-4">
         <img
           src={`${import.meta.env.BASE_URL}images/money-face.png`}
           alt=""
@@ -58,17 +58,15 @@ const BreakdownSheet: React.FC<BreakdownSheetProps> = ({
           draggable={false}
         />
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] tracking-[0.18em] text-muted-foreground uppercase">
-            Next payday
-          </p>
-          <p className="text-[17px] leading-snug font-semibold">
+          <p className="text-footnote text-muted-foreground">Next payday</p>
+          <p className="text-body leading-snug font-semibold">
             {dayjs(nextPayday.date).format('dddd, MMMM D')}
           </p>
-          <p className="text-[15px] text-muted-foreground [overflow-wrap:anywhere]">
+          <p className="text-subheadline [overflow-wrap:anywhere] text-muted-foreground">
             {formatCurrency(nextPayday.amount, currency)} paycheck
           </p>
         </div>
-        <p className="shrink-0 text-[17px] font-semibold text-primary">
+        <p className="shrink-0 text-body font-semibold text-primary">
           {formatDaysLeft(nextPayday.daysLeft)}
         </p>
       </section>
@@ -82,15 +80,15 @@ const BreakdownSheet: React.FC<BreakdownSheetProps> = ({
           return (
             <div
               key={key}
-              className="relative px-4 py-3 after:absolute after:right-0 after:bottom-0 after:left-4 after:h-px after:bg-border last:after:hidden"
+              className="relative px-4 py-3 after:absolute after:right-0 after:bottom-0 after:left-4 after:h-[0.5px] after:bg-border last:after:hidden"
             >
               <div className="flex items-baseline justify-between gap-3">
-                <span className="shrink-0 text-[17px]">{label}</span>
+                <span className="shrink-0 text-body">{label}</span>
                 <span className="flex min-w-0 flex-wrap items-baseline justify-end gap-x-1.5 text-right">
-                  <span className="text-[17px] font-semibold whitespace-nowrap text-primary">
+                  <span className="text-body font-semibold whitespace-nowrap text-primary">
                     {formatCurrency(earned, currency)}
                   </span>
-                  <span className="text-[13px] whitespace-nowrap text-muted-foreground">
+                  <span className="text-footnote whitespace-nowrap text-muted-foreground">
                     of {formatCurrency(total, currency)}
                   </span>
                 </span>
@@ -98,7 +96,7 @@ const BreakdownSheet: React.FC<BreakdownSheetProps> = ({
               <Progress
                 value={progress}
                 aria-label={`${label} progress`}
-                className="mt-2 h-1.5 bg-secondary"
+                className="mt-2 h-1 bg-secondary"
               />
             </div>
           )
@@ -114,22 +112,22 @@ const BreakdownSheet: React.FC<BreakdownSheetProps> = ({
         }`}
       >
         <ListRow label="Per second">
-          <span className="text-[17px] font-semibold">
+          <span className="text-body font-semibold">
             {formatCurrency(rates.perSecond, currency, 4)}
           </span>
         </ListRow>
         <ListRow label="Per minute">
-          <span className="text-[17px] font-semibold">
+          <span className="text-body font-semibold">
             {formatCurrency(rates.perMinute, currency)}
           </span>
         </ListRow>
         <ListRow label="Per hour">
-          <span className="text-[17px] font-semibold">
+          <span className="text-body font-semibold">
             {formatCurrency(rates.perHour, currency)}
           </span>
         </ListRow>
         <ListRow label="Per day">
-          <span className="text-[17px] font-semibold">
+          <span className="text-body font-semibold">
             {formatCurrency(rates.perDay, currency)}
           </span>
         </ListRow>
