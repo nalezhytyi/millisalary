@@ -126,9 +126,11 @@ export const useAppState = () => {
   )
 
   // Settings edit a draft; this is the only place they reach storage. The
-  // per-field events fire here, once, for the fields that actually changed
+  // per-field events fire here, once, for the fields that actually changed.
+  // The theme lives in useTheme: SettingsScreen saves it just before and
+  // names it in `extraChangedFields`
   const handleSaveSettings = useCallback(
-    (next: SettingsValues) => {
+    (next: SettingsValues, extraChangedFields: string[] = []) => {
       const saved: SettingsValues = {
         monthlySalary,
         monthlySalaryCurrency,
@@ -185,7 +187,9 @@ export const useAppState = () => {
       }
 
       changedFields.forEach((field) => events[field]?.())
-      trackAmplitudeEvent('settings_saved', { changed_fields: changedFields })
+      trackAmplitudeEvent('settings_saved', {
+        changed_fields: [...changedFields, ...extraChangedFields],
+      })
       handleCloseSettings('save')
     },
     [

@@ -26,7 +26,8 @@ interface SettingsScreenProps {
   onClose: (method: NavCloseMethod) => void
   /** The browser went forward to Settings after it closed */
   onReopen: () => void
-  onSave: (values: SettingsValues) => void
+  /** `extraChangedFields` names changes outside `values`, i.e. the theme */
+  onSave: (values: SettingsValues, extraChangedFields?: string[]) => void
   onDiscard: () => void
   monthlySalary: number
   monthlySalaryCurrency: string
@@ -89,9 +90,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
     ]
   )
   // Edits go to a draft that starts from the saved values every time the
-  // screen opens; only the checkmark writes them back. Appearance is not part
-  // of it: it applies at once.
+  // screen opens; only the checkmark writes them back. Appearance is part of
+  // it too (its own draft, since the theme lives in useTheme): picking one
+  // applies nothing until the checkmark.
   const [draft, setDraft] = useState(saved)
+  const [draftTheme, setDraftTheme] = useState(theme)
   const [wasOpen, setWasOpen] = useState(open)
   const [isDiscardAlertOpen, setIsDiscardAlertOpen] = useState(false)
 
@@ -99,10 +102,19 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
     setWasOpen(open)
     if (open) {
       setDraft(saved)
+      setDraftTheme(theme)
     }
   }
 
-  const hasChanges = getChangedFields(saved, draft).length > 0
+  const themeChanged = draftTheme !== theme
+  const hasChanges = getChangedFields(saved, draft).length > 0 || themeChanged
+
+  const handleSave = () => {
+    if (themeChanged) {
+      onThemeChange(draftTheme)
+    }
+    onSave(draft, themeChanged ? ['theme'] : [])
+  }
 
   // ‹, Esc and the browser's back all ask here: with unsaved changes the
   // page stays and asks first. An open alert owns Esc, so the screen's own
@@ -131,7 +143,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             size="icon"
             aria-label="Save"
             disabled={!hasChanges}
-            onClick={() => onSave(draft)}
+            onClick={handleSave}
           >
             <CheckmarkSymbol />
           </Button>
@@ -265,8 +277,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             <SegmentedControl
               aria-label="Appearance"
               options={THEME_OPTIONS}
-              value={theme}
-              onChange={onThemeChange}
+              value={draftTheme}
+              onChange={setDraftTheme}
             />
           </div>
         </ListGroup>
