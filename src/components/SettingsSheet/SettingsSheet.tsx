@@ -188,7 +188,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
         title="Appearance"
         footer="System follows your device's light or dark setting."
       >
-        <div className="p-2">
+        <div className="p-2.5">
           <SegmentedControl
             aria-label="Appearance"
             options={THEME_OPTIONS}
