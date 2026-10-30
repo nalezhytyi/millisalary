@@ -4,10 +4,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* iOS system colors. shadcn tokens are mapped onto UIKit semantic colors:
-   background = systemGroupedBackground, card = secondarySystemGroupedBackground,
+/* iOS 27 system colors (values from the kit's Colors page, 27.0.2). shadcn
+   tokens are mapped onto UIKit semantic colors: background =
+   systemGroupedBackground, card = secondarySystemGroupedBackground,
    foreground = label, muted-foreground = secondaryLabel, secondary/muted =
-   tertiarySystemFill, border = separator, primary/ring = systemBlue. */
+   tertiarySystemFill, border = non-opaque separator, primary/ring =
+   systemBlue. The --fill-* tokens are the four system fill levels. */
 :root {
   --background: #f2f2f7;
   --foreground: #000000;
@@ -15,7 +17,7 @@
   --card-foreground: #000000;
   --popover: #ffffff;
   --popover-foreground: #000000;
-  --primary: #007aff;
+  --primary: #0088ff;
   --primary-foreground: #ffffff;
   --secondary: rgb(118 118 128 / 12%);
   --secondary-foreground: #000000;
@@ -23,10 +25,15 @@
   --muted-foreground: rgb(60 60 67 / 60%);
   --accent: rgb(118 118 128 / 12%);
   --accent-foreground: #000000;
-  --destructive: #ff3b30;
-  --border: rgb(60 60 67 / 29%);
-  --input: rgb(60 60 67 / 29%);
-  --ring: #007aff;
+  --destructive: #ff383c;
+  --border: rgb(0 0 0 / 12%);
+  --input: rgb(0 0 0 / 12%);
+  --ring: #0088ff;
+  --fill-primary: rgb(120 120 128 / 20%);
+  --fill-secondary: rgb(120 120 128 / 16%);
+  --fill-tertiary: rgb(118 118 128 / 12%);
+  --fill-quaternary: rgb(116 116 128 / 8%);
+  --segment-selected: #ffffff;
   --radius: 0.75rem;
 
   font-family: var(--font-sans);
@@ -48,24 +55,50 @@
   --card-foreground: #ffffff;
   --popover: #1c1c1e;
   --popover-foreground: #ffffff;
-  --primary: #0a84ff;
+  --primary: #0091ff;
   --primary-foreground: #ffffff;
   --secondary: rgb(118 118 128 / 24%);
   --secondary-foreground: #ffffff;
   --muted: rgb(118 118 128 / 24%);
-  --muted-foreground: rgb(235 235 245 / 60%);
+  --muted-foreground: rgb(235 235 245 / 70%);
   --accent: rgb(118 118 128 / 24%);
   --accent-foreground: #ffffff;
-  --destructive: #ff453a;
-  --border: rgb(84 84 88 / 65%);
-  --input: rgb(84 84 88 / 65%);
-  --ring: #0a84ff;
+  --destructive: #ff4245;
+  --border: rgb(255 255 255 / 17%);
+  --input: rgb(255 255 255 / 17%);
+  --ring: #0091ff;
+  --fill-primary: rgb(120 120 128 / 36%);
+  --fill-secondary: rgb(120 120 128 / 32%);
+  --fill-tertiary: rgb(118 118 128 / 24%);
+  --fill-quaternary: rgb(118 118 128 / 18%);
+  --segment-selected: rgb(255 255 255 / 27%);
+}
+
+/* The kit's increased-contrast accents and secondary label (the kit dropped
+   it as an authoring mode, but the setting is still honored at runtime) */
+@media (prefers-contrast: more) {
+  :root {
+    --primary: #1e6ef4;
+    --ring: #1e6ef4;
+    --destructive: #e9152d;
+    --muted-foreground: rgb(60 60 67 / 80%);
+  }
+  .dark {
+    --primary: #5cb8ff;
+    --ring: #5cb8ff;
+    --destructive: #ff6165;
+  }
 }
 
 @theme inline {
   --font-sans:
     -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   --font-heading: var(--font-sans);
+  --color-fill-primary: var(--fill-primary);
+  --color-fill-secondary: var(--fill-secondary);
+  --color-fill-tertiary: var(--fill-tertiary);
+  --color-fill-quaternary: var(--fill-quaternary);
+  --color-segment-selected: var(--segment-selected);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -84,6 +117,27 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+  /* iOS text styles (SF Pro Text, regular size / line height / tracking) */
+  --text-headline: 17px;
+  --text-headline--line-height: 22px;
+  --text-headline--letter-spacing: -0.43px;
+  --text-body: 17px;
+  --text-body--line-height: 22px;
+  --text-body--letter-spacing: -0.43px;
+  --text-callout: 16px;
+  --text-callout--line-height: 21px;
+  --text-callout--letter-spacing: -0.31px;
+  --text-subheadline: 15px;
+  --text-subheadline--line-height: 20px;
+  --text-subheadline--letter-spacing: -0.23px;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-footnote--letter-spacing: -0.08px;
+  --text-caption1: 12px;
+  --text-caption1--line-height: 16px;
+  --text-caption2: 11px;
+  --text-caption2--line-height: 13px;
+  --text-caption2--letter-spacing: 0.06px;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -106,10 +160,6 @@
   [role='button']:not(:disabled) {
     cursor: pointer;
   }
-}
-
-a:hover {
-  color: #535bf2;
 }
 
 body {
