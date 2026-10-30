@@ -8,7 +8,6 @@ const twMerge = extendTailwindMerge({
   extend: {
     theme: {
       text: [
-        'large-title',
         'headline',
         'body',
         'callout',

@@ -16,13 +16,9 @@ interface NavScreenProps {
 // animationend, e.g. in a hidden tab where animations don't run
 const EXIT_FALLBACK_MS = 500
 
-// Scroll distance over which the large title hands over to the bar title
-const COLLAPSE_START = 24
-const COLLAPSE_RANGE = 24
-
-// iOS 27 pushed page: slides in from the right over the main screen, 54pt bar
-// with a round glass back chevron, and a 34pt large title that collapses into
-// the bar's 17pt title as the content scrolls. Rendered in a portal on <body>
+// iOS 27 pushed page: slides in from the right over the main screen, with a
+// bar holding a round glass back chevron and the 17pt title. Rendered in a
+// portal on <body>
 // while open or closing so #root can be made inert without taking the page
 // with it, and so nothing waits off-screen.
 const NavScreen = ({
@@ -37,8 +33,6 @@ const NavScreen = ({
   const returnFocusTo = useRef<HTMLElement | null>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const barTitleRef = useRef<HTMLSpanElement>(null)
-  const barEdgeRef = useRef<HTMLDivElement>(null)
 
   // Same render as the prop change, so the layer and its animation class are
   // there on the first frame
@@ -147,23 +141,6 @@ const NavScreen = ({
     return null
   }
 
-  // Style updates go straight to the nodes: a re-render per scroll event
-  // would be wasted work for two opacity values
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop } = event.currentTarget
-    const collapse = Math.min(
-      1,
-      Math.max(0, (scrollTop - COLLAPSE_START) / COLLAPSE_RANGE)
-    )
-
-    if (barTitleRef.current) {
-      barTitleRef.current.style.opacity = String(collapse)
-    }
-    if (barEdgeRef.current) {
-      barEdgeRef.current.style.opacity = scrollTop > 1 ? '1' : '0'
-    }
-  }
-
   return createPortal(
     <div
       className="nav-screen-layer fixed inset-0 z-50 overflow-hidden"
@@ -180,13 +157,16 @@ const NavScreen = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="nav-screen-title"
-        className="nav-screen-page absolute inset-0 flex flex-col bg-background"
+        className="nav-screen-page absolute inset-0 bg-background"
       >
-        <div className="relative shrink-0 bg-background pt-[env(safe-area-inset-top)]">
-          {/* The back button sits 8pt below the safe area like the main
-              screen's header buttons, so it doesn't jump on the push; the
-              bar stays 54pt */}
-          <div className="mx-auto grid h-[54px] w-full max-w-md grid-cols-[1fr_auto_1fr] items-start px-4 pt-2">
+        {/* The bar floats over the scrolling content with the iOS 27 scroll
+            edge effect (nav-scroll-edge in index.css) instead of a solid
+            background and a hairline */}
+        <div className="nav-scroll-edge absolute inset-x-0 top-0 z-10 pt-[env(safe-area-inset-top)]">
+          {/* The buttons sit 8pt below the safe area like the main screen's
+              header buttons, so they don't jump on the push, with the kit's
+              10pt under them: 8 + 44 + 10 = 62pt */}
+          <div className="mx-auto grid h-[62px] w-full max-w-md grid-cols-[1fr_auto_1fr] items-start px-4 pt-2">
             <Button
               variant="glass"
               size="icon"
@@ -195,34 +175,21 @@ const NavScreen = ({
             >
               <ChevronLeftSymbol />
             </Button>
-            <span
-              ref={barTitleRef}
-              aria-hidden
-              className="text-headline leading-11 font-semibold opacity-0"
-            >
-              {title}
-            </span>
-            <div className="justify-self-end">{action}</div>
-          </div>
-          <div
-            ref={barEdgeRef}
-            aria-hidden
-            className="absolute inset-x-0 bottom-0 h-[0.5px] bg-border opacity-0 transition-opacity"
-          />
-        </div>
-        <div
-          onScroll={handleScroll}
-          className="flex-1 overflow-y-auto overscroll-contain"
-        >
-          <div className="mx-auto w-full max-w-md px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom)+var(--keyboard-inset,0px))]">
             <h1
               id="nav-screen-title"
               ref={titleRef}
               tabIndex={-1}
-              className="pt-2 pb-2.5 text-large-title font-bold outline-none"
+              className="text-headline leading-11 font-semibold outline-none"
             >
               {title}
             </h1>
+            <div className="justify-self-end">{action}</div>
+          </div>
+        </div>
+        <div className="absolute inset-0 overflow-y-auto overscroll-contain">
+          {/* Content starts 8pt below the bar, so a card doesn't sit right
+              under the buttons; it scrolls on under the bar */}
+          <div className="mx-auto w-full max-w-md px-4 pt-[calc(env(safe-area-inset-top)+70px)] pb-[calc(1.5rem+env(safe-area-inset-bottom)+var(--keyboard-inset,0px))]">
             {children}
           </div>
         </div>

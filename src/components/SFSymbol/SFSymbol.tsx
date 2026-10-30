@@ -4,8 +4,13 @@ import type { CSSProperties } from 'react'
 // the 19pt size iOS 27 uses in toolbars, so the glyphs match the system's own
 // back, close and done buttons. They take the button's text color. The size
 // is set inline so the Button's default `size-5` for icons doesn't stretch it.
-const glyph = (width: number, height: number, d: string) => {
-  const style: CSSProperties = { width, height }
+// `opticalX` shifts a glyph off its geometric centre the way iOS does.
+const glyph = (width: number, height: number, d: string, opticalX = 0) => {
+  const style: CSSProperties = {
+    width,
+    height,
+    ...(opticalX && { transform: `translateX(${opticalX}px)` }),
+  }
 
   const Glyph = () => (
     <svg
@@ -21,11 +26,13 @@ const glyph = (width: number, height: number, d: string) => {
   return Glyph
 }
 
-// chevron.left
+// chevron.left; iOS centres it optically, 1.33pt left of its box's centre
+// (measured on Safari's own back button on iOS 27)
 export const ChevronLeftSymbol = glyph(
   10.91,
   18.82,
-  'M0 9.40479C0.00553381 9.2111 0.0442709 9.03402 0.116211 8.87354C0.188151 8.71305 0.298828 8.55811 0.448242 8.40869L8.76562 0.356934C9.00358 0.118978 9.29688 0 9.64551 0C9.87793 0 10.0882 0.0553386 10.2764 0.166016C10.4701 0.276693 10.6222 0.426107 10.7329 0.614258C10.8491 0.802409 10.9072 1.0127 10.9072 1.24512C10.9072 1.58822 10.7772 1.88981 10.5171 2.1499L2.99658 9.39648L10.5171 16.6514C10.7772 16.917 10.9072 17.2186 10.9072 17.5562C10.9072 17.7941 10.8491 18.0072 10.7329 18.1953C10.6222 18.3835 10.4701 18.5329 10.2764 18.6436C10.0882 18.7598 9.87793 18.8179 9.64551 18.8179C9.29688 18.8179 9.00358 18.6961 8.76562 18.4526L0.448242 10.4009C0.293294 10.2515 0.17985 10.0965 0.10791 9.93604C0.0359701 9.77002 0 9.59294 0 9.40479Z'
+  'M0 9.40479C0.00553381 9.2111 0.0442709 9.03402 0.116211 8.87354C0.188151 8.71305 0.298828 8.55811 0.448242 8.40869L8.76562 0.356934C9.00358 0.118978 9.29688 0 9.64551 0C9.87793 0 10.0882 0.0553386 10.2764 0.166016C10.4701 0.276693 10.6222 0.426107 10.7329 0.614258C10.8491 0.802409 10.9072 1.0127 10.9072 1.24512C10.9072 1.58822 10.7772 1.88981 10.5171 2.1499L2.99658 9.39648L10.5171 16.6514C10.7772 16.917 10.9072 17.2186 10.9072 17.5562C10.9072 17.7941 10.8491 18.0072 10.7329 18.1953C10.6222 18.3835 10.4701 18.5329 10.2764 18.6436C10.0882 18.7598 9.87793 18.8179 9.64551 18.8179C9.29688 18.8179 9.00358 18.6961 8.76562 18.4526L0.448242 10.4009C0.293294 10.2515 0.17985 10.0965 0.10791 9.93604C0.0359701 9.77002 0 9.59294 0 9.40479Z',
+  -1.33
 )
 
 // xmark
