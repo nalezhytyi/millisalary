@@ -108,11 +108,20 @@ const BreakdownScreen: React.FC<BreakdownScreenProps> = ({
 
       <ListGroup
         title="Your rate"
-        footer={`Pay is spread evenly over each working day (Mon–Fri) between your start and end time.${
-          showExchangeRate
-            ? ` Exchange rate: 1 ${monthlySalaryCurrency} = ${exchangeRate} ${currency}.`
-            : ''
-        }`}
+        footer={
+          <>
+            Pay is spread evenly over each working day{' '}
+            <span className="whitespace-nowrap">(Mon-Fri)</span> between your
+            start and end time.
+            {showExchangeRate && (
+              <>
+                <br />
+                Exchange rate: 1 {monthlySalaryCurrency} = {exchangeRate}{' '}
+                {currency}.
+              </>
+            )}
+          </>
+        }
       >
         <ListRow label="Per second">
           <span className="text-body font-semibold">

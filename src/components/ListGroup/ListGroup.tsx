@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 
 interface ListGroupProps {
   title: string
-  footer?: string
+  footer?: ReactNode
   children: ReactNode
 }
 
