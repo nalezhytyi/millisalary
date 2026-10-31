@@ -131,8 +131,10 @@ const NavScreen = ({
       return
     }
 
+    // A sheet or alert above the page closes on the same Esc first (Radix
+    // listens in the capture phase and marks the event handled)
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && !event.defaultPrevented) {
         requestClose('escape')
       }
     }

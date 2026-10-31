@@ -39,6 +39,9 @@ interface SettingsScreenProps {
   endHour: Date | null
   theme: Theme
   onThemeChange: (theme: Theme) => void
+  /** The browser can install the app (see useInstallPrompt) */
+  canInstall: boolean
+  onInstall: () => void
 }
 
 const THEME_OPTIONS: { value: Theme; label: string }[] = [
@@ -66,6 +69,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
   endHour,
   theme,
   onThemeChange,
+  canInstall,
+  onInstall,
 }) => {
   const saved = useMemo<SettingsValues>(
     () => ({
@@ -282,6 +287,24 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             />
           </div>
         </ListGroup>
+
+        {canInstall && (
+          <ListGroup
+            title="App"
+            footer="Opens full screen like a regular app and works offline."
+          >
+            {/* An action row like the ones in iOS Settings: the accent label
+                and no chevron, since it opens a sheet or the browser's
+                prompt rather than another page */}
+            <button
+              type="button"
+              onClick={onInstall}
+              className="flex min-h-[52px] w-full items-center px-4 text-left text-body text-primary outline-none [-webkit-tap-highlight-color:transparent] focus-visible:bg-fill-tertiary active:bg-fill-primary"
+            >
+              Add to Home Screen
+            </button>
+          </ListGroup>
+        )}
       </NavScreen>
       <DiscardAlert
         open={isDiscardAlertOpen}

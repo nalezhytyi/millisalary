@@ -41,9 +41,11 @@ const App: React.FC = () => {
   } = useAppState()
   const { theme, setTheme } = useTheme()
   const {
+    isInstallAvailable,
     isInstallBannerVisible,
     isInstallSheetOpen,
     handleInstallClick,
+    handleSettingsInstallClick,
     handleDismissInstallBanner,
     handleCloseInstallSheet,
   } = useInstallPrompt()
@@ -67,6 +69,8 @@ const App: React.FC = () => {
           endHour={endHour}
           theme={theme}
           onThemeChange={setTheme}
+          canInstall={isInstallAvailable}
+          onInstall={handleSettingsInstallClick}
         />
         <BreakdownScreen
           open={isBreakdownOpen}

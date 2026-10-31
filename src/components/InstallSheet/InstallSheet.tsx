@@ -63,7 +63,8 @@ const STEPS: ReactNode[] = isSafari26
     ]
 
 // iPhone only: a page can't add itself to the Home Screen there, so the
-// banner's Install button opens Safari's steps instead
+// banner's Install button and Settings' Add to Home Screen open Safari's steps
+// instead
 const InstallSheet = ({ open, onClose }: InstallSheetProps) => (
   <Sheet
     open={open}

@@ -4,6 +4,8 @@ import { useLocalStorage } from './useLocalStorage'
 
 export type InstallPlatform = 'ios' | 'android'
 
+type InstallSource = 'banner' | 'settings'
+
 // Chromium's install prompt event (not in the DOM typings)
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -11,7 +13,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 // Chrome can fire beforeinstallprompt before React mounts, so it's captured
-// as soon as this module loads and kept for the banner's Install button
+// as soon as this module loads and kept for the banner and Settings
 let deferredPrompt: BeforeInstallPromptEvent | null = null
 const promptListeners = new Set<() => void>()
 
@@ -92,36 +94,51 @@ export const useInstallPrompt = () => {
   }, [platform, setIsBannerHidden])
 
   // Android only offers an install while Chrome considers the app installable
-  // and not yet installed, which is when it fires beforeinstallprompt
-  const isInstallBannerVisible =
-    !isBannerHidden &&
-    (platform === 'ios' || (platform === 'android' && prompt !== null))
+  // and not yet installed, which is when it fires beforeinstallprompt.
+  // Settings keeps offering it after the banner is gone.
+  const isInstallAvailable =
+    platform === 'ios' || (platform === 'android' && prompt !== null)
+  const isInstallBannerVisible = !isBannerHidden && isInstallAvailable
+
+  // The banner and Settings install the same way: Safari's steps on iPhone,
+  // Chrome's prompt on Android
+  const install = useCallback(
+    (source: InstallSource) => {
+      if (platform === 'ios') {
+        // Safari can't tell whether the app was added, so seeing the steps
+        // once retires the banner
+        setIsInstallSheetOpen(true)
+        setIsBannerHidden(true)
+        return
+      }
+
+      if (!prompt) {
+        return
+      }
+
+      // The event can prompt only once; Chrome fires a new one if it's
+      // dismissed
+      setDeferredPrompt(null)
+      void prompt.prompt()
+      void prompt.userChoice.then(({ outcome }) => {
+        trackAmplitudeEvent('install_prompt_result', { outcome, source })
+        if (outcome === 'accepted') {
+          setIsBannerHidden(true)
+        }
+      })
+    },
+    [platform, prompt, setIsBannerHidden]
+  )
 
   const handleInstallClick = useCallback(() => {
     trackAmplitudeEvent('install_banner_clicked', { platform })
+    install('banner')
+  }, [install, platform])
 
-    if (platform === 'ios') {
-      // Safari can't tell whether the app was added, so seeing the steps once
-      // retires the banner
-      setIsInstallSheetOpen(true)
-      setIsBannerHidden(true)
-      return
-    }
-
-    if (!prompt) {
-      return
-    }
-
-    // The event can prompt only once; Chrome fires a new one if it's dismissed
-    setDeferredPrompt(null)
-    void prompt.prompt()
-    void prompt.userChoice.then(({ outcome }) => {
-      trackAmplitudeEvent('install_prompt_result', { outcome })
-      if (outcome === 'accepted') {
-        setIsBannerHidden(true)
-      }
-    })
-  }, [platform, prompt, setIsBannerHidden])
+  const handleSettingsInstallClick = useCallback(() => {
+    trackAmplitudeEvent('settings_install_clicked', { platform })
+    install('settings')
+  }, [install, platform])
 
   const handleDismissInstallBanner = useCallback(() => {
     setIsBannerHidden(true)
@@ -134,9 +151,11 @@ export const useInstallPrompt = () => {
   )
 
   return {
+    isInstallAvailable,
     isInstallBannerVisible,
     isInstallSheetOpen,
     handleInstallClick,
+    handleSettingsInstallClick,
     handleDismissInstallBanner,
     handleCloseInstallSheet,
   }
