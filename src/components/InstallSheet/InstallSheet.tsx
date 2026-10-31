@@ -94,7 +94,7 @@ const InstallSheet = ({ open, onClose }: InstallSheetProps) => (
       {STEPS.map((step, index) => (
         <div
           key={index}
-          className="relative flex items-center gap-3 px-4 py-3 after:absolute after:right-0 after:bottom-0 after:left-14 after:h-px after:bg-border last:after:hidden"
+          className="relative flex items-center gap-3 px-4 py-3 after:absolute after:right-4 after:bottom-0 after:left-14 after:h-px after:bg-border last:after:hidden"
         >
           <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary text-[15px] font-semibold text-primary-foreground">
             {index + 1}

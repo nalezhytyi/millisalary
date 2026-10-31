@@ -83,7 +83,7 @@ const BreakdownScreen: React.FC<BreakdownScreenProps> = ({
           return (
             <div
               key={key}
-              className="relative px-4 py-3 after:absolute after:right-0 after:bottom-0 after:left-4 after:h-[0.5px] after:bg-border last:after:hidden"
+              className="relative px-4 py-3 after:absolute after:right-4 after:bottom-0 after:left-4 after:h-[0.5px] after:bg-border last:after:hidden"
             >
               <div className="flex items-baseline justify-between gap-3">
                 <span className="shrink-0 text-body">{label}</span>
