@@ -34,28 +34,36 @@
   --fill-tertiary: rgb(118 118 128 / 12%);
   --fill-quaternary: rgb(116 116 128 / 8%);
   --segment-selected: #ffffff;
-  /* The iOS 27 kit's Glass button as rendered (Buttons page, light): a lens
-     that is greyer at the top and brighter towards the bottom, grey hairline
-     crescents on the left and right edges (the kit's 1.25px #d0d0d0, a touch
-     wider and darker so they render as strongly in a browser), a 0.5pt ring
-     and a 2% shadow */
+  /* Native iOS 27 glass on a light page, measured from a 3x screenshot of
+     the system's buttons: a white lens a little brighter than the page,
+     whitest at the top and bottom edges and in the lower half, with a white
+     inner rim along the top and bottom; grey hairline crescents on the left
+     and right edges, a 0.5pt ring and a 2% shadow underneath */
   --glass-fill: linear-gradient(
     to bottom,
-    rgb(238 238 238 / 85%),
-    rgb(248 248 248 / 85%) 55%,
-    rgb(252 252 252 / 90%)
+    rgb(255 255 255 / 85%),
+    rgb(255 255 255 / 45%) 25%,
+    rgb(255 255 255 / 50%) 50%,
+    rgb(255 255 255 / 75%) 70%,
+    rgb(255 255 255 / 90%)
   );
   --glass-shadow:
+    inset 0 2px 1.5px -0.5px #ffffff, inset 0 -2px 1.5px -0.5px #ffffff,
     1.5px 0 0 -0.75px #c8c8c8, -1.5px 0 0 -0.75px #c8c8c8,
     0 0 0 0.5px #e8e8e8, 0 8px 15px rgb(0 0 0 / 2%);
-  /* Glass Prominent (blue) buttons, as the kit renders them: the accent fill
-     with lighter 1px rims at the top and bottom and a 2% shadow */
+  /* Glass Prominent (blue) as native iOS 27 draws it: the accent fill with a
+     darker blue hairline at the very edge and, just inside it, a thin lit
+     cyan band along the top and bottom that fades out before the sides; a
+     2% shadow */
   --glass-prominent-fill: var(--primary);
   --glass-prominent-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 18%), inset 0 -1px 0 rgb(255 255 255 / 18%),
+    inset 0 0 0 0.35px rgb(0 40 140 / 30%),
+    inset 0 2px 0.5px -0.85px rgb(90 230 255 / 70%),
+    inset 0 -2px 0.5px -0.85px rgb(90 230 255 / 65%),
     0 8px 15px rgb(0 0 0 / 2%);
-  /* Glyphs on glass: the kit's vibrant labels (primary, tertiary) */
-  --glass-label: #1a1a1a;
+  /* Glyphs on glass: black like native glass buttons, and the kit's
+     tertiary label when disabled */
+  --glass-label: #000000;
   --glass-label-disabled: #bfbfbf;
   --overlay-alert: rgb(41 41 58 / 23%);
   --radius: 0.75rem;
