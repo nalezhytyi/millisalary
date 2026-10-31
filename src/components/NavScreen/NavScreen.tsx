@@ -1,4 +1,11 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeftSymbol } from '@/components/SFSymbol'
 import { Button } from '@/components/ui/button'
@@ -28,11 +35,21 @@ if (window.history.state?.navScreen) {
   window.history.replaceState(null, '')
 }
 
-// iOS 27 pushed page: slides in from the right over the main screen, with a
-// bar holding a round glass back chevron and the 17pt title. Rendered in a
-// portal on <body>
-// while open or closing so #root can be made inert without taking the page
-// with it, and so nothing waits off-screen.
+// The pages open right now, bottom to top. A page pushed from another page
+// covers it: the covered page shifts back like the main screen does
+// (data-covered in index.css) and can't be focused, and only the top page
+// answers Esc
+interface OpenPage {
+  setCovered: (covered: boolean) => void
+}
+
+const openPages: OpenPage[] = []
+
+// iOS 27 pushed page: slides in from the right over the main screen (or over
+// the page it was pushed from), with a bar holding a round glass back chevron
+// and the 17pt title. Rendered in a portal on <body> while open or closing so
+// #root can be made inert without taking the page with it, and so nothing
+// waits off-screen.
 const NavScreen = ({
   open,
   onClose,
@@ -45,6 +62,7 @@ const NavScreen = ({
   const [mounted, setMounted] = useState(open)
   const [closing, setClosing] = useState(false)
   const returnFocusTo = useRef<HTMLElement | null>(null)
+  const layerRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const onCloseRef = useRef(onClose)
@@ -54,6 +72,11 @@ const NavScreen = ({
   // close that called history.back() was asked for
   const hasHistoryEntry = useRef(false)
   const pendingMethod = useRef<NavCloseMethod | null>(null)
+  // How many pages were open under this one when it opened (0 over the main
+  // screen), and its place in openPages
+  const depth = useRef(0)
+  const openPage = useRef<OpenPage | null>(null)
+  const titleId = useId()
 
   useEffect(() => {
     onCloseRef.current = onClose
@@ -94,13 +117,25 @@ const NavScreen = ({
   }, [])
 
   // The main screen slides left (index.css) and cannot be focused or read
-  // while the page is up; both end as soon as the page starts to leave
+  // while the page is up, and so does a page this one was pushed from; both
+  // end as soon as the page starts to leave. The covered page is set
+  // directly, so it is focusable again before focus returns to it
   useEffect(() => {
     if (!isOpen) {
       return
     }
 
     const root = document.getElementById('root')
+    const page: OpenPage = {
+      setCovered: (covered) => {
+        const layer = layerRef.current
+
+        if (layer) {
+          layer.inert = covered
+          layer.toggleAttribute('data-covered', covered)
+        }
+      },
+    }
 
     returnFocusTo.current = document.activeElement as HTMLElement | null
     // data-nav-instant names the one transition the browser already animated
@@ -108,6 +143,10 @@ const NavScreen = ({
     if (document.documentElement.dataset.navInstant !== 'open') {
       delete document.documentElement.dataset.navInstant
     }
+    depth.current = openPages.length
+    openPages.at(-1)?.setCovered(true)
+    openPages.push(page)
+    openPage.current = page
     document.documentElement.dataset.navScreen = 'open'
     if (root) {
       root.inert = true
@@ -115,12 +154,20 @@ const NavScreen = ({
     titleRef.current?.focus({ preventScroll: true })
 
     return () => {
+      const index = openPages.indexOf(page)
+
+      openPages.splice(index, 1)
+      if (index === openPages.length) {
+        openPages.at(-1)?.setCovered(false)
+      }
       if (document.documentElement.dataset.navInstant !== 'close') {
         delete document.documentElement.dataset.navInstant
       }
-      delete document.documentElement.dataset.navScreen
-      if (root) {
-        root.inert = false
+      if (openPages.length === 0) {
+        delete document.documentElement.dataset.navScreen
+        if (root) {
+          root.inert = false
+        }
       }
       returnFocusTo.current?.focus({ preventScroll: true })
     }
@@ -134,7 +181,11 @@ const NavScreen = ({
     // A sheet or alert above the page closes on the same Esc first (Radix
     // listens in the capture phase and marks the event handled)
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !event.defaultPrevented) {
+      if (
+        event.key === 'Escape' &&
+        !event.defaultPrevented &&
+        openPages.at(-1) === openPage.current
+      ) {
         requestClose('escape')
       }
     }
@@ -144,21 +195,36 @@ const NavScreen = ({
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, requestClose])
 
-  // The page is a history entry, keyed by its title, so the browser's and
-  // Android's back close it like ‹ does. Pushing only when the current entry
-  // isn't this page's keeps StrictMode's second mount, and a page reopened by
-  // going forward, from adding another one
+  // The page is a history entry, keyed by its title and depth, so the
+  // browser's and Android's back close it like ‹ does. Pushing only when the
+  // current entry isn't this page's keeps StrictMode's second mount, and a
+  // page reopened by going forward, from adding another one
   useEffect(() => {
     if (!isOpen) {
       return
     }
 
+    const entry = { navScreen: title, navDepth: depth.current }
+
     if (window.history.state?.navScreen !== title) {
-      window.history.pushState({ navScreen: title }, '')
+      window.history.pushState(entry, '')
     }
     hasHistoryEntry.current = true
 
     const handlePopState = (event: PopStateEvent) => {
+      const state = event.state
+      const stateDepth = state?.navDepth ?? 0
+
+      // Back from a page pushed on top of this one lands on this page's
+      // entry, and going forward again lands above it: this page stays
+      if (
+        state?.navScreen &&
+        (stateDepth > depth.current ||
+          (stateDepth === depth.current && state.navScreen === title))
+      ) {
+        return
+      }
+
       const method = pendingMethod.current ?? 'history'
       const fromBrowser = pendingMethod.current === null
 
@@ -166,7 +232,7 @@ const NavScreen = ({
       // ‹ and Esc asked onBeforeClose already; a browser back can't be
       // cancelled, so put the entry back while the page asks
       if (fromBrowser && onBeforeCloseRef.current?.() === false) {
-        window.history.pushState({ navScreen: title }, '')
+        window.history.pushState(entry, '')
         return
       }
       hasHistoryEntry.current = false
@@ -275,6 +341,7 @@ const NavScreen = ({
 
   return createPortal(
     <div
+      ref={layerRef}
       className="nav-screen-layer fixed inset-0 z-50 overflow-hidden"
       data-closing={closing ? '' : undefined}
       onAnimationEnd={(event) => {
@@ -288,7 +355,7 @@ const NavScreen = ({
         ref={pageRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="nav-screen-title"
+        aria-labelledby={titleId}
         className="nav-screen-page absolute inset-0 bg-background"
       >
         {/* The bar floats over the scrolling content with the iOS 27 scroll
@@ -308,7 +375,7 @@ const NavScreen = ({
               <ChevronLeftSymbol />
             </Button>
             <h1
-              id="nav-screen-title"
+              id={titleId}
               ref={titleRef}
               tabIndex={-1}
               className="text-headline leading-11 font-semibold outline-none"

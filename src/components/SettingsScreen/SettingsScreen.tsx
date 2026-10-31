@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import ChoiceScreen from '@/components/ChoiceScreen'
 import CurrencySelect from '@/components/CurrencySelect'
 import DiscardAlert from '@/components/DiscardAlert'
 import ListGroup from '@/components/ListGroup'
@@ -6,7 +7,6 @@ import ListRow from '@/components/ListRow'
 import NavScreen, { type NavCloseMethod } from '@/components/NavScreen'
 import NumberInput from '@/components/NumberInput'
 import { CheckmarkSymbol } from '@/components/SFSymbol'
-import SegmentedControl from '@/components/SegmentedControl'
 import TimePicker from '@/components/TimePicker'
 import { Button } from '@/components/ui/button'
 import type { Theme } from '@/hooks'
@@ -49,6 +49,23 @@ const THEME_OPTIONS: { value: Theme; label: string }[] = [
   { value: 'light', label: 'Light' },
   { value: 'dark', label: 'Dark' },
 ]
+
+// The disclosure chevron of an iOS list row that pushes a page, in the
+// tertiary label color
+const DisclosureChevron = () => (
+  <svg
+    viewBox="0 0 8 14"
+    className="h-3.5 w-2 text-muted-foreground/50"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M1.5 1.5 7 7l-5.5 5.5" />
+  </svg>
+)
 
 const numberInputClasses =
   'h-[52px] w-32 border-0 bg-transparent p-0 text-right text-body shadow-none focus-visible:ring-0 dark:bg-transparent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield] md:text-body'
@@ -102,9 +119,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
   const [draftTheme, setDraftTheme] = useState(theme)
   const [wasOpen, setWasOpen] = useState(open)
   const [isDiscardAlertOpen, setIsDiscardAlertOpen] = useState(false)
+  const [isAppearanceOpen, setIsAppearanceOpen] = useState(false)
 
   if (open !== wasOpen) {
     setWasOpen(open)
+    setIsAppearanceOpen(false)
     if (open) {
       setDraft(saved)
       setDraftTheme(theme)
@@ -112,6 +131,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
   }
 
   const themeChanged = draftTheme !== theme
+  const draftThemeLabel = THEME_OPTIONS.find(
+    (option) => option.value === draftTheme
+  )?.label
   const hasChanges = getChangedFields(saved, draft).length > 0 || themeChanged
 
   const handleSave = () => {
@@ -274,20 +296,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </ListRow>
         </ListGroup>
 
-        <ListGroup
-          title="Appearance"
-          footer="System follows your device's light or dark setting."
-        >
-          <div className="p-2.5">
-            <SegmentedControl
-              aria-label="Appearance"
-              options={THEME_OPTIONS}
-              value={draftTheme}
-              onChange={setDraftTheme}
-            />
-          </div>
-        </ListGroup>
-
         {canInstall && (
           <ListGroup
             title="App"
@@ -299,13 +307,38 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             <button
               type="button"
               onClick={onInstall}
-              className="flex min-h-[52px] w-full items-center px-4 text-left text-body text-primary outline-none [-webkit-tap-highlight-color:transparent] focus-visible:bg-fill-tertiary active:bg-fill-primary"
+              className="flex min-h-[52px] w-full items-center px-4 text-left text-body text-primary outline-none [-webkit-tap-highlight-color:transparent] focus-visible:bg-fill-tertiary active:bg-fill-primary active:duration-0 motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
             >
               Add to Home Screen
             </button>
           </ListGroup>
         )}
+
+        <ListGroup>
+          <button
+            type="button"
+            onClick={() => setIsAppearanceOpen(true)}
+            className="flex min-h-[52px] w-full items-center justify-between gap-4 px-4 text-left text-body outline-none [-webkit-tap-highlight-color:transparent] focus-visible:bg-fill-tertiary active:bg-fill-primary active:duration-0 motion-safe:transition-colors motion-safe:duration-300 motion-safe:ease-out"
+          >
+            Appearance
+            <span className="flex items-center gap-3 text-muted-foreground">
+              {draftThemeLabel}
+              <DisclosureChevron />
+            </span>
+          </button>
+        </ListGroup>
       </NavScreen>
+      {/* Pushed over Settings; picking a theme only changes the draft */}
+      <ChoiceScreen
+        open={isAppearanceOpen}
+        onClose={() => setIsAppearanceOpen(false)}
+        onReopen={() => open && setIsAppearanceOpen(true)}
+        title="Appearance"
+        options={THEME_OPTIONS}
+        value={draftTheme}
+        onChange={setDraftTheme}
+        footer="System follows your device's light or dark setting."
+      />
       <DiscardAlert
         open={isDiscardAlertOpen}
         onKeepEditing={() => setIsDiscardAlertOpen(false)}

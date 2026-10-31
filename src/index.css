@@ -281,6 +281,26 @@ body {
 .nav-screen-layer[data-closing] .nav-screen-page {
   animation: nav-screen-out 0.35s var(--ease-ios) forwards;
 }
+/* A page pushed from another page (Settings > Appearance) covers it, and the
+   covered page shifts and fades like the main screen does under the first
+   one. Its layer keeps the page color behind it while covered and through
+   the pop, so the fade doesn't let the main screen show through. */
+.nav-screen-layer {
+  transition: background-color 0s 0.35s;
+}
+.nav-screen-layer[data-covered] {
+  background-color: var(--background);
+  transition: none;
+}
+.nav-screen-page {
+  transition:
+    transform 0.35s var(--ease-ios),
+    opacity 0.35s var(--ease-ios);
+}
+.nav-screen-layer[data-covered] .nav-screen-page {
+  transform: translateX(-30%);
+  opacity: 0.8;
+}
 .app-screen {
   transition:
     transform 0.35s var(--ease-ios),
@@ -294,7 +314,8 @@ html[data-nav-screen='open'] .app-screen {
    forward swipe; NavScreen sets data-nav-instant to `open` or `close`), so
    nothing slides a second time: the main screen snaps, and a page reopened
    by going forward appears without its slide-in */
-html[data-nav-instant] .app-screen {
+html[data-nav-instant] .app-screen,
+html[data-nav-instant] .nav-screen-page {
   transition: none;
 }
 html[data-nav-instant='open'] .nav-screen-layer:not([data-closing]) .nav-screen-page {
@@ -308,10 +329,12 @@ html[data-nav-instant='open'] .nav-screen-layer:not([data-closing]) .nav-screen-
   .nav-screen-layer[data-closing] .nav-screen-page {
     animation: nav-fade-out 0.15s linear forwards;
   }
-  .app-screen {
+  .app-screen,
+  .nav-screen-page {
     transition: none;
   }
-  html[data-nav-screen='open'] .app-screen {
+  html[data-nav-screen='open'] .app-screen,
+  .nav-screen-layer[data-covered] .nav-screen-page {
     transform: none;
   }
 }
